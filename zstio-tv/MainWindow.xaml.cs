@@ -24,7 +24,13 @@ namespace zstio_tv
             this.Left = 0;
 
             if (!Config.Developer)
+            {
                 this.Topmost = true;
+                developerbadge.Visibility = Visibility.Hidden;
+            } else
+            {
+                developerbadge.Visibility = Visibility.Visible;
+            }
 
             // Setup the scaling - fit on every tv without knowing the size.
             float DisplayScaleFactor = Math.Min(LocalMemory.Display[1] / 1366.0f, LocalMemory.Display[0] / 768.0f);
@@ -58,6 +64,11 @@ namespace zstio_tv
 
             handler_bar_clock.Text = IDateTime.CalculateClock();
             handler_bar_date.Text = IDateTime.CalculateDate();
+        }
+
+        private void developerbadgeMD(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            this.Close();
         }
     }
 }

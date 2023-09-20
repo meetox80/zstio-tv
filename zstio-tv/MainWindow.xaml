@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:zstio_tv"
         mc:Ignorable="d"
-        Title="zstio-tv" Loaded="WindowLoaded" Height="768" Width="1366" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None">
+        Title="zstio-tv" Loaded="WindowLoaded" Height="768" Width="1366" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" Icon="/logo.ico">
     <Grid Background="Black">
         <Grid x:Name="handler" Height="768" Width="1366" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0,0">
             <Grid.Background>
@@ -23,14 +23,22 @@
             <Grid x:Name="handler_bar" Width="300" HorizontalAlignment="Left">
                 <Rectangle x:Name="handler_bar_background" Stroke="#FF1E1E1E" Fill="#FF0A0303"/>
                 <StackPanel Margin="0,50,0,0">
-                    <TextBlock x:Name="handler_bar_clock" Height="80" FontFamily="/Font/InterBold/#Inter" Text="00:00" Foreground="White" TextAlignment="Center" FontSize="75" VerticalAlignment="Top"/>
+                    <TextBlock x:Name="handler_bar_clock" Height="80" FontFamily="/Font/InterBold/#Inter" Text="00:00" Foreground="White" TextAlignment="Center" FontSize="75" VerticalAlignment="Top">
+                        <TextBlock.Effect>
+                            <DropShadowEffect Color="White" Direction="0" ShadowDepth="0" BlurRadius="20" Opacity="0.25"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
                     <TextBlock x:Name="handler_bar_date" Height="25" FontFamily="/Font/InterBold/#Inter" Text="20 Września - Środa" Foreground="White" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="0,10,0,0"/>
 
                     <StackPanel Orientation="Horizontal" Margin="0,20,0,0" HorizontalAlignment="Center">
-                        <Grid x:Name="handler_bar_lessonwidget" Height="45" Width="250">
-                            <Rectangle RadiusX="10" RadiusY="10" Fill="#FF0A0505" Stroke="#FF272727"/>
-                            <TextBlock x:Name="handler_bar_lessonwidget_title" FontFamily="/Font/InterBold/#Inter" FontSize="10" Foreground="White" Text="Czas do konca xxxxx:" TextAlignment="Center" Margin="0,5,0,0"/>
-                            <TextBlock x:Name="handler_bar_lessonwidget_timer" FontFamily="/Font/InterBold/#Inter" FontSize="20" Foreground="White" Text="00:00:00" TextAlignment="Center" Margin="0,17.5,0,0"/>
+                        <Grid x:Name="handler_bar_lessonwidget" Height="60" Width="250">
+                            <Rectangle RadiusX="10" RadiusY="10" Fill="#FF0A0505" Stroke="#FF272727">
+                                <Rectangle.Effect>
+                                    <DropShadowEffect ShadowDepth="0" Direction="0" BlurRadius="15"/>
+                                </Rectangle.Effect>
+                            </Rectangle>
+                            <TextBlock x:Name="handler_bar_lessonwidget_title" FontFamily="/Font/InterBold/#Inter" FontSize="14" Foreground="White" Text="Czas do konca xxxxx:" TextAlignment="Center" Margin="0,5,0,0"/>
+                            <TextBlock x:Name="handler_bar_lessonwidget_timer" FontFamily="/Font/InterBold/#Inter" FontSize="28" Foreground="White" Text="00:00:00" TextAlignment="Center" Margin="0,22.5,0,0"/>
                         </Grid>
                     </StackPanel>
                 </StackPanel>
@@ -48,6 +56,92 @@
                     </StackPanel>
                 </Grid>
             </Grid>
+
+            <Grid x:Name="handler_content" Width="1066" HorizontalAlignment="Right">
+
+                <TabControl Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}">
+                    <TabItem Header="TabItem" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Visibility="Collapsed">
+                        <Grid>
+                            <Label Content="tab1" Foreground="White"/>
+                        </Grid>
+                    </TabItem>
+                    
+                    <TabItem Header="TabItem" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Visibility="Collapsed">
+                        <Grid>
+                            <Label Content="tab2" Foreground="White"/>
+                        </Grid>
+                    </TabItem>
+                    
+                    <TabItem Header="TabItem" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Visibility="Collapsed">
+                        <Grid>
+                            <Label Content="tab3" Foreground="White"/>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem Header="TabItem" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Visibility="Collapsed">
+                        <Grid>
+                            <Label Content="tab4" Foreground="White"/>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem Header="TabItem" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Visibility="Collapsed">
+                        <Grid>
+                            <Label Content="tab5" Foreground="White"/>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+
+                <Grid x:Name="handler_content_description" VerticalAlignment="Bottom" Height="75">
+                    <Grid x:Name="handler_content_description_warning" Width="866" HorizontalAlignment="Left"></Grid>
+                    <Grid x:Name="handler_content_description_pages" Width="200" HorizontalAlignment="Right">
+                        <Rectangle Height="50" Width="150" RadiusX="7.5" RadiusY="7.5" Fill="#FF0D0A0A" Stroke="#FF271E1E"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8"/>
+                            <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
+                            <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
+                            <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
+                            <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <!-- Developer mode information (to not mess things when releasing, for example topmost) -->
+            <Label Cursor="Hand" x:Name="developerbadge" Content="Developer mode" FontSize="14" FontFamily="/Font/InterBold/#Inter" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,10,0" Opacity="0.5" MouseDown="developerbadgeMD">
+                <Label.Triggers>
+                    <EventTrigger RoutedEvent="Label.MouseEnter">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <Storyboard x:Name="developerbadge_opacityin">
+                                    <DoubleAnimation From="0.5" To="1" Duration="00:00:0.5" BeginTime="00:00:00"
+                                    Storyboard.TargetName="developerbadge" 
+                                    Storyboard.TargetProperty="Opacity">
+                                        <DoubleAnimation.EasingFunction>
+                                            <CubicEase EasingMode="EaseOut"></CubicEase>
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+
+                    <EventTrigger RoutedEvent="Label.MouseLeave">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <Storyboard x:Name="developerbadge_opacityout">
+                                    <DoubleAnimation From="1" To="0.5" Duration="00:00:0.5" BeginTime="00:00:00"
+                                    Storyboard.TargetName="developerbadge" 
+                                    Storyboard.TargetProperty="Opacity">
+                                        <DoubleAnimation.EasingFunction>
+                                            <CubicEase EasingMode="EaseOut"></CubicEase>
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Label.Triggers>
+            </Label>
         </Grid>
     </Grid>
 </Window>
