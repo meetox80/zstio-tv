@@ -25,6 +25,14 @@
                 <StackPanel Margin="0,50,0,0">
                     <TextBlock x:Name="handler_bar_clock" Height="80" FontFamily="/Font/InterBold/#Inter" Text="00:00" Foreground="White" TextAlignment="Center" FontSize="75" VerticalAlignment="Top"/>
                     <TextBlock x:Name="handler_bar_date" Height="25" FontFamily="/Font/InterBold/#Inter" Text="20 Września - Środa" Foreground="White" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="0,10,0,0"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,20,0,0" HorizontalAlignment="Center">
+                        <Grid x:Name="handler_bar_lessonwidget" Height="45" Width="250">
+                            <Rectangle RadiusX="10" RadiusY="10" Fill="#FF0A0505" Stroke="#FF272727"/>
+                            <TextBlock x:Name="handler_bar_lessonwidget_title" FontFamily="/Font/InterBold/#Inter" FontSize="10" Foreground="White" Text="Czas do konca xxxxx:" TextAlignment="Center" Margin="0,5,0,0"/>
+                            <TextBlock x:Name="handler_bar_lessonwidget_timer" FontFamily="/Font/InterBold/#Inter" FontSize="20" Foreground="White" Text="00:00:00" TextAlignment="Center" Margin="0,17.5,0,0"/>
+                        </Grid>
+                    </StackPanel>
                 </StackPanel>
                 <Grid x:Name="handler_bar_zstiofm" Height="100" VerticalAlignment="Bottom">
                     <StackPanel Orientation="Horizontal">

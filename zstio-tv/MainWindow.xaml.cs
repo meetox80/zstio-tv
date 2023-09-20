@@ -14,6 +14,9 @@ namespace zstio_tv
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
+            // Reload the API in order to start Lesson dispatcher
+            IDateTime.ReloadDateAPI();
+
             // Setup the display height and width, make it fullscreen
             this.Height = LocalMemory.Display[0];
             this.Width = LocalMemory.Display[1];
@@ -33,6 +36,20 @@ namespace zstio_tv
             ClockTimer.Interval = TimeSpan.FromSeconds(10);
             ClockTimer.Tick += ClockTimerTick;
             ClockTimer.Start();
+
+            // Setup the lesson/session dispatcher
+            DispatcherTimer LessonTimer = new DispatcherTimer();
+            LessonTimer.Interval = TimeSpan.FromSeconds(1);
+            LessonTimer.Tick += LessonTimerTick;
+            LessonTimer.Start();
+        }
+
+        private void LessonTimerTick(object sender, EventArgs e)
+        {
+            string[] GetLessonsOutput = ILesson.GetLessons();
+
+            handler_bar_lessonwidget_title.Text = GetLessonsOutput[0];
+            handler_bar_lessonwidget_timer.Text = GetLessonsOutput[1];
         }
 
         private void ClockTimerTick(object sender, EventArgs e)

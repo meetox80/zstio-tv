@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.Net.Http;
 using System.Text.RegularExpressions;
-using System.Windows;
 
 namespace zstio_tv.Helpers
 {
