@@ -113,7 +113,7 @@ namespace zstio_tv.Helpers
                     break;
             }
 
-            return $"{ProcessMonth}-{Day}";
+            return $"{Day} {Month} - {WeekDay}";
         }
     }
 }
