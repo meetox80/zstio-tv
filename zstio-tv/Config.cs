@@ -4,6 +4,7 @@
     {
         public static bool Developer = true;
         public static string TimeAPI = "http://worldtimeapi.org/api/timezone/Europe/Warsaw";
+        public static string ReplacementsAPI = "https://zastepstwa-zstio.netlify.app/api/getSubstitutions";
 
         public static string[] LessonTimes = {
             "8:00 - 8:45",

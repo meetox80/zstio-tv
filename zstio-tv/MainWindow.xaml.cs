@@ -9,9 +9,11 @@ namespace zstio_tv
 {
     public partial class MainWindow : Window
     {
+        public static MainWindow _Instance;
         public MainWindow()
         {
             InitializeComponent();
+            _Instance = this;
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)

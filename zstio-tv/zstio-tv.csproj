@@ -208,6 +208,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="Helpers\IDateTime.cs" />
     <Compile Include="Helpers\ILesson.cs" />
+    <Compile Include="Helpers\IReplacements.cs" />
     <Compile Include="LocalMemory.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
