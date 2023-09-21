@@ -23,5 +23,7 @@
             //"19:05 - 20:00", - lesson timer development at night :3
             //"20:10 - 21:05",
         };
+
+        public static string Warning = "Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych.";
     }
 }

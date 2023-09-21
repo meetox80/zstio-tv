@@ -58,11 +58,49 @@
             </Grid>
 
             <Grid x:Name="handler_content" Width="1066" HorizontalAlignment="Right">
-
-                <TabControl Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}">
+                <TabControl x:Name="handler_content_tabcontrol" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" SelectionChanged="TabControl_SelectionChanged">
                     <TabItem Header="TabItem" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Visibility="Collapsed">
-                        <Grid>
-                            <Label Content="tab1" Foreground="White"/>
+                        <Grid x:Name="handler_content_tabcontrol_replacements" VerticalAlignment="Top" Margin="0,00,0,0">
+                            <TextBlock x:Name="handler_content_tabcontrol_replacements_titledate" FontSize="16" Margin="0,15,0,0" FontFamily="/Font/InterBold/#Inter" Opacity="0.75" Foreground="White" TextAlignment="Center" HorizontalAlignment="Center" Text="Zastepstwa na dzien --.--.----"/>
+                            
+                            <StackPanel Orientation="Horizontal" Opacity="0.75" Width="1000">
+                                <Grid Width="45" HorizontalAlignment="Left" Height="20">
+                                    <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Lekcja" TextAlignment="Center" HorizontalAlignment="Center"/>
+                                </Grid> <!-- Mark:Lekcja -->
+                                
+                                <Grid Width="175" HorizontalAlignment="Left" Height="20">
+                                    <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Oddział" TextAlignment="Center" HorizontalAlignment="Center"/>
+                                </Grid> <!-- Mark:Oddział -->
+                                
+                                <Grid Width="300" HorizontalAlignment="Left" Height="20">
+                                    <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Nauczyciel" TextAlignment="Center" HorizontalAlignment="Center"/>
+                                </Grid> <!-- Mark:Nauczyciel -->
+                                
+                                <Grid Width="300" HorizontalAlignment="Left" Height="20">
+                                    <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Zastepstwo" TextAlignment="Center" HorizontalAlignment="Center"/>
+                                </Grid> <!-- Mark:Zastępstwo -->
+                                
+                                <Grid Width="150" HorizontalAlignment="Left" Height="20">
+                                    <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Sala" TextAlignment="Center" HorizontalAlignment="Center"/>
+                                </Grid> <!-- Mark:Sala -->
+                            </StackPanel>
+                            
+                            <Grid x:Name="handler_content_tabcontrol_replacements_fields" Margin="0,75,0,0">
+                                <Grid VerticalAlignment="Top">
+                                    <!-- Field example -->
+                                    <Rectangle Height="45" Width="1000" Fill="#FF0E0B0B" RadiusX="5" RadiusY="5"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Grid Width="45" Margin="30,0,0,0">
+                                            <Rectangle Height="45" Width="45" RadiusX="5" RadiusY="5" Fill="#FF111010" Stroke="#FF271E1E"/>
+                                            <TextBlock Text="1" FontFamily="/Font/InterBold/#Inter" Foreground="White" TextAlignment="Center" FontSize="24" Margin="0,7.5,0,0"/>
+                                        </Grid> <!-- Mark:Lekcja -->
+
+                                        <Grid Width="175">
+                                            
+                                        </Grid> <!-- Mark:Oddział -->
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
                         </Grid>
                     </TabItem>
                     
@@ -91,11 +129,16 @@
                     </TabItem>
                 </TabControl>
 
-                <Grid x:Name="handler_content_description" VerticalAlignment="Bottom" Height="75">
-                    <Grid x:Name="handler_content_description_warning" Width="866" HorizontalAlignment="Left"></Grid>
+                <Grid x:Name="handler_content_description" VerticalAlignment="Bottom" Height="75" Margin="0,0,0,15">
+                    <Grid x:Name="handler_content_description_warning" Width="900" HorizontalAlignment="Left">
+                        <Rectangle Height="50" Width="825" RadiusX="7.5" RadiusY="7.5" Fill="#FF0D0A0A" Stroke="#FF271E1E"/>
+                        <!-- Text placed there is just an placeholder. -->
+                        <TextBlock x:Name="handler_content_description_warning_label" FontSize="13" FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych." Opacity="0.75" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                    
                     <Grid x:Name="handler_content_description_pages" Width="200" HorizontalAlignment="Right">
                         <Rectangle Height="50" Width="150" RadiusX="7.5" RadiusY="7.5" Fill="#FF0D0A0A" Stroke="#FF271E1E"/>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <StackPanel x:Name="handler_content_description_pages_display" Orientation="Horizontal" HorizontalAlignment="Center">
                             <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8"/>
                             <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
                             <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
@@ -103,6 +146,14 @@
                             <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
                         </StackPanel>
                     </Grid>
+                </Grid>
+
+                <Grid Height="10" VerticalAlignment="Bottom">
+                    <Rectangle x:Name="handler_content_tabchangeprogress" Width="10" Fill="#FFCC4E4E" HorizontalAlignment="Left" RadiusX="5" RadiusY="5">
+                        <Rectangle.Effect>
+                            <DropShadowEffect Color="#FFCC4E4E" ShadowDepth="0" Direction="0" BlurRadius="20"/>
+                        </Rectangle.Effect>
+                    </Rectangle>
                 </Grid>
             </Grid>
 
