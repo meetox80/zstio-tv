@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
@@ -20,6 +22,8 @@ namespace zstio_tv
         {
             // Reload the API in order to start Lesson dispatcher
             IDateTime.ReloadDateAPI();
+            // Reload the Replacements functionality
+            ReplacementsGETAPI_Tick(null, null);
 
             // Setup the warning display, if the warning string is empty; then hide.
             if (Config.Warning == "")
@@ -63,6 +67,38 @@ namespace zstio_tv
             TabTimer.Interval = TimeSpan.FromSeconds(1);
             TabTimer.Tick += TabTimerTick;
             TabTimer.Start();
+
+            // Dispatcher for substitutions/replacements
+            DispatcherTimer ReplacementsGETAPI = new DispatcherTimer();
+            ReplacementsGETAPI.Interval = TimeSpan.FromHours(1);
+            ReplacementsGETAPI.Tick += ReplacementsGETAPI_Tick;
+            ReplacementsGETAPI.Start();
+            DispatcherTimer ReplacementsCALC = new DispatcherTimer();
+            ReplacementsCALC.Interval = TimeSpan.FromSeconds(10);
+            ReplacementsCALC.Tick += ReplacementsCALC_Tick;
+            ReplacementsCALC.Start();
+        }
+
+        private void ReplacementsCALC_Tick(object sender, EventArgs e)
+        {
+            IReplacements.ConfigureReplacements();
+        }
+
+        private void ReplacementsGETAPI_Tick(object sender, EventArgs e)
+        {
+            // Contact with the api responsible for replacements/substitutions
+            using (HttpClient Client = new HttpClient())
+            {
+                try
+                {
+                    LocalMemory.ReplacementsAPIResponse = Client.GetStringAsync(Config.ReplacementsAPI).Result;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+            }
+            Console.WriteLine($"-> {LocalMemory.ReplacementsAPIResponse}");
         }
 
         int PageTime = 0; int PageIndex = 0;

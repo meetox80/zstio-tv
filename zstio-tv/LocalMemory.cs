@@ -7,5 +7,6 @@ namespace zstio_tv
         public static int[] Display = { (int)SystemParameters.PrimaryScreenHeight, (int)SystemParameters.PrimaryScreenWidth };
 
         public static string DateAPIResponse = "";
+        public static string ReplacementsAPIResponse = "";
     }
 }

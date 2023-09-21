@@ -1,19 +1,70 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net.Http;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace zstio_tv.Helpers
 {
+
     internal class IReplacements
     {
-        public static void ConfigureReplacements()
+        public class Substitution
         {
-
+            public string lesson { get; set; }
+            public string branch { get; set; }
+            public string subject { get; set; }
+            public string @class { get; set; }
+            public string @case { get; set; }
+            public string message { get; set; }
         }
 
-        public static void PlaceElement(int LessonNumber, string branch, string teacher, string replacement, string classroom)
+        public class Table
+        {
+            public List<Substitution> zastepstwa { get; set; }
+        }
+
+        public class Root
+        {
+            public List<Table> tables { get; set; }
+        }
+        public static void ConfigureReplacements()
+        {
+            Root root = JsonConvert.DeserializeObject<Root>(LocalMemory.ReplacementsAPIResponse);
+
+            foreach (var table in root.tables)
+            {
+                foreach (var substitution in table.zastepstwa)
+                {
+                    string replacement;
+                    if (substitution.message == "")
+                    {
+                        replacement = substitution.@case;
+                    }
+                    else
+                    {
+                        replacement = substitution.message;
+                    }
+
+                    if (substitution.@class == "")
+                    {
+                        substitution.@class = "-";
+                    }
+
+                    substitution.branch = substitution.branch.Replace("|", " - ");
+
+                    PlaceElement(substitution.lesson.Split(',')[0], substitution.branch, substitution.subject, replacement, substitution.@class);
+                }
+            }
+        }
+
+        public static void PlaceElement(string LessonNumber, string branch, string teacher, string replacement, string classroom)
         {
             Grid HandlerGrid = new Grid();
             HandlerGrid.VerticalAlignment = VerticalAlignment.Top;
