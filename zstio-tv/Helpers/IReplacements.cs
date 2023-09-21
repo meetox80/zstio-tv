@@ -27,6 +27,7 @@ namespace zstio_tv.Helpers
 
         public class Table
         {
+            public string time { get; set; }
             public List<Substitution> zastepstwa { get; set; }
         }
 
@@ -61,6 +62,8 @@ namespace zstio_tv.Helpers
 
                     PlaceElement(substitution.lesson.Split(',')[0], substitution.branch, substitution.subject, replacement, substitution.@class);
                 }
+
+                MainWindow._Instance.handler_content_tabcontrol_replacements_titledate.Text = $"Zastępstwa na dzień {table.time.Substring(7)}";
             }
         }
 
