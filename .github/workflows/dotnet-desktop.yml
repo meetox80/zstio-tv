@@ -1,0 +1,31 @@
+name: Build and Release an development build of zstio-tv
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2.0.9
+
+    - name: Restore NuGet packages
+      run: nuget restore ./zstio-tv.sln
+
+    - name: Build WPF App
+      run: msbuild ./zstio-tv.sln /p:Configuration=Release /p:Platform="Any CPU"
+
+    - name: Publish Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: DEV-ZSTIOTV-${{ github.run_number }}.exe
+        path: ./path/to/your/build/output/folder
