@@ -1,18 +1,13 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net.Http;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace zstio_tv.Helpers
 {
-
     internal class IReplacements
     {
         public class Substitution
@@ -35,32 +30,50 @@ namespace zstio_tv.Helpers
         {
             public List<Table> tables { get; set; }
         }
+
+        public static int SpacingWidth = 2;
+        // When theres an break, it clears the lesson. There is an backup to still display the replacements no matter if theres an lesson or not.
+        public static int CurrentLessonIndexBackup;
         public static void ConfigureReplacements()
         {
+            if (ILesson.CurrentLessonIndex > CurrentLessonIndexBackup)
+            {
+                CurrentLessonIndexBackup = ILesson.CurrentLessonIndex;
+            }
+            MainWindow._Instance.handler_content_tabcontrol_replacements_fields.Children.Clear();
+
             Root root = JsonConvert.DeserializeObject<Root>(LocalMemory.ReplacementsAPIResponse);
 
             foreach (var table in root.tables)
             {
-                foreach (var substitution in table.zastepstwa)
+                int TableNum = 0; TableNum++;
+                if (TableNum == 1)
                 {
-                    string replacement;
-                    if (substitution.message == "")
+                    foreach (var substitution in table.zastepstwa)
                     {
-                        replacement = substitution.@case;
-                    }
-                    else
-                    {
-                        replacement = substitution.message;
-                    }
+                        Console.WriteLine(ILesson.CurrentLessonIndex + 1);
+                        if (CurrentLessonIndexBackup < Int32.Parse(substitution.lesson.Split(',')[0]))
+                        {
+                            string replacement;
+                            if (substitution.message == "")
+                            {
+                                replacement = substitution.@case;
+                            }
+                            else
+                            {
+                                replacement = substitution.message;
+                            }
 
-                    if (substitution.@class == "")
-                    {
-                        substitution.@class = "-";
+                            if (substitution.@class == "")
+                            {
+                                substitution.@class = "-";
+                            }
+
+                            substitution.branch = substitution.branch.Replace("|", " - ");
+
+                            PlaceElement(substitution.lesson.Split(',')[0], substitution.branch, substitution.subject, replacement, substitution.@class);
+                        }
                     }
-
-                    substitution.branch = substitution.branch.Replace("|", " - ");
-
-                    PlaceElement(substitution.lesson.Split(',')[0], substitution.branch, substitution.subject, replacement, substitution.@class);
                 }
 
                 MainWindow._Instance.handler_content_tabcontrol_replacements_titledate.Text = $"Zastępstwa na dzień {table.time.Substring(7)}";
@@ -84,7 +97,6 @@ namespace zstio_tv.Helpers
             StackPanel HandlerPanel = new StackPanel();
             HandlerPanel.Orientation = Orientation.Horizontal;
 
-
             Grid LessonNumberGrid = new Grid();
             LessonNumberGrid.Width = 45;
             LessonNumberGrid.Margin = new Thickness(30, 0, 0, 0);
@@ -107,7 +119,7 @@ namespace zstio_tv.Helpers
             HandlerPanel.Children.Add(LessonNumberGrid);
 
             Grid BranchGrid = new Grid();
-            BranchGrid.Width = 175;
+            BranchGrid.Width = 190 - SpacingWidth;
             TextBlock BranchTextBlock = new TextBlock();
             BranchTextBlock.Text = $"{branch}";
             BranchTextBlock.FontFamily = new FontFamily(new Uri("pack://application:,,,/"), "./Font/InterBold/#Inter");
@@ -117,9 +129,13 @@ namespace zstio_tv.Helpers
             BranchTextBlock.VerticalAlignment = VerticalAlignment.Center;
             BranchGrid.Children.Add(BranchTextBlock);
             HandlerPanel.Children.Add(BranchGrid);
+            Rectangle BranchSpacingRectangle = new Rectangle();
+            BranchSpacingRectangle.Width = SpacingWidth;
+            BranchSpacingRectangle.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF202020"));
+            HandlerPanel.Children.Add(BranchSpacingRectangle);
 
             Grid TeacherGrid = new Grid();
-            TeacherGrid.Width = 300;
+            TeacherGrid.Width = 300 - SpacingWidth;
             TextBlock TeacherTextBlock = new TextBlock();
             TeacherTextBlock.Text = $"{teacher}";
             TeacherTextBlock.FontFamily = new FontFamily(new Uri("pack://application:,,,/"), "./Font/InterBold/#Inter");
@@ -129,9 +145,13 @@ namespace zstio_tv.Helpers
             TeacherTextBlock.VerticalAlignment = VerticalAlignment.Center;
             TeacherGrid.Children.Add(TeacherTextBlock);
             HandlerPanel.Children.Add(TeacherGrid);
+            Rectangle TeacherSpacingRectangle = new Rectangle();
+            TeacherSpacingRectangle.Width = SpacingWidth;
+            TeacherSpacingRectangle.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF202020"));
+            HandlerPanel.Children.Add(TeacherSpacingRectangle);
 
             Grid ReplacementGrid = new Grid();
-            ReplacementGrid.Width = 300;
+            ReplacementGrid.Width = 300 - SpacingWidth;
             TextBlock ReplacementTextBlock = new TextBlock();
             ReplacementTextBlock.Text = $"{replacement}";
             ReplacementTextBlock.FontFamily = new FontFamily(new Uri("pack://application:,,,/"), "./Font/InterBold/#Inter");
@@ -143,7 +163,7 @@ namespace zstio_tv.Helpers
             HandlerPanel.Children.Add(ReplacementGrid);
 
             Grid ClassroomGrid = new Grid();
-            ClassroomGrid.Width = 150;
+            ClassroomGrid.Width = 180;
             TextBlock ClassroomTextBlock = new TextBlock();
             ClassroomTextBlock.Text = $"{classroom}";
             ClassroomTextBlock.FontFamily = new FontFamily(new Uri("pack://application:,,,/"), "./Font/InterBold/#Inter");
@@ -151,6 +171,12 @@ namespace zstio_tv.Helpers
             ReplacementTextBlock.FontSize = 16;
             ClassroomTextBlock.TextAlignment = TextAlignment.Center;
             ClassroomTextBlock.VerticalAlignment = VerticalAlignment.Center;
+            Rectangle ClassroomBackground = new Rectangle();
+            ClassroomBackground.RadiusX = 5;
+            ClassroomBackground.RadiusY = 5;
+            ClassroomBackground.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF111010"));
+            ClassroomBackground.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF271E1E"));
+            ClassroomGrid.Children.Add(ClassroomBackground);
             ClassroomGrid.Children.Add(ClassroomTextBlock);
             HandlerPanel.Children.Add(ClassroomGrid);
 

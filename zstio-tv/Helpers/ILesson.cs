@@ -4,12 +4,11 @@ namespace zstio_tv.Helpers
 {
     internal class ILesson
     {
+        public static int CurrentLessonIndex = -1;
         public static string[] GetLessons()
         {
             // Fetch the current time each time the method is called
             DateTime CurrentTime = DateTime.Now;
-
-            int CurrentLessonIndex = -1;
 
             for (int i = 0; i < Config.LessonTimes.Length; i++)
             {
@@ -30,7 +29,7 @@ namespace zstio_tv.Helpers
                 DateTime CurrentLessonEndTime = DateTime.Parse(Config.LessonTimes[CurrentLessonIndex].Split('-')[1].Trim());
                 TimeSpan RemainingTime = CurrentLessonEndTime - CurrentTime;
 
-                return new string[] { "Czas do konca lekcji:", $"{RemainingTime.ToString(@"hh\:mm\:ss")}" };
+                return new string[] { $"Czas do konca {CurrentLessonIndex + 1} lekcji: ", $"{RemainingTime.ToString(@"hh\:mm\:ss")}" };
             }
             else
             {

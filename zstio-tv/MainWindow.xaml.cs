@@ -22,8 +22,9 @@ namespace zstio_tv
         {
             // Reload the API in order to start Lesson dispatcher
             IDateTime.ReloadDateAPI();
-            // Reload the Replacements functionality
+            // Reload the Replacements functionality, start the replacements scrolling
             ReplacementsGETAPI_Tick(null, null);
+            ReplacementsCALC_Tick(null, null);
 
             // Setup the warning display, if the warning string is empty; then hide.
             if (Config.Warning == "")
@@ -79,10 +80,7 @@ namespace zstio_tv
             ReplacementsCALC.Start();
         }
 
-        private void ReplacementsCALC_Tick(object sender, EventArgs e)
-        {
-            IReplacements.ConfigureReplacements();
-        }
+        private void ReplacementsCALC_Tick(object sender, EventArgs e) => IReplacements.ConfigureReplacements();
 
         private void ReplacementsGETAPI_Tick(object sender, EventArgs e)
         {
@@ -101,15 +99,16 @@ namespace zstio_tv
             Console.WriteLine($"-> {LocalMemory.ReplacementsAPIResponse}");
         }
 
-        int PageTime = 0; int PageIndex = 0;
+        int PageTime = 0; int PageIndex = 0; public static int PageLength = 30;
         private void TabTimerTick(object sender, EventArgs e)
         {
-            // 30 Seconds
-            if (PageTime == 30)
+            if (PageTime == PageLength)
             {
-                PageIndex++;
-                // 5 Pages
-                if (PageIndex > 5)
+                // Im currently disabling this cause we aint got ideas for other pages lmao
+                // PageIndex++;
+
+                // 5 pages, but starting from 0
+                if (PageIndex == 4)
                 {
                     PageIndex = 0;
                 }
@@ -167,13 +166,6 @@ namespace zstio_tv
             handler_bar_date.Text = IDateTime.CalculateDate();
         }
 
-        private void developerbadgeMD(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void TabControl_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-        }
+        private void developerbadgeMD(object sender, System.Windows.Input.MouseButtonEventArgs e) => this.Close();
     }
 }

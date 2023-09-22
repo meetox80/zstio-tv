@@ -46,8 +46,8 @@
                     <StackPanel Orientation="Horizontal">
                         <Grid Width="180" Margin="20,20,0,0">
                             <StackPanel>
-                                <Label FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="20" Content="Anyżowe żelki"/>
-                                <Label FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="15" Content="chivas" Opacity="0.75" Margin="0,-7.5,0,0"/>
+                                <Label FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="20" Content="No data avalible."/>
+                                <Label FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="15" Content="null" Opacity="0.75" Margin="0,-7.5,0,0"/>
                             </StackPanel>
                         </Grid>
                         <Grid Width="96">
@@ -58,7 +58,7 @@
             </Grid>
 
             <Grid x:Name="handler_content" Width="1066" HorizontalAlignment="Right">
-                <TabControl x:Name="handler_content_tabcontrol" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" SelectionChanged="TabControl_SelectionChanged">
+                <TabControl x:Name="handler_content_tabcontrol" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}">
                     <TabItem Header="TabItem" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Visibility="Collapsed">
                         <Grid x:Name="handler_content_tabcontrol_replacements" VerticalAlignment="Top" Margin="0,10,0,0">
                             <Grid Margin="0,10,0,0">
@@ -70,30 +70,30 @@
                                     </Grid>
                                     <!-- Mark:Lekcja -->
 
-                                    <Grid Width="175" HorizontalAlignment="Left" Height="20">
+                                    <Grid Width="190" HorizontalAlignment="Left" Height="20">
                                         <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Oddział" TextAlignment="Center" HorizontalAlignment="Center"/>
                                     </Grid>
                                     <!-- Mark:Oddział -->
 
                                     <Grid Width="300" HorizontalAlignment="Left" Height="20">
-                                        <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Nauczyciel" TextAlignment="Center" HorizontalAlignment="Center"/>
+                                        <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Przed Zastępstwem" TextAlignment="Center" HorizontalAlignment="Center"/>
                                     </Grid>
-                                    <!-- Mark:Nauczyciel -->
+                                    <!-- Mark:Before -->
 
                                     <Grid Width="300" HorizontalAlignment="Left" Height="20">
                                         <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Zastepstwo" TextAlignment="Center" HorizontalAlignment="Center"/>
                                     </Grid>
                                     <!-- Mark:Zastępstwo -->
 
-                                    <Grid Width="150" HorizontalAlignment="Left" Height="20">
+                                    <Grid Width="180" HorizontalAlignment="Left" Height="20">
                                         <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Sala" TextAlignment="Center" HorizontalAlignment="Center"/>
                                     </Grid>
                                     <!-- Mark:Sala -->
                                 </StackPanel>
                             </Grid>
 
-                            <Grid Margin="0,75,0,0" Height="600">
-                                <StackPanel x:Name="handler_content_tabcontrol_replacements_fields">
+                            <Grid x:Name="handler_content_tabcontrol_replacements_viewer" Margin="0,75,0,0" Height="600">
+                                <StackPanel Margin="0,0,0,0" x:Name="handler_content_tabcontrol_replacements_fields">
                                     <!--
                                     
                                     // Field example, to see in designer; uncomment and remove this.
@@ -102,20 +102,23 @@
                                     <Grid VerticalAlignment="Top" Margin="0,10,0,0">
                                         <Rectangle Height="45" Width="1000" Fill="#FF0E0B0B" RadiusX="5" RadiusY="5"/>
                                         <StackPanel Orientation="Horizontal">
-                                            <Grid Width="45" Margin="30,0,0,0">
+                                            <Grid Width="47" Margin="30,0,0,0">
                                                 <Rectangle Height="45" Width="45" RadiusX="5" RadiusY="5" Fill="#FF111010" Stroke="#FF271E1E"/>
                                                 <TextBlock Text="1" FontFamily="/Font/InterBold/#Inter" Foreground="White" TextAlignment="Center" FontSize="24" Margin="0,7.5,0,0"/>
                                             </Grid>
-                                            <Grid Width="175">
+                                            <Grid Width="188">
                                                 <TextBlock Text="-TI 1/2" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="16" TextAlignment="Center" VerticalAlignment="Center"/>
                                             </Grid>
-                                            <Grid Width="300">
+                                            <Rectangle Width="2" Fill="#FF202020"/>
+                                            <Grid Width="298">
                                                 <TextBlock Text="John Doe" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="16" TextAlignment="Center" VerticalAlignment="Center"/>
                                             </Grid>
-                                            <Grid Width="300">
+                                            <Rectangle Width="2" Fill="#FF202020"/>
+                                            <Grid Width="298">
                                                 <TextBlock Text="Jan Kowalski" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="16" TextAlignment="Center" VerticalAlignment="Center"/>
                                             </Grid>
-                                            <Grid Width="150">
+                                            <Grid Width="180">
+                                                <Rectangle Fill="#FF111010" RadiusX="5" RadiusY="5" Stroke="#FF271E1E"/>
                                                 <TextBlock Text="36" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="16" TextAlignment="Center" VerticalAlignment="Center"/>
                                             </Grid>
                                         </StackPanel>

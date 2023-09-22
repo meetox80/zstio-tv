@@ -3,7 +3,7 @@
     internal class Config
     {
         public static bool Developer = true;
-        public static string TimeAPI = "http://worldtimeapi.org/api/timezone/Europe/Warsaw";
+        public static string TimeAPI = "http://localhost/resp.json"; // http://worldtimeapi.org/api/timezone/Europe/Warsaw
         public static string ReplacementsAPI = "https://zastepstwa-zstio.netlify.app/api/getSubstitutions";
 
         public static string[] LessonTimes = {
