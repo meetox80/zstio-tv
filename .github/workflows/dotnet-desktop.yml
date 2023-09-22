@@ -1,4 +1,5 @@
-name: Build and Release an development build of zstio-tv
+name: Development build
+
 on:
   push:
     branches:
@@ -12,20 +13,35 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.0.2
-
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
 
     - name: Restore NuGet packages
-      run: nuget restore ./zstio-tv.sln
+      run: |
+        nuget restore ./zstio-tv.sln
+      shell: pwsh
 
     - name: Build WPF App
-      run: msbuild ./zstio-tv.sln /p:Configuration=Release /p:Platform="Any CPU"
+      run: |
+        dotnet build ./zstio-tv.sln --configuration Release
+      shell: pwsh
 
-    - name: Publish Artifact
+    - name: Publish WPF App
+      run: |
+        dotnet publish ./zstio-tv.sln --configuration Release --output ./publish
+      shell: pwsh
+
+    - name: Rename executable
+      run: |
+        $artifact = Get-ChildItem -Path ./publish -Recurse -Filter *.exe
+        $artifactName = $artifact.Name
+        Rename-Item -Path $artifact.FullName -NewName "DEV-ZSTIOTV-$artifactName"
+      shell: pwsh
+
+    - name: Upload executable as artifact
       uses: actions/upload-artifact@v2
       with:
-        name: DEV-ZSTIOTV-${{ github.run_number }}.exe
-        path: ./path/to/your/build/output/folder
+        name: wpf-app-artifact
+        path: ./publish/DEV-ZSTIOTV-*.exe
