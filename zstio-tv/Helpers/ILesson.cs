@@ -7,7 +7,6 @@ namespace zstio_tv.Helpers
         public static int CurrentLessonIndex = -1;
         public static string[] GetLessons()
         {
-            // Fetch the current time each time the method is called
             DateTime CurrentTime = DateTime.Now;
 
             for (int i = 0; i < Config.LessonTimes.Length; i++)
@@ -19,38 +18,47 @@ namespace zstio_tv.Helpers
                 if (CurrentTime >= LessonStartTime && CurrentTime <= LessonEndTime)
                 {
                     CurrentLessonIndex = i;
-                    break;
+                    TimeSpan RemainingTime = LessonEndTime - CurrentTime;
+                    return new string[] { $"Czas do końca {CurrentLessonIndex + 1} lekcji: ", $"{RemainingTime.ToString(@"hh\:mm\:ss")}" };
                 }
             }
 
-            if (CurrentLessonIndex >= 0)
+            DateTime NextLessonOrBreakStartTime = DateTime.MaxValue;
+            for (int i = 0; i < Config.BreakTimes.Length; i++)
             {
-                // Aktualnie trwa lekcja
-                DateTime CurrentLessonEndTime = DateTime.Parse(Config.LessonTimes[CurrentLessonIndex].Split('-')[1].Trim());
-                TimeSpan RemainingTime = CurrentLessonEndTime - CurrentTime;
+                string[] BreakTimeParts = Config.BreakTimes[i].Split('-');
+                DateTime BreakStartTime = DateTime.Parse(BreakTimeParts[0].Trim());
 
-                return new string[] { $"Czas do konca {CurrentLessonIndex + 1} lekcji: ", $"{RemainingTime.ToString(@"hh\:mm\:ss")}" };
-            }
-            else
-            {
-                // Aktualnie trwa przerwa - znajdz czas do najblizszej lekcji lub przerwy
-                DateTime NextLessonStartTime = DateTime.MaxValue;
-                for (int i = 0; i < Config.LessonTimes.Length; i++)
+                if (BreakStartTime > CurrentTime && BreakStartTime < NextLessonOrBreakStartTime)
                 {
-                    string[] LessonTimeParts = Config.LessonTimes[i].Split('-');
-                    DateTime LessonStartTime = DateTime.Parse(LessonTimeParts[0].Trim());
-
-                    if (LessonStartTime > CurrentTime && LessonStartTime < NextLessonStartTime)
-                    {
-                        NextLessonStartTime = LessonStartTime;
-                    }
+                    NextLessonOrBreakStartTime = BreakStartTime;
                 }
-
-                TimeSpan TimeToNextLesson = NextLessonStartTime - CurrentTime;
-
-                return new string[] { "Aktualnie nie ma lekcji.", $"{TimeToNextLesson.ToString(@"hh\:mm\:ss")}" };
             }
-        }
 
+            for (int i = 0; i < Config.LessonTimes.Length; i++)
+            {
+                string[] LessonTimeParts = Config.LessonTimes[i].Split('-');
+                DateTime LessonStartTime = DateTime.Parse(LessonTimeParts[0].Trim());
+
+                if (LessonStartTime > CurrentTime && LessonStartTime < NextLessonOrBreakStartTime)
+                {
+                    NextLessonOrBreakStartTime = LessonStartTime;
+                }
+            }
+
+            if (NextLessonOrBreakStartTime == DateTime.MaxValue)
+            {
+                return new string[] { "Brak lekcji na dziś.", "" };
+            }
+
+            TimeSpan TimeToNextLessonOrBreak = NextLessonOrBreakStartTime - CurrentTime;
+
+            if (TimeToNextLessonOrBreak.TotalMinutes <= 0)
+            {
+                return new string[] { "Przerwa!", "00:00:00" };
+            }
+
+            return new string[] { "Przerwa!", $"{TimeToNextLessonOrBreak.ToString(@"hh\:mm\:ss")}" };
+        }
     }
 }
