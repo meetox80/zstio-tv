@@ -6,6 +6,9 @@
         public static string TimeAPI = "http://worldtimeapi.org/api/timezone/Europe/Warsaw";
         public static string ReplacementsAPI = "https://zastepstwa-zstio.netlify.app/api/getSubstitutions";
 
+        public static string SpotifyID = "859de286484544ad859832003ac4e6b4";
+        public static string SpotifyAuth = "f10212b6f8d74b058f5685edfdc92704";
+
         public static string[] LessonTimes = {
             "8:00 - 8:45",
             "8:50 - 9:35",

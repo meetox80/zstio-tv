@@ -55,10 +55,10 @@ namespace zstio_tv.Helpers
 
             if (TimeToNextLessonOrBreak.TotalMinutes <= 0)
             {
-                return new string[] { "Przerwa!", "00:00:00" };
+                return new string[] { "Przerwa", "00:00:00" };
             }
 
-            return new string[] { "Przerwa!", $"{TimeToNextLessonOrBreak.ToString(@"hh\:mm\:ss")}" };
+            return new string[] { "Przerwa", $"{TimeToNextLessonOrBreak.ToString(@"hh\:mm\:ss")}" };
         }
     }
 }

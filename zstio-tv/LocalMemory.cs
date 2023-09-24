@@ -8,5 +8,7 @@ namespace zstio_tv
 
         public static string DateAPIResponse = "";
         public static string ReplacementsAPIResponse = "";
+        public static string SpotifyToken = "";
+        public static string SpotifyRefreshToken;
     }
 }

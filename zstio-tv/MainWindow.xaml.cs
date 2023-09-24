@@ -1,11 +1,16 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using zstio_tv.Helpers;
+using zstio_tv.Modules;
 
 namespace zstio_tv
 {
@@ -25,6 +30,8 @@ namespace zstio_tv
             // Reload the Replacements functionality, start the replacements scrolling
             ReplacementsGETAPI_Tick(null, null);
             ReplacementsCALC_Tick(null, null);
+
+            SpotifyAuth.AuthorizeSpotify();
 
             // Setup the warning display, if the warning string is empty; then hide.
             if (Config.Warning == "")
@@ -78,6 +85,48 @@ namespace zstio_tv
             ReplacementsCALC.Interval = TimeSpan.FromSeconds(10);
             ReplacementsCALC.Tick += ReplacementsCALC_Tick;
             ReplacementsCALC.Start();
+
+            // Spotify integration
+            DispatcherTimer SpotifyCurrentPlaying = new DispatcherTimer();
+            SpotifyCurrentPlaying.Interval = TimeSpan.FromSeconds(10);
+            SpotifyCurrentPlaying.Tick += SpotifyCurrentPlaying_Tick;
+            SpotifyCurrentPlaying.Start();
+        }
+
+        private void SpotifyCurrentPlaying_Tick(object sender, EventArgs e)
+        {
+            JObject SongResponse = JObject.Parse(SpotifyAuth.GetAPI("me/player/currently-playing"));
+
+            if (SongResponse["item"] != null)
+            {
+                string SongName = SongResponse["item"]["name"].ToString();
+
+                JArray artistsArray = (JArray)SongResponse["item"]["artists"];
+                List<string> authors = artistsArray.Select(artist => artist["name"].ToString()).ToList();
+                string SongAuthors = string.Join(", ", authors);
+
+                JObject album = (JObject)SongResponse["item"]["album"];
+                string SongImage = "";
+                if (album["images"] != null)
+                {
+                    JArray images = (JArray)album["images"];
+
+                    if (images.Count > 0)
+                    {
+                        SongImage = images[0]["url"].ToString();
+                    }
+                }
+
+                // Set the text, authors, image of zstiofm.
+                handler_bar_zstiofm_title.Content = SongName;
+                handler_bar_zstiom_authors.Content = SongAuthors;
+
+                BitmapImage SongImageBitmap = new BitmapImage(new Uri(SongImage));
+                handler_bar_zstiofm_image.Source = SongImageBitmap;
+            } else
+            {
+                // No song playing.
+            }
         }
 
         private void ReplacementsCALC_Tick(object sender, EventArgs e) => IReplacements.ConfigureReplacements();
@@ -96,7 +145,6 @@ namespace zstio_tv
                     Debug.WriteLine(ex);
                 }
             }
-            Console.WriteLine($"-> {LocalMemory.ReplacementsAPIResponse}");
         }
 
         int PageTime = 0; int PageIndex = 0; public static int PageLength = 30;

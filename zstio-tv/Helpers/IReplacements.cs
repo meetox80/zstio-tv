@@ -51,7 +51,8 @@ namespace zstio_tv.Helpers
                 {
                     foreach (var substitution in table.zastepstwa)
                     {
-                        Console.WriteLine(ILesson.CurrentLessonIndex + 1);
+                        // Forgot to tag this as an line for development/debugging.
+                        // Console.WriteLine(ILesson.CurrentLessonIndex + 1);
                         if (CurrentLessonIndexBackup < Int32.Parse(substitution.lesson.Split(',')[0]))
                         {
                             string replacement;
