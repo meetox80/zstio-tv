@@ -10,5 +10,7 @@ namespace zstio_tv
         public static string ReplacementsAPIResponse = "";
         public static string SpotifyToken = "";
         public static string SpotifyRefreshToken;
+
+        public static bool SongPlaying = false, SongPlayingBackup = true;
     }
 }

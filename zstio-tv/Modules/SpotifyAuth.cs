@@ -74,11 +74,21 @@ namespace zstio_tv.Modules
                     var tokenData = JObject.Parse(responseText);
 
                     string accessToken = tokenData["access_token"].ToString();
-                    string refreshToken = tokenData["refresh_token"].ToString(); // Retrieve the refresh token
+                    string refreshToken = tokenData["refresh_token"].ToString();
                     LocalMemory.SpotifyToken = accessToken;
-                    LocalMemory.SpotifyRefreshToken = refreshToken; // Store the refresh token
+                    LocalMemory.SpotifyRefreshToken = refreshToken;
                     Console.WriteLine($"Successfully Received AccessToken: {accessToken}");
                     Console.WriteLine($"Refresh Token: {refreshToken}");
+
+                    // Send the html repsonse that it is successfully authorized.
+                    var ListenerResponse = context.Response;
+                    ListenerResponse.ContentType = "text/html";
+                    string ListenerResponseContent = " <head><meta charset='UTF-8'></head> <center><h1>Successfully authorized with spotify!</h1><p style='opacity: 0.5; margin-top: -10px;'>Made by lemonek.</p></center> <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap'); body{color:white;background-color:#101010;font-family: 'Inter', sans-serif;}</style>";
+                    byte[] ListenerResponseBytes =  Encoding.UTF8.GetBytes(ListenerResponseContent);
+
+                    ListenerResponse.ContentLength64 = ListenerResponseBytes.Length;
+                    ListenerResponse.OutputStream.Write(ListenerResponseBytes, 0, ListenerResponseBytes.Length);
+                    ListenerResponse.Close();
                 }
             }
             catch (Exception ex)
@@ -94,8 +104,6 @@ namespace zstio_tv.Modules
 
         public static string GetAPI(string APIPoint)
         {
-            // For testing the refreshtoken
-            // RefreshToken();
             try
             {
                 using (var httpClient = new HttpClient())
@@ -122,14 +130,14 @@ namespace zstio_tv.Modules
                     else
                     {
                         Console.WriteLine($"Error getting currently playing track: {response.StatusCode}");
-                        return null;
+                        return "ERRinternal";
                     }
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error getting currently playing track: {ex.Message}");
-                return null;
+                return "ERRinternal";
             }
         }
 
@@ -137,7 +145,6 @@ namespace zstio_tv.Modules
         {
             try
             {
-
                 using (var httpClient = new HttpClient())
                 {
                     var tokenRequest = new Dictionary<string, string>
@@ -149,7 +156,7 @@ namespace zstio_tv.Modules
                     httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{Config.SpotifyID}:{Config.SpotifyAuth }")));
 
                     var content = new FormUrlEncodedContent(tokenRequest);
-                    var response = httpClient.PostAsync("https://accounts.spotify.com/api/token", content).Result; // TokenURL
+                    var response = httpClient.PostAsync("https://accounts.spotify.com/api/token", content).Result;
 
                     if (response.IsSuccessStatusCode)
                     {

@@ -88,49 +88,100 @@ namespace zstio_tv
 
             // Spotify integration
             DispatcherTimer SpotifyCurrentPlaying = new DispatcherTimer();
-            SpotifyCurrentPlaying.Interval = TimeSpan.FromSeconds(10);
+            SpotifyCurrentPlaying.Interval = TimeSpan.FromSeconds(5);
             SpotifyCurrentPlaying.Tick += SpotifyCurrentPlaying_Tick;
             SpotifyCurrentPlaying.Start();
         }
 
         private void SpotifyCurrentPlaying_Tick(object sender, EventArgs e)
         {
-            JObject SongResponse = JObject.Parse(SpotifyAuth.GetAPI("me/player/currently-playing"));
+            string Response = SpotifyAuth.GetAPI("me/player/currently-playing").ToString();
+            // MessageBox.Show(Response);
 
-            if (SongResponse["item"] != null)
+            if (Response.Contains("ERRinternal") || Response == null || Response == "")
             {
-                string SongName = SongResponse["item"]["name"].ToString();
-
-                JArray artistsArray = (JArray)SongResponse["item"]["artists"];
-                List<string> authors = artistsArray.Select(artist => artist["name"].ToString()).ToList();
-                string SongAuthors = string.Join(", ", authors);
-
-                JObject album = (JObject)SongResponse["item"]["album"];
-                string SongImage = "";
-                if (album["images"] != null)
-                {
-                    JArray images = (JArray)album["images"];
-
-                    if (images.Count > 0)
-                    {
-                        SongImage = images[0]["url"].ToString();
-                    }
-                }
-
-                // Set the text, authors, image of zstiofm.
-                handler_bar_zstiofm_title.Content = SongName;
-                handler_bar_zstiom_authors.Content = SongAuthors;
-
-                BitmapImage SongImageBitmap = new BitmapImage(new Uri(SongImage));
-                handler_bar_zstiofm_image.Source = SongImageBitmap;
+                LocalMemory.SongPlaying = false;
             } else
             {
-                // No song playing.
+                JObject SongResponse = JObject.Parse(Response);
+                if (SongResponse["item"] != null)
+                {
+                    string SongName = SongResponse["item"]["name"].ToString();
+
+                    JArray artistsArray = (JArray)SongResponse["item"]["artists"];
+                    List<string> authors = artistsArray.Select(artist => artist["name"].ToString()).ToList();
+                    string SongAuthors = string.Join(", ", authors);
+
+                    JObject album = (JObject)SongResponse["item"]["album"];
+                    string SongImage = "";
+                    if (album["images"] != null)
+                    {
+                        JArray images = (JArray)album["images"];
+
+                        if (images.Count > 0)
+                        {
+                            SongImage = images[0]["url"].ToString();
+                        }
+                    }
+
+                    // Set the text, authors, image of zstiofm.
+                    handler_bar_zstiofm_title.Content = SongName;
+                    handler_bar_zstiom_authors.Content = SongAuthors;
+
+                    BitmapImage SongImageBitmap = new BitmapImage(new Uri(SongImage));
+                    handler_bar_zstiofm_image.Source = SongImageBitmap;
+
+                    LocalMemory.SongPlaying = true;
+                }
+            }
+
+            // InAnimation
+            if (LocalMemory.SongPlaying == true && LocalMemory.SongPlayingBackup == false)
+            {
+                LocalMemory.SongPlayingBackup = true;
+
+                var SongAnimationIn = new ThicknessAnimation
+                {
+                    From = new Thickness(-600,0,0,0),
+                    To = new Thickness(0, 0, 0, 0),
+                    Duration = TimeSpan.FromSeconds(1),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+
+                var LocalStoryboard = new Storyboard();
+                LocalStoryboard.Children.Add(SongAnimationIn);
+
+                Storyboard.SetTarget(SongAnimationIn, zstiofm_movementhandler);
+                Storyboard.SetTargetProperty(SongAnimationIn, new PropertyPath(MarginProperty));
+
+                LocalStoryboard.Begin();
+            }
+
+            // OutAnimation
+            if (LocalMemory.SongPlaying == false && LocalMemory.SongPlayingBackup == true)
+            {
+                LocalMemory.SongPlayingBackup = false;
+
+                var SongAnimationOut = new ThicknessAnimation
+                {
+                    From = new Thickness(0, 0, 0, 0),
+                    To = new Thickness(-600, 0, 0, 0),
+                    Duration = TimeSpan.FromSeconds(1),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+
+                var LocalStoryboard = new Storyboard();
+                LocalStoryboard.Children.Add(SongAnimationOut);
+
+                Storyboard.SetTarget(SongAnimationOut, zstiofm_movementhandler);
+                Storyboard.SetTargetProperty(SongAnimationOut, new PropertyPath(MarginProperty));
+
+                LocalStoryboard.Begin();
             }
         }
 
         private void ReplacementsCALC_Tick(object sender, EventArgs e) => IReplacements.ConfigureReplacements();
-
+        
         private void ReplacementsGETAPI_Tick(object sender, EventArgs e)
         {
             // Contact with the api responsible for replacements/substitutions

@@ -42,30 +42,31 @@
                         </Grid>
                     </StackPanel>
                 </StackPanel>
-                <Image x:Name="handler_bar_zstiofm_image" Margin="0,0,0,-100" Width="298" Height="300" VerticalAlignment="Bottom"/>
-                <Rectangle Height="201" Width="298" VerticalAlignment="Bottom">
-                    <Rectangle.Fill>
-                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                            <GradientStop Color="#BF0A0303" Offset="1"/>
-                            <GradientStop Color="#FF0A0303" Offset="0"/>
-                        </LinearGradientBrush>
-                    </Rectangle.Fill>
-                </Rectangle>
-                <Grid x:Name="handler_bar_zstiofm" Height="100" VerticalAlignment="Bottom">
-                    <StackPanel Orientation="Horizontal">
-                        <Grid Width="180" Margin="20,20,0,0">
-                            <StackPanel>
-                                <Label x:Name="handler_bar_zstiofm_title" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="20" Content="No data avalible."/>
-                                <Label x:Name="handler_bar_zstiom_authors" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="15" Content="null" Opacity="0.75" Margin="0,-7.5,0,0"/>
-                            </StackPanel>
-                        </Grid>
-                        <Grid Width="96">
-                            <Image Source="/Resources/zstiofm.png" Height="48" Width="48"/>
-                        </Grid>
-                    </StackPanel>
+                <Grid x:Name="zstiofm_movementhandler" Margin="0,0,0,0">
+                    <Image x:Name="handler_bar_zstiofm_image" Margin="0,0,0,-100" Width="298" Height="300" VerticalAlignment="Bottom"/>
+                    <Rectangle Height="201" Width="298" VerticalAlignment="Bottom">
+                        <Rectangle.Fill>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#BF0A0303" Offset="1"/>
+                                <GradientStop Color="#FF0A0303" Offset="0"/>
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <Grid x:Name="handler_bar_zstiofm" Height="100" VerticalAlignment="Bottom">
+                        <StackPanel Orientation="Horizontal">
+                            <Grid Width="180" Margin="20,20,0,0">
+                                <StackPanel>
+                                    <Label x:Name="handler_bar_zstiofm_title" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="20" Content="No data avalible."/>
+                                    <Label x:Name="handler_bar_zstiom_authors" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="15" Content="null" Opacity="0.75" Margin="0,-7.5,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Width="96">
+                                <Image Source="/Resources/zstiofm.png" Height="48" Width="48"/>
+                            </Grid>
+                        </StackPanel>
+                   </Grid>
                 </Grid>
             </Grid>
-
             <Grid x:Name="handler_content" Width="1066" HorizontalAlignment="Right">
                 <TabControl x:Name="handler_content_tabcontrol" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}">
                     <TabItem Header="TabItem" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Visibility="Collapsed">
