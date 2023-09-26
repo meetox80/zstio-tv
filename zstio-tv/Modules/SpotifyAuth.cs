@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Net.Http;
 using System.Text;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace zstio_tv.Modules
 {
@@ -83,7 +84,7 @@ namespace zstio_tv.Modules
                     // Send the html repsonse that it is successfully authorized.
                     var ListenerResponse = context.Response;
                     ListenerResponse.ContentType = "text/html";
-                    string ListenerResponseContent = " <head><meta charset='UTF-8'></head> <center><h1>Successfully authorized with spotify!</h1><p style='opacity: 0.5; margin-top: -10px;'>Made by lemonek.</p></center> <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap'); body{color:white;background-color:#101010;font-family: 'Inter', sans-serif;}</style>";
+                    string ListenerResponseContent = "<head><meta charset='UTF-8'></head><center><h1>Successfully authorized with spotify!</h1><p style='opacity:0.5;margin-top:-10px;'>Made by lemonek.</p><button onclick='window.close();'>Close</button></center><style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap'); body{color:white;background-color:#101010;font-family: 'Inter', sans-serif;}</style>";
                     byte[] ListenerResponseBytes =  Encoding.UTF8.GetBytes(ListenerResponseContent);
 
                     ListenerResponse.ContentLength64 = ListenerResponseBytes.Length;

@@ -30,6 +30,7 @@ namespace zstio_tv
             // Reload the Replacements functionality, start the replacements scrolling
             ReplacementsGETAPI_Tick(null, null);
             ReplacementsCALC_Tick(null, null);
+            GetWeatherTick(null, null);
 
             SpotifyAuth.AuthorizeSpotify();
 
@@ -46,7 +47,7 @@ namespace zstio_tv
 
             if (!Config.Developer)
             {
-                this.Topmost = true;
+                //this.Topmost = true;
                 developerbadge.Visibility = Visibility.Hidden;
             } else
             {
@@ -91,12 +92,32 @@ namespace zstio_tv
             SpotifyCurrentPlaying.Interval = TimeSpan.FromSeconds(5);
             SpotifyCurrentPlaying.Tick += SpotifyCurrentPlaying_Tick;
             SpotifyCurrentPlaying.Start();
+
+            // Weather integration
+            DispatcherTimer GetWeather = new DispatcherTimer();
+            GetWeather.Interval = TimeSpan.FromHours(1);
+            GetWeather.Tick += GetWeatherTick;
+            GetWeather.Start();
+        }
+
+        private void GetWeatherTick(object sender, EventArgs e)
+        {
+            LocalMemory.WeatherAPIResponse = IWeather.GetWeatherData();
+
+            if (LocalMemory.WeatherAPIResponse != null || LocalMemory.WeatherAPIResponse != "")
+            {
+                JObject WeatherData = JObject.Parse(LocalMemory.WeatherAPIResponse);
+
+                if (WeatherData["current"] != null)
+                {
+                    handler_bar_weatherwidget_header_title.Text = $"{Config.WeatherCity} - {WeatherData["current"]["temp_c"].ToString()}°C";
+                }
+            }
         }
 
         private void SpotifyCurrentPlaying_Tick(object sender, EventArgs e)
         {
             string Response = SpotifyAuth.GetAPI("me/player/currently-playing").ToString();
-            // MessageBox.Show(Response);
 
             if (Response.Contains("ERRinternal") || Response == null || Response == "")
             {
