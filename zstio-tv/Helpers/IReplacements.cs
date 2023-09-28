@@ -169,7 +169,7 @@ namespace zstio_tv.Helpers
             ClassroomTextBlock.Text = $"{classroom}";
             ClassroomTextBlock.FontFamily = new FontFamily(new Uri("pack://application:,,,/"), "./Font/InterBold/#Inter");
             ClassroomTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFFFF"));
-            ReplacementTextBlock.FontSize = 16;
+            ClassroomTextBlock.FontSize = 16;
             ClassroomTextBlock.TextAlignment = TextAlignment.Center;
             ClassroomTextBlock.VerticalAlignment = VerticalAlignment.Center;
             Rectangle ClassroomBackground = new Rectangle();

@@ -1,73 +1,43 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Diagnostics;
-using System.Net.Http;
-using System.Text.RegularExpressions;
+﻿using System;
 
 namespace zstio_tv.Helpers
 {
     internal class IDateTime
     {
-        public static dynamic ProcessDynamic() { return JsonConvert.DeserializeObject(LocalMemory.DateAPIResponse); }
-
-        public static void ReloadDateAPI()
-        {
-            using (HttpClient Client = new HttpClient())
-            {
-                try
-                {
-                    LocalMemory.DateAPIResponse = Client.GetStringAsync(Config.TimeAPI).Result;
-                } catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-                }
-            }
-        }
-
         public static string CalculateClock()
         {
-            dynamic Data = ProcessDynamic();
-            string DateResult = Data.datetime;
-
-            Match RegexMatch = Regex.Match(DateResult, @"\b(\d{2}:\d{2})\b");
-            if (RegexMatch.Success)
-                return RegexMatch.Groups[1].Value;
-            return "--:--";
+            return DateTime.Now.ToString("HH:mm");
         }
 
         public static string CalculateDate()
         {
-            dynamic Data = ProcessDynamic();
-            string DateResult = Data.datetime;
-
-            // Debug - i had many problems with parsing :/ Console.WriteLine(DateResult);
-            string Day = DateResult.Split('/')[1].Split('/')[0];
-            string ProcessMonth = DateResult.Split('/')[0];
-            string ProcessWeekDay = Data.day_of_week;
+            string Day = DateTime.Now.ToString("dd");
+            string ProcessMonth = DateTime.Now.ToString("MM");
+            string ProcessWeekDay = DateTime.Now.DayOfWeek.ToString();
 
             string WeekDay = "", Month = "";
 
             switch (ProcessWeekDay)
             {
-                case "1":
+                case "Monday":
                     WeekDay = "Poniedzialek";
                     break;
-                case "2":
+                case "Tuesday":
                     WeekDay = "Wtorek";
                     break;
-                case "3":
+                case "Wednesday":
                     WeekDay = "Środa";
                     break;
-                case "4":
+                case "Thursday":
                     WeekDay = "Czwartek";
                     break;
-                case "5":
+                case "Friday":
                     WeekDay = "Piątek";
                     break;
-                case "6":
+                case "Saturday":
                     WeekDay = "Sobota";
                     break;
-                case "7":
+                case "Sunday":
                     WeekDay = "Niedziela";
                     break;
             }

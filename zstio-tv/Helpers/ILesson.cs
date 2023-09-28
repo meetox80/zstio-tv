@@ -48,7 +48,7 @@ namespace zstio_tv.Helpers
 
             if (NextLessonOrBreakStartTime == DateTime.MaxValue)
             {
-                return new string[] { "Brak lekcji na dziś.", "" };
+                return new string[] { "Brak lekcji na dziś", "" };
             }
 
             TimeSpan TimeToNextLessonOrBreak = NextLessonOrBreakStartTime - CurrentTime;

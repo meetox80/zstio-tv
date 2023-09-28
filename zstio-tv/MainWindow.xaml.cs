@@ -25,14 +25,16 @@ namespace zstio_tv
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
-            // Reload the API in order to start Lesson dispatcher
-            IDateTime.ReloadDateAPI();
             // Reload the Replacements functionality, start the replacements scrolling
             ReplacementsGETAPI_Tick(null, null);
             ReplacementsCALC_Tick(null, null);
             GetWeatherTick(null, null);
+            ClockTimerTick(null, null);
 
             SpotifyAuth.AuthorizeSpotify();
+
+            ConfigWindow ConfigWindow_Manager = new ConfigWindow();
+            ConfigWindow_Manager.Show();
 
             // Setup the warning display, if the warning string is empty; then hide.
             if (Config.Warning == "")
@@ -201,9 +203,9 @@ namespace zstio_tv
             }
         }
 
-        private void ReplacementsCALC_Tick(object sender, EventArgs e) => IReplacements.ConfigureReplacements();
+        public static void ReplacementsCALC_Tick(object sender, EventArgs e) => IReplacements.ConfigureReplacements();
         
-        private void ReplacementsGETAPI_Tick(object sender, EventArgs e)
+        public static void ReplacementsGETAPI_Tick(object sender, EventArgs e)
         {
             // Contact with the api responsible for replacements/substitutions
             using (HttpClient Client = new HttpClient())
@@ -276,12 +278,20 @@ namespace zstio_tv
 
             handler_bar_lessonwidget_title.Text = GetLessonsOutput[0];
             handler_bar_lessonwidget_timer.Text = GetLessonsOutput[1];
+
+            if (handler_bar_lessonwidget_title.Text.StartsWith("Brak lekcji"))
+            {
+                handler_bar_lessonwidget_title.FontSize = 24;
+                handler_bar_lessonwidget_title.Margin = new Thickness(0, 16, 0, 0);
+            } else
+            {
+                handler_bar_lessonwidget_title.FontSize = 14;
+                handler_bar_lessonwidget_title.Margin = new Thickness(0, 5, 0, 0);
+            }
         }
 
         private void ClockTimerTick(object sender, EventArgs e)
         {
-            IDateTime.ReloadDateAPI();
-
             handler_bar_clock.Text = IDateTime.CalculateClock();
             handler_bar_date.Text = IDateTime.CalculateDate();
         }

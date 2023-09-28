@@ -3,7 +3,6 @@
     internal class Config
     {
         public static bool Developer = false;
-        public static string TimeAPI = "http://worldtimeapi.org/api/timezone/Europe/Warsaw";
         public static string ReplacementsAPI = "https://zastepstwa-zstio.netlify.app/api/getSubstitutions";
 
         public static string SpotifyID = "859de286484544ad859832003ac4e6b4";
@@ -43,6 +42,42 @@
             "17:20 - 17:25",
             "18:10 - 18:15",
             "19:00 - 00:00"
+        };
+
+
+        // Short lesson times
+        public static string[] ShortLessonTimes =
+        {
+            "8:00 - 8:30",
+            "8:35 - 9:05",
+            "9:10 - 9:40",
+            "9:45 - 10:15",
+            "10:30 - 11:00",
+            "11:05 - 11:35",
+            "11:40 - 12:10",
+            "12:15 - 12:45",
+            "12:50 - 13:20",
+            "13:25 - 13:55",
+            "14:00 - 14:30",
+            "14:35 - 15:05",
+            "15:10 - 15:40"
+        };
+
+        public static string[] ShortBreakTimes =
+        {
+            "8:30 - 8:35",
+            "9:05 - 9:10",
+            "9:40 - 9:45",
+            "10:15 - 10:30",
+            "11:00 - 11:05",
+            "11:35 - 11:40",
+            "12:10 - 12:15",
+            "12:45 - 12:50",
+            "13:20 - 13:25",
+            "13:55 - 14:00",
+            "14:30 - 14:35",
+            "15:05 - 15:10",
+            "15:40 - 00:00"
         };
 
         public static string Warning = "Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych.";
