@@ -30,7 +30,7 @@
         <StackPanel Orientation="Vertical">
             <StackPanel Orientation="Horizontal" Margin="15,15,0,0" Height="30" VerticalAlignment="Top">
                 <Label Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="15" Content="Ostrzezenie: " Height="30"/>
-                <TextBox x:Name="input_warning" Width="650" Height="20" Background="#FF1B1B1B" BorderBrush="{x:Null}" Foreground="White" SelectionBrush="#FFA94646" MaxLength="125"/>
+                <TextBox x:Name="input_warning" Width="650" Height="20" Background="#FF1B1B1B" BorderBrush="{x:Null}" Foreground="White" Text="..." SelectionBrush="#FFA94646" MaxLength="125"/>
             </StackPanel>
 
             <CheckBox x:Name="checkbox_short" Content="Skrocone lekcje" Foreground="White" FontFamily="/Font/InterBold/#Inter" Height="16" Margin="20,5,0,0"/>

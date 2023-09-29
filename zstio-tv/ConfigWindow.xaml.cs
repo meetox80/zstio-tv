@@ -25,7 +25,7 @@ namespace zstio_tv
         public static string[] TempLessonTimes = { }, TempBreakTimes = { };
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (input_warning.Text != null || input_warning.Text != "")
+            if (input_warning.Text != null && input_warning.Text != "...")
             {
                 Config.Warning = input_warning.Text;
                 MainWindow._Instance.handler_content_description_warning_label.Text = Config.Warning;

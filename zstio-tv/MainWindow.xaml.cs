@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -30,9 +31,7 @@ namespace zstio_tv
             ReplacementsCALC_Tick(null, null);
             GetWeatherTick(null, null);
             ClockTimerTick(null, null);
-
             SpotifyAuth.AuthorizeSpotify();
-
             ConfigWindow ConfigWindow_Manager = new ConfigWindow();
             ConfigWindow_Manager.Show();
 
@@ -44,42 +43,37 @@ namespace zstio_tv
             // Setup the display height and width, make it fullscreen
             this.Height = LocalMemory.Display[0];
             this.Width = LocalMemory.Display[1];
-            this.Top = 0;
-            this.Left = 0;
+            Screen firstScreen = Screen.AllScreens.FirstOrDefault();
 
-            if (!Config.Developer)
+            if (firstScreen != null)
             {
-                //this.Topmost = true;
-                developerbadge.Visibility = Visibility.Hidden;
-            } else
-            {
-                developerbadge.Visibility = Visibility.Visible;
+                // Set the window's position to the top-left corner of the first screen
+                Left = firstScreen.WorkingArea.Left;
+                Top = firstScreen.WorkingArea.Top;
             }
+
+            developerbadge.Visibility = Visibility.Hidden;
+            if (Config.Developer)
+                developerbadge.Visibility = Visibility.Visible;
 
             // Setup the scaling - fit on every tv without knowing the size.
             float DisplayScaleFactor = Math.Min(LocalMemory.Display[1] / 1366.0f, LocalMemory.Display[0] / 768.0f);
             handler_scale.ScaleX = DisplayScaleFactor;
             handler_scale.ScaleY = DisplayScaleFactor;
 
-            // Setup the clock dispatcher
+
             DispatcherTimer ClockTimer = new DispatcherTimer();
             ClockTimer.Interval = TimeSpan.FromSeconds(10);
             ClockTimer.Tick += ClockTimerTick;
             ClockTimer.Start();
-
-            // Setup the lesson/session dispatcher
             DispatcherTimer LessonTimer = new DispatcherTimer();
             LessonTimer.Interval = TimeSpan.FromSeconds(1);
             LessonTimer.Tick += LessonTimerTick;
             LessonTimer.Start();
-
-            // Setup the tabchanger
             DispatcherTimer TabTimer = new DispatcherTimer();
             TabTimer.Interval = TimeSpan.FromSeconds(1);
             TabTimer.Tick += TabTimerTick;
             TabTimer.Start();
-
-            // Dispatcher for substitutions/replacements
             DispatcherTimer ReplacementsGETAPI = new DispatcherTimer();
             ReplacementsGETAPI.Interval = TimeSpan.FromHours(1);
             ReplacementsGETAPI.Tick += ReplacementsGETAPI_Tick;
@@ -88,14 +82,10 @@ namespace zstio_tv
             ReplacementsCALC.Interval = TimeSpan.FromSeconds(10);
             ReplacementsCALC.Tick += ReplacementsCALC_Tick;
             ReplacementsCALC.Start();
-
-            // Spotify integration
             DispatcherTimer SpotifyCurrentPlaying = new DispatcherTimer();
             SpotifyCurrentPlaying.Interval = TimeSpan.FromSeconds(5);
             SpotifyCurrentPlaying.Tick += SpotifyCurrentPlaying_Tick;
             SpotifyCurrentPlaying.Start();
-
-            // Weather integration
             DispatcherTimer GetWeather = new DispatcherTimer();
             GetWeather.Interval = TimeSpan.FromHours(1);
             GetWeather.Tick += GetWeatherTick;
@@ -158,7 +148,6 @@ namespace zstio_tv
                 }
             }
 
-            // InAnimation
             if (LocalMemory.SongPlaying == true && LocalMemory.SongPlayingBackup == false)
             {
                 LocalMemory.SongPlayingBackup = true;
@@ -179,8 +168,6 @@ namespace zstio_tv
 
                 LocalStoryboard.Begin();
             }
-
-            // OutAnimation
             if (LocalMemory.SongPlaying == false && LocalMemory.SongPlayingBackup == true)
             {
                 LocalMemory.SongPlayingBackup = false;
@@ -203,11 +190,22 @@ namespace zstio_tv
             }
         }
 
+        private void TabTransition(float FromOpacity, float ToOpacity)
+        {
+            var TabAnimation = new DoubleAnimation {
+                From = FromOpacity,
+                To = ToOpacity,
+                Duration = TimeSpan.FromMilliseconds(750),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+
+            handler_content_tabcontrol.BeginAnimation(UIElement.OpacityProperty, TabAnimation);
+        }
+
         public static void ReplacementsCALC_Tick(object sender, EventArgs e) => IReplacements.ConfigureReplacements();
         
         public static void ReplacementsGETAPI_Tick(object sender, EventArgs e)
         {
-            // Contact with the api responsible for replacements/substitutions
             using (HttpClient Client = new HttpClient())
             {
                 try
@@ -224,12 +222,17 @@ namespace zstio_tv
         int PageTime = 0; int PageIndex = 0; public static int PageLength = 30;
         private void TabTimerTick(object sender, EventArgs e)
         {
+            Console.WriteLine(PageIndex);
+
+            if (PageTime == 1)
+                TabTransition(0, 1);
+
+            if (PageTime == PageLength - 1)
+                TabTransition(1, 0);
+
             if (PageTime == PageLength)
             {
-                // Im currently disabling this cause we aint got ideas for other pages lmao
-                // PageIndex++;
-
-                // 5 pages, but starting from 0
+                PageIndex++;
                 if (PageIndex == 4)
                 {
                     PageIndex = 0;

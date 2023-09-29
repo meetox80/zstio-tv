@@ -127,7 +127,6 @@
                                     
                                     // Field example, to see in designer; uncomment and remove this.
                                     // Made to port into raw c# from xaml
-                                    
                                     <Grid VerticalAlignment="Top" Margin="0,10,0,0">
                                         <Rectangle Height="45" Width="1000" Fill="#FF0E0B0B" RadiusX="5" RadiusY="5"/>
                                         <StackPanel Orientation="Horizontal">
@@ -140,7 +139,7 @@
                                             </Grid>
                                             <Rectangle Width="2" Fill="#FF202020"/>
                                             <Grid Width="298">
-                                                <TextBlock Text="John Doe" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="16" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                <TextBlock Text="John Doe" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="16" TextAlignment="Center" VerticalAlignment="Center" Width="300"/>
                                             </Grid>
                                             <Rectangle Width="2" Fill="#FF202020"/>
                                             <Grid Width="298">
