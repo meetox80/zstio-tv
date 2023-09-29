@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media.Animation;
@@ -35,6 +37,15 @@ namespace zstio_tv
             ConfigWindow ConfigWindow_Manager = new ConfigWindow();
             ConfigWindow_Manager.Show();
 
+
+            Process[] processes = Process.GetProcessesByName("node");
+            foreach (Process process in processes)
+            {
+                try { process.Kill(); } catch (Exception ex) { Console.WriteLine(ex.Message); }
+            }
+            ModulesManager.ReloadModules();
+            loadingmodules.Visibility = Visibility.Hidden;
+
             // Setup the warning display, if the warning string is empty; then hide.
             if (Config.Warning == "")
                 handler_content_description_warning_label.Visibility = Visibility.Hidden;
@@ -61,6 +72,7 @@ namespace zstio_tv
             handler_scale.ScaleX = DisplayScaleFactor;
             handler_scale.ScaleY = DisplayScaleFactor;
 
+            ConfigWindow._Instance.modulescount.Content = $"Zaladowane moduly: {ModulesManager.ModulesCount()}";
 
             DispatcherTimer ClockTimer = new DispatcherTimer();
             ClockTimer.Interval = TimeSpan.FromSeconds(10);
@@ -222,8 +234,6 @@ namespace zstio_tv
         int PageTime = 0; int PageIndex = 0; public static int PageLength = 30;
         private void TabTimerTick(object sender, EventArgs e)
         {
-            Console.WriteLine(PageIndex);
-
             if (PageTime == 1)
                 TabTransition(0, 1);
 

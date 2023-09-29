@@ -17,15 +17,17 @@ namespace zstio_tv
 
     public partial class ConfigWindow : Window
     {
+        public static ConfigWindow _Instance;
         public ConfigWindow()
         {
             InitializeComponent();
+            _Instance = this;
         }
 
         public static string[] TempLessonTimes = { }, TempBreakTimes = { };
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (input_warning.Text != null && input_warning.Text != "...")
+            if (input_warning.Text != null && input_warning.Text != Config.Warning)
             {
                 Config.Warning = input_warning.Text;
                 MainWindow._Instance.handler_content_description_warning_label.Text = Config.Warning;
@@ -58,6 +60,8 @@ namespace zstio_tv
 
             var hwnd = new WindowInteropHelper(this).Handle;
             Win32.SetWindowLong(hwnd, Win32.GWL_STYLE, Win32.GetWindowLong(hwnd, Win32.GWL_STYLE) & ~Win32.WS_SYSMENU);
+
+            input_warning.Text = Config.Warning;
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)

@@ -11,7 +11,7 @@ namespace zstio_tv
         public static string WeatherAPIResponse = "";
 
         public static string SpotifyToken = "";
-        public static string SpotifyRefreshToken;
+        public static string SpotifyRefreshToken = "";
 
         public static bool SongPlaying = false, SongPlayingBackup = true;
     }

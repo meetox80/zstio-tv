@@ -7,7 +7,6 @@ using System.Net.Http.Headers;
 using System.Net.Http;
 using System.Text;
 using System.Collections.Generic;
-using System.Windows;
 
 namespace zstio_tv.Modules
 {
@@ -38,8 +37,6 @@ namespace zstio_tv.Modules
             var listener = new HttpListener();
             listener.Prefixes.Add(redirectUri + "/");
             listener.Start();
-
-            Console.WriteLine($"Waiting for the Spotify authorization callback at server: {redirectUri}...");
             var context = listener.GetContext();
 
             string code = context.Request.QueryString["code"];
@@ -78,8 +75,6 @@ namespace zstio_tv.Modules
                     string refreshToken = tokenData["refresh_token"].ToString();
                     LocalMemory.SpotifyToken = accessToken;
                     LocalMemory.SpotifyRefreshToken = refreshToken;
-                    Console.WriteLine($"Successfully Received AccessToken: {accessToken}");
-                    Console.WriteLine($"Refresh Token: {refreshToken}");
 
                     // Send the html repsonse that it is successfully authorized.
                     var ListenerResponse = context.Response;
@@ -99,8 +94,6 @@ namespace zstio_tv.Modules
 
             // Close the HTTP listener. Recieved the shit successfully! 🔥
             listener.Stop();
-
-            Console.WriteLine(SpotifyAuth.GetAPI("/me/player/currently-playing"));
         }
 
         public static string GetAPI(string APIPoint)
@@ -130,14 +123,13 @@ namespace zstio_tv.Modules
                     }
                     else
                     {
-                        Console.WriteLine($"Error getting currently playing track: {response.StatusCode}");
                         return "ERRinternal";
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting currently playing track: {ex.Message}");
+                Console.WriteLine(ex);
                 return "ERRinternal";
             }
         }
@@ -166,11 +158,6 @@ namespace zstio_tv.Modules
 
                         string accessToken = tokenData["access_token"].ToString();
                         LocalMemory.SpotifyToken = accessToken;
-                        Console.WriteLine($"Successfully Refreshed AccessToken: {accessToken}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Error refreshing access token: {response.StatusCode}");
                     }
                 }
             }

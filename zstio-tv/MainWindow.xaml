@@ -58,6 +58,19 @@
                                 <TextBlock x:Name="handler_bar_weatherwidget_header_title" VerticalAlignment="Top" TextAlignment="Center" Text="XXXXXXXXXX" Foreground="White" FontFamily="/Font/InterBold/#Inter" Margin="0,-1,0,0" FontSize="15" Height="15" Width="200"/>
                             </StackPanel>
                         </Grid>
+
+                        <Grid x:Name="handler_bar_happynumberwidget" Height="50" Width="250" Margin="0,15,0,0">
+                            <Rectangle RadiusX="10" RadiusY="10" Fill="#FF0A0505" Stroke="#FF272727">
+                                <Rectangle.Effect>
+                                    <DropShadowEffect ShadowDepth="0" Direction="0" BlurRadius="15"/>
+                                </Rectangle.Effect>
+                            </Rectangle>
+
+                            <StackPanel x:Name="handler_bar_happynumberwidget_header" Orientation="Horizontal" Margin="20,16,0,0">
+                                <TextBlock Opacity="0.75" x:Name="handler_bar_happynumberwidget_header_title" VerticalAlignment="Top" TextAlignment="Center" Text="Szczesliwy numerek:" Foreground="White" FontFamily="/Font/InterBold/#Inter" Margin="0,-1,0,0" FontSize="15" Height="15"/>
+                                <TextBlock x:Name="handler_bar_happynumberwidget_header_content" VerticalAlignment="Top" TextAlignment="Center" Text="0" Foreground="White" FontFamily="/Font/InterBold/#Inter" Margin="0,-5,0,0" Width="75" FontSize="25" Height="30"/>
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
                 </StackPanel>
 
@@ -83,7 +96,7 @@
                                 <Image Source="/Resources/zstiofm.png" Height="48" Width="48"/>
                             </Grid>
                         </StackPanel>
-                   </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
             <Grid x:Name="handler_content" Width="1066" HorizontalAlignment="Right">
@@ -156,13 +169,13 @@
                             </Grid>
                         </Grid>
                     </TabItem>
-                    
+
                     <TabItem Header="TabItem" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Visibility="Collapsed">
                         <Grid>
                             <Label Content="tab2" Foreground="White"/>
                         </Grid>
                     </TabItem>
-                    
+
                     <TabItem Header="TabItem" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Visibility="Collapsed">
                         <Grid>
                             <Label Content="tab3" Foreground="White"/>
@@ -182,6 +195,8 @@
                     </TabItem>
                 </TabControl>
 
+                <Label x:Name="loadingmodules" FontSize="20" Foreground="White" FontFamily="/Font/InterBold/#Inter" Content="Ladowanie modułow, proszę czekać." HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
                 <Rectangle>
                     <!-- Fading Overlay -->
                     <Rectangle.Fill>
@@ -199,7 +214,7 @@
                         <!-- Text placed there is just an placeholder. -->
                         <TextBlock x:Name="handler_content_description_warning_label" FontSize="13" FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych." Opacity="0.75" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Grid>
-                    
+
                     <Grid x:Name="handler_content_description_pages" Width="200" HorizontalAlignment="Right">
                         <Rectangle Height="50" Width="150" RadiusX="7.5" RadiusY="7.5" Fill="#FF0D0A0A" Stroke="#FF271E1E"/>
                         <StackPanel x:Name="handler_content_description_pages_display" Orientation="Horizontal" HorizontalAlignment="Center">
