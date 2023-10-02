@@ -55,20 +55,20 @@
                                     </Path.Effect>
                                 </Path>
 
-                                <TextBlock x:Name="handler_bar_weatherwidget_header_title" VerticalAlignment="Top" TextAlignment="Center" Text="XXXXXXXXXX" Foreground="White" FontFamily="/Font/InterBold/#Inter" Margin="0,-1,0,0" FontSize="15" Height="15" Width="200"/>
+                                <TextBlock Margin="0,-4,0,0" x:Name="handler_bar_weatherwidget_header_title" VerticalAlignment="Top" HorizontalAlignment="Center" TextAlignment="Center" Text="XXXXXXXXXX" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="20" Height="20" Width="200"/>
                             </StackPanel>
                         </Grid>
 
-                        <Grid x:Name="handler_bar_happynumberwidget" Height="50" Width="250" Margin="0,15,0,0">
+                        <Grid Visibility="Collapsed" x:Name="handler_bar_happynumberwidget"  Height="50" Width="250" Margin="0,15,0,0">
                             <Rectangle RadiusX="10" RadiusY="10" Fill="#FF0A0505" Stroke="#FF272727">
                                 <Rectangle.Effect>
                                     <DropShadowEffect ShadowDepth="0" Direction="0" BlurRadius="15"/>
                                 </Rectangle.Effect>
                             </Rectangle>
 
-                            <StackPanel x:Name="handler_bar_happynumberwidget_header" Orientation="Horizontal" Margin="20,16,0,0">
-                                <TextBlock Opacity="0.75" x:Name="handler_bar_happynumberwidget_header_title" VerticalAlignment="Top" TextAlignment="Center" Text="Szczesliwy numerek:" Foreground="White" FontFamily="/Font/InterBold/#Inter" Margin="0,-1,0,0" FontSize="15" Height="15"/>
-                                <TextBlock x:Name="handler_bar_happynumberwidget_header_content" VerticalAlignment="Top" TextAlignment="Center" Text="0" Foreground="White" FontFamily="/Font/InterBold/#Inter" Margin="0,-5,0,0" Width="75" FontSize="25" Height="30"/>
+                            <StackPanel x:Name="handler_bar_happynumberwidget_header" Orientation="Horizontal" Margin="20,0,0,0">
+                                <TextBlock Opacity="0.75" x:Name="handler_bar_happynumberwidget_header_title" VerticalAlignment="Center" TextAlignment="Center" Text="Szczęśliwy numerek:" Foreground="White" FontFamily="/Font/InterBold/#Inter" Margin="0,1,0,0" FontSize="15" Height="20"/>
+                                <TextBlock x:Name="handler_bar_happynumberwidget_header_content" TextAlignment="Center" Text="0" Foreground="White" FontFamily="/Font/InterBold/#Inter" Margin="0,-1,0,0" Width="75" FontSize="25" Height="30"/>
                             </StackPanel>
                         </Grid>
                     </StackPanel>
@@ -140,6 +140,7 @@
                                     
                                     // Field example, to see in designer; uncomment and remove this.
                                     // Made to port into raw c# from xaml
+                                    
                                     <Grid VerticalAlignment="Top" Margin="0,10,0,0">
                                         <Rectangle Height="45" Width="1000" Fill="#FF0E0B0B" RadiusX="5" RadiusY="5"/>
                                         <StackPanel Orientation="Horizontal">
@@ -152,7 +153,7 @@
                                             </Grid>
                                             <Rectangle Width="2" Fill="#FF202020"/>
                                             <Grid Width="298">
-                                                <TextBlock Text="John Doe" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="16" TextAlignment="Center" VerticalAlignment="Center" Width="300"/>
+                                                <TextBlock Text="John Doeihdaf hids shfhdsfudsfhadf uuidf id" Margin="0,0,0,0" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="16" TextAlignment="Center" VerticalAlignment="Center" Width="300"/>
                                             </Grid>
                                             <Rectangle Width="2" Fill="#FF202020"/>
                                             <Grid Width="298">
@@ -172,7 +173,42 @@
 
                     <TabItem Header="TabItem" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Visibility="Collapsed">
                         <Grid>
-                            <Label Content="tab2" Foreground="White"/>
+                            <Grid x:Name="handler_spotifyqr" VerticalAlignment="Center" HorizontalAlignment="Center" Height="500" Width="375" Margin="0,0,0,75">
+                                <TextBlock x:Name="handler_spotifyqr_title" Text="Aktualnie gramy" FontFamily="/Font/InterBold/#Inter" Foreground="White" TextAlignment="Center" FontSize="40"/>
+
+                                <Grid Height="425" Margin="0,75,0,0">
+                                    <Rectangle RadiusX="20" RadiusY="20" Fill="#FF0D0A0A"/>
+
+                                    <Grid Height="325" Width="325" Margin="0,25,0,0" VerticalAlignment="Top">
+                                        <Rectangle RadiusX="10" RadiusY="10" Width="324" Height="324">
+                                            <Rectangle.Fill>
+                                                <ImageBrush x:Name="handler_spotifyqr_background" ImageSource="https://i.imgur.com/UsGvzra.png"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+
+                                        <Rectangle Height="200" Margin="0,0,0,50" VerticalAlignment="Bottom">
+                                            <Rectangle.Fill>
+                                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                    <GradientStop Color="#00000000"/>
+                                                    <GradientStop Color="Black" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+
+                                        <Rectangle RadiusX="10" RadiusY="10" Height="80" Width="325" VerticalAlignment="Bottom">
+                                            <Rectangle.Fill>
+                                                <ImageBrush x:Name="handler_spotifyqr_code" ImageSource="https://scannables.scdn.co/uri/plain/png/000000/white/640/spotify:playlist:56Ljg19fTjjP1cgO2WFtAT"/>
+                                            </Rectangle.Fill>
+                                        </Rectangle>
+                                    </Grid>
+
+                                    <Grid VerticalAlignment="Bottom" Margin="0,0,0,10">
+                                        <Rectangle Height="55" Width="250" RadiusX="10" RadiusY="10" Fill="#FF161111" Stroke="#FF221B1B"/>
+
+                                        <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Zeskanuj kod Spotify" FontSize="20" TextAlignment="Center" Margin="0,14,0,0"/>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
                         </Grid>
                     </TabItem>
 
@@ -195,7 +231,7 @@
                     </TabItem>
                 </TabControl>
 
-                <Label x:Name="loadingmodules" FontSize="20" Foreground="White" FontFamily="/Font/InterBold/#Inter" Content="Ladowanie modułow, proszę czekać." HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Label Visibility="Collapsed" x:Name="loadingmodules" FontSize="20" Foreground="White" FontFamily="/Font/InterBold/#Inter" Content="Ladowanie modułow, proszę czekać." HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                 <Rectangle>
                     <!-- Fading Overlay -->
@@ -228,11 +264,7 @@
                 </Grid>
 
                 <Grid Height="5" VerticalAlignment="Bottom">
-                    <Rectangle x:Name="handler_content_tabchangeprogress" Width="5" Fill="#FFCC4E4E" HorizontalAlignment="Left" RadiusX="2.5" RadiusY="2.5">
-                        <Rectangle.Effect>
-                            <DropShadowEffect Color="#FFCC4E4E" ShadowDepth="0" Direction="0" BlurRadius="20"/>
-                        </Rectangle.Effect>
-                    </Rectangle>
+                    <Rectangle x:Name="handler_content_tabchangeprogress" Width="5" Fill="#FFCC4E4E" HorizontalAlignment="Left" RadiusX="2.5" RadiusY="2.5"/>
                 </Grid>
             </Grid>
 

@@ -69,6 +69,7 @@ namespace zstio_tv
                 // Forward for selected modules
                 if (string.Join(",", GetModules()).Contains("happynumber"))
                 {
+                    MainWindow._Instance.handler_bar_happynumberwidget.Visibility = Visibility.Visible;
                     Module_HappyNumber.RegisterModule(AddressInfo);
                 }
             }

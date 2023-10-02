@@ -11,7 +11,7 @@ namespace zstio_tv.Helpers
 
         public static string CalculateDate()
         {
-            string Day = DateTime.Now.ToString("dd");
+            string Day = DateTime.Now.ToString("%d");
             string ProcessMonth = DateTime.Now.ToString("MM");
             string ProcessWeekDay = DateTime.Now.DayOfWeek.ToString();
 

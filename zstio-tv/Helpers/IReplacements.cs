@@ -152,6 +152,11 @@ namespace zstio_tv.Helpers
             TeacherSpacingRectangle.Width = SpacingWidth;
             TeacherSpacingRectangle.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF202020"));
             HandlerPanel.Children.Add(TeacherSpacingRectangle);
+            if (TeacherTextBlock.Text.Length > 23)
+            {
+                double TempSize = (TeacherTextBlock.Text.Length - 23) * 0.25;
+                TeacherTextBlock.FontSize = TeacherTextBlock.FontSize - TempSize;
+            }
 
             Grid ReplacementGrid = new Grid();
             ReplacementGrid.Width = 300 - SpacingWidth;

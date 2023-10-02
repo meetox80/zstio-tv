@@ -2,7 +2,6 @@
 using System;
 using System.Diagnostics;
 using System.Net.Http;
-using System.Windows;
 using System.Windows.Threading;
 
 namespace zstio_tv.Modules

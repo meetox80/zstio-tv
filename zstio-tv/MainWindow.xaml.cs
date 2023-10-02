@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media.Animation;
@@ -36,7 +34,6 @@ namespace zstio_tv
             SpotifyAuth.AuthorizeSpotify();
             ConfigWindow ConfigWindow_Manager = new ConfigWindow();
             ConfigWindow_Manager.Show();
-
 
             Process[] processes = Process.GetProcessesByName("node");
             foreach (Process process in processes)
@@ -107,14 +104,14 @@ namespace zstio_tv
         private void GetWeatherTick(object sender, EventArgs e)
         {
             LocalMemory.WeatherAPIResponse = IWeather.GetWeatherData();
-
-            if (LocalMemory.WeatherAPIResponse != null || LocalMemory.WeatherAPIResponse != "")
+            Console.WriteLine(LocalMemory.WeatherAPIResponse);
+            if (LocalMemory.WeatherAPIResponse != null && LocalMemory.WeatherAPIResponse != "" && LocalMemory.WeatherAPIResponse != "{}")
             {
                 JObject WeatherData = JObject.Parse(LocalMemory.WeatherAPIResponse);
 
-                if (WeatherData["current"] != null)
+                if (WeatherData["current"] != null && WeatherData["current"].ToString() != "")
                 {
-                    handler_bar_weatherwidget_header_title.Text = $"{Config.WeatherCity} - {WeatherData["current"]["temp_c"].ToString()}°C";
+                    handler_bar_weatherwidget_header_title.Text = $"{Config.WeatherCity}: {WeatherData["current"]["temp_c"].ToString()}°C";
                 }
             }
         }
@@ -157,6 +154,12 @@ namespace zstio_tv
                     handler_bar_zstiofm_image.Source = SongImageBitmap;
 
                     LocalMemory.SongPlaying = true;
+
+                    // SpotifyQR Integration
+                    string SpotifyQR = $"https://scannables.scdn.co/uri/plain/png/000000/white/640/{SongResponse["item"]["uri"].ToString()}";
+                    BitmapImage SpotifyQR_Bitmap = new BitmapImage(new Uri(SpotifyQR));
+                    handler_spotifyqr_code.ImageSource = SpotifyQR_Bitmap;
+                    handler_spotifyqr_background.ImageSource = SongImageBitmap;
                 }
             }
 
@@ -234,6 +237,14 @@ namespace zstio_tv
         int PageTime = 0; int PageIndex = 0; public static int PageLength = 30;
         private void TabTimerTick(object sender, EventArgs e)
         {
+            if (!LocalMemory.SongPlaying)
+            {
+                handler_spotifyqr_title.Text = "Ostatnio grane";
+            } else
+            {
+                handler_spotifyqr_title.Text = "Aktualnie gramy";
+            }
+
             if (PageTime == 1)
                 TabTransition(0, 1);
 
@@ -243,7 +254,7 @@ namespace zstio_tv
             if (PageTime == PageLength)
             {
                 PageIndex++;
-                if (PageIndex == 4)
+                if (PageIndex == 2)
                 {
                     PageIndex = 0;
                 }
