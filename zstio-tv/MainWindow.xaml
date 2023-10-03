@@ -5,15 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:zstio_tv"
         mc:Ignorable="d"
-        Title="zstio-tv" Loaded="WindowLoaded" Height="768" Width="1366" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" Icon="/logo.ico">
+        Title="zstio-tv" Loaded="WindowLoaded" Height="768" Width="1366" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" Icon="/logo.ico" KeyDown="Window_KeyDown">
     <Grid Background="Black">
-        <Grid x:Name="handler" Height="768" Width="1366" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0,0">
-            <Grid.Background>
-                <LinearGradientBrush EndPoint="1,1" StartPoint="0,0">
-                    <GradientStop Color="#FF070707"/>
-                    <GradientStop Color="#FF0B0101" Offset="1"/>
-                </LinearGradientBrush>
-            </Grid.Background>
+        <Grid x:Name="handler" Height="768" Width="1366" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0,0" Background="#FF020202">
             <Grid.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform x:Name="handler_scale" ScaleY="1" ScaleX="1"/>
@@ -21,34 +15,35 @@
             </Grid.RenderTransform>
 
             <Grid x:Name="handler_bar" Width="300" HorizontalAlignment="Left">
-                <Rectangle x:Name="handler_bar_background" Stroke="#FF1E1E1E" Fill="#FF0A0303"/>
+                <Rectangle x:Name="handler_bar_background" Stroke="#FF1E1E1E" Fill="#FF020202"/>
                 <StackPanel Margin="0,50,0,0">
                     <TextBlock x:Name="handler_bar_clock" Height="80" FontFamily="/Font/InterBold/#Inter" Text="00:00" Foreground="White" TextAlignment="Center" FontSize="75" VerticalAlignment="Top">
                         <TextBlock.Effect>
-                            <DropShadowEffect Color="White" Direction="0" ShadowDepth="0" BlurRadius="20" Opacity="0.25"/>
+                            <DropShadowEffect Color="White" Direction="0" ShadowDepth="0" BlurRadius="20" Opacity="0.10"/>
                         </TextBlock.Effect>
                     </TextBlock>
                     <TextBlock x:Name="handler_bar_date" Height="25" FontFamily="/Font/InterBold/#Inter" Text="20 Września - Środa" Foreground="White" TextAlignment="Center" FontSize="15" VerticalAlignment="Top" Margin="0,10,0,0"/>
 
                     <StackPanel Orientation="Vertical" Margin="0,20,0,0" HorizontalAlignment="Center">
                         <Grid x:Name="handler_bar_lessonwidget" Height="60" Width="250" Margin="0,15,0,0">
-                            <Rectangle RadiusX="10" RadiusY="10" Fill="#FF0A0505" Stroke="#FF272727">
+                            <Rectangle RadiusX="10" RadiusY="10" Fill="#FF050505" Stroke="#FF272727">
                                 <Rectangle.Effect>
                                     <DropShadowEffect ShadowDepth="0" Direction="0" BlurRadius="15"/>
                                 </Rectangle.Effect>
                             </Rectangle>
                             <TextBlock x:Name="handler_bar_lessonwidget_title" FontFamily="/Font/InterBold/#Inter" FontSize="14" Foreground="White" Text="Czas do konca xxxxx:" TextAlignment="Center" Margin="0,5,0,0"/>
-                            <TextBlock x:Name="handler_bar_lessonwidget_timer" FontFamily="/Font/InterBold/#Inter" FontSize="28" Foreground="White" Text="00:00:00" TextAlignment="Center" Margin="0,22.5,0,0"/>
+                            <TextBlock x:Name="handler_bar_lessonwidget_timer" FontFamily="/Font/InterBold/#Inter" FontSize="28" Foreground="White" Text="00:00" TextAlignment="Center" Margin="0,22.5,0,0"/>
                         </Grid>
 
                         <Grid x:Name="handler_bar_weatherwidget" Height="50" Width="250" Margin="0,15,0,0">
-                            <Rectangle RadiusX="10" RadiusY="10" Fill="#FF0A0505" Stroke="#FF272727">
+                            <Rectangle RadiusX="10" RadiusY="10" Fill="#FF050505" Stroke="#FF272727">
                                 <Rectangle.Effect>
                                     <DropShadowEffect ShadowDepth="0" Direction="0" BlurRadius="15"/>
                                 </Rectangle.Effect>
                             </Rectangle>
 
-                            <StackPanel x:Name="handler_bar_weatherwidget_header" Orientation="Horizontal" Margin="20,16,0,0">
+                            <StackPanel x:Name="handler_bar_weatherwidget_header" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <!--
                                 <Path Stretch="Fill" Height="16" Width="24" Fill="White" Opacity="0.75" HorizontalAlignment="Left" VerticalAlignment="Top" Data="M0 336c0 79.5 64.5 144 144 144H512c70.7 0 128-57.3 128-128c0-61.9-44-113.6-102.4-125.4c4.1-10.7 6.4-22.4 6.4-34.6c0-53-43-96-96-96c-19.7 0-38.1 6-53.3 16.2C367 64.2 315.3 32 256 32C167.6 32 96 103.6 96 192c0 2.7 .1 5.4 .2 8.1C40.2 219.8 0 273.2 0 336z">
                                     <Path.Effect>
                                         <DropShadowEffect Color="#BFFFFFFF" BlurRadius="15" Direction="0" ShadowDepth="0" Opacity="0.5"/>
@@ -56,19 +51,28 @@
                                 </Path>
 
                                 <TextBlock Margin="0,-4,0,0" x:Name="handler_bar_weatherwidget_header_title" VerticalAlignment="Top" HorizontalAlignment="Center" TextAlignment="Center" Text="XXXXXXXXXX" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="20" Height="20" Width="200"/>
+                                -->
+
+                                <Path Stretch="Fill" Height="16" Width="24" Fill="White" Opacity="0.75" HorizontalAlignment="Left" VerticalAlignment="Top" Data="M0 336c0 79.5 64.5 144 144 144H512c70.7 0 128-57.3 128-128c0-61.9-44-113.6-102.4-125.4c4.1-10.7 6.4-22.4 6.4-34.6c0-53-43-96-96-96c-19.7 0-38.1 6-53.3 16.2C367 64.2 315.3 32 256 32C167.6 32 96 103.6 96 192c0 2.7 .1 5.4 .2 8.1C40.2 219.8 0 273.2 0 336z">
+                                    <Path.Effect>
+                                        <DropShadowEffect Color="#BFFFFFFF" BlurRadius="15" Direction="0" ShadowDepth="0" Opacity="0.5"/>
+                                    </Path.Effect>
+                                </Path>
+
+                                <TextBlock x:Name="handler_bar_weatherwidget_header_title" FontFamily="/Font/InterBold/#Inter" Text="XXXXXXXXXXXX" Foreground="White" FontSize="15" Margin="10,0,0,0"/>
                             </StackPanel>
                         </Grid>
 
-                        <Grid Visibility="Collapsed" x:Name="handler_bar_happynumberwidget"  Height="50" Width="250" Margin="0,15,0,0">
-                            <Rectangle RadiusX="10" RadiusY="10" Fill="#FF0A0505" Stroke="#FF272727">
+                        <Grid x:Name="handler_bar_happynumberwidget"  Height="50" Width="250" Margin="0,15,0,0">
+                            <Rectangle RadiusX="10" RadiusY="10" Fill="#FF050505" Stroke="#FF272727">
                                 <Rectangle.Effect>
                                     <DropShadowEffect ShadowDepth="0" Direction="0" BlurRadius="15"/>
                                 </Rectangle.Effect>
                             </Rectangle>
 
-                            <StackPanel x:Name="handler_bar_happynumberwidget_header" Orientation="Horizontal" Margin="20,0,0,0">
-                                <TextBlock Opacity="0.75" x:Name="handler_bar_happynumberwidget_header_title" VerticalAlignment="Center" TextAlignment="Center" Text="Szczęśliwy numerek:" Foreground="White" FontFamily="/Font/InterBold/#Inter" Margin="0,1,0,0" FontSize="15" Height="20"/>
-                                <TextBlock x:Name="handler_bar_happynumberwidget_header_content" TextAlignment="Center" Text="0" Foreground="White" FontFamily="/Font/InterBold/#Inter" Margin="0,-1,0,0" Width="75" FontSize="25" Height="30"/>
+                            <StackPanel x:Name="handler_bar_happynumberwidget_header" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock x:Name="handler_bar_happynumberwidget_header_title" VerticalAlignment="Center" Text="Szczęśliwy numerek:" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="15"/>
+                                <TextBlock x:Name="handler_bar_happynumberwidget_header_content" Text="00" Foreground="White" FontFamily="/Font/InterBold/#Inter" Margin="7.5,0,0,0" VerticalAlignment="Center" FontSize="25"/>
                             </StackPanel>
                         </Grid>
                     </StackPanel>
@@ -79,8 +83,8 @@
                     <Rectangle Height="201" Width="298" VerticalAlignment="Bottom">
                         <Rectangle.Fill>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#BF0A0303" Offset="1"/>
-                                <GradientStop Color="#FF0A0303" Offset="0"/>
+                                <GradientStop Color="#BF020202" Offset="1"/>
+                                <GradientStop Color="#FF020202" Offset="0"/>
                             </LinearGradientBrush>
                         </Rectangle.Fill>
                     </Rectangle>
@@ -88,8 +92,10 @@
                         <StackPanel Orientation="Horizontal">
                             <Grid Width="180" Margin="20,20,0,0">
                                 <StackPanel>
-                                    <Label x:Name="handler_bar_zstiofm_title" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="20" Content="No data avalible."/>
-                                    <Label x:Name="handler_bar_zstiom_authors" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="15" Content="null" Opacity="0.75" Margin="0,-7.5,0,0"/>
+                                    <Grid Width="200" HorizontalAlignment="Left" Margin="4,0,0,0">
+                                        <TextBlock Width="Auto" x:Name="handler_bar_zstiofm_title" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="20" Text="Brak danych" Margin="0,0,0,0"/>
+                                    </Grid>
+                                    <Label x:Name="handler_bar_zstiom_authors" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="15" Content="Wczytywanie aplikacji" Opacity="0.75" Margin="0,-7.5,0,0"/>
                                 </StackPanel>
                             </Grid>
                             <Grid Width="96">
@@ -100,7 +106,8 @@
                 </Grid>
             </Grid>
             <Grid x:Name="handler_content" Width="1066" HorizontalAlignment="Right">
-                <TabControl x:Name="handler_content_tabcontrol" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}">
+                <Image Source="/Resources/zstio-splash.png" VerticalAlignment="Center" HorizontalAlignment="Center" Height="256" Opacity="0.05"/>
+                <TabControl x:Name="handler_content_tabcontrol" Background="#FF020202" BorderBrush="{x:Null}" Foreground="{x:Null}">
                     <TabItem Header="TabItem" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="{x:Null}" Visibility="Collapsed">
                         <Grid x:Name="handler_content_tabcontrol_replacements" VerticalAlignment="Top" Margin="0,10,0,0">
                             <Grid Margin="0,10,0,0">
@@ -140,16 +147,16 @@
                                     
                                     // Field example, to see in designer; uncomment and remove this.
                                     // Made to port into raw c# from xaml
-                                    
+                                    -->
                                     <Grid VerticalAlignment="Top" Margin="0,10,0,0">
-                                        <Rectangle Height="45" Width="1000" Fill="#FF0E0B0B" RadiusX="5" RadiusY="5"/>
+                                        <Rectangle Height="45" Width="1000" Fill="#FF0A0A0A" RadiusX="5" RadiusY="5"/>
                                         <StackPanel Orientation="Horizontal">
                                             <Grid Width="47" Margin="30,0,0,0">
-                                                <Rectangle Height="45" Width="45" RadiusX="5" RadiusY="5" Fill="#FF111010" Stroke="#FF271E1E"/>
+                                                <Rectangle Height="45" Width="45" RadiusX="5" RadiusY="5" Fill="#FF151515"/>
                                                 <TextBlock Text="1" FontFamily="/Font/InterBold/#Inter" Foreground="White" TextAlignment="Center" FontSize="24" Margin="0,7.5,0,0"/>
                                             </Grid>
                                             <Grid Width="188">
-                                                <TextBlock Text="-TI 1/2" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="16" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                <TextBlock Text="12345678901234567" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="16" TextAlignment="Center" VerticalAlignment="Center"/>
                                             </Grid>
                                             <Rectangle Width="2" Fill="#FF202020"/>
                                             <Grid Width="298">
@@ -160,12 +167,12 @@
                                                 <TextBlock Text="Jan Kowalski" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="16" TextAlignment="Center" VerticalAlignment="Center"/>
                                             </Grid>
                                             <Grid Width="180">
-                                                <Rectangle Fill="#FF111010" RadiusX="5" RadiusY="5" Stroke="#FF271E1E"/>
+                                                <Rectangle Fill="#FF151515" RadiusX="5" RadiusY="5"/>
                                                 <TextBlock Text="36" Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="16" TextAlignment="Center" VerticalAlignment="Center"/>
                                             </Grid>
                                         </StackPanel>
                                     </Grid>
-                                    -->
+                                    
                                 </StackPanel>
                             </Grid>
                         </Grid>
@@ -177,7 +184,7 @@
                                 <TextBlock x:Name="handler_spotifyqr_title" Text="Aktualnie gramy" FontFamily="/Font/InterBold/#Inter" Foreground="White" TextAlignment="Center" FontSize="40"/>
 
                                 <Grid Height="425" Margin="0,75,0,0">
-                                    <Rectangle RadiusX="20" RadiusY="20" Fill="#FF0D0A0A"/>
+                                    <Rectangle RadiusX="20" RadiusY="20" Fill="#FF090909"/>
 
                                     <Grid Height="325" Width="325" Margin="0,25,0,0" VerticalAlignment="Top">
                                         <Rectangle RadiusX="10" RadiusY="10" Width="324" Height="324">
@@ -203,7 +210,7 @@
                                     </Grid>
 
                                     <Grid VerticalAlignment="Bottom" Margin="0,0,0,10">
-                                        <Rectangle Height="55" Width="250" RadiusX="10" RadiusY="10" Fill="#FF161111" Stroke="#FF221B1B"/>
+                                        <Rectangle Height="55" Width="250" RadiusX="10" RadiusY="10" Fill="#FF101010" Stroke="#FF151515"/>
 
                                         <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Zeskanuj kod Spotify" FontSize="20" TextAlignment="Center" Margin="0,14,0,0"/>
                                     </Grid>
@@ -238,7 +245,7 @@
                     <Rectangle.Fill>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                             <GradientStop Color="#00080606" Offset="0.80"/>
-                            <GradientStop Color="#FF0A0202" Offset="0.92"/>
+                            <GradientStop Color="#FF050505" Offset="0.92"/>
                             <!-- development bottom backup: #FF0A0202 -->
                         </LinearGradientBrush>
                     </Rectangle.Fill>
@@ -246,18 +253,15 @@
 
                 <Grid x:Name="handler_content_description" VerticalAlignment="Bottom" Height="75" Margin="0,0,0,15">
                     <Grid x:Name="handler_content_description_warning" Width="900" HorizontalAlignment="Left">
-                        <Rectangle Height="50" Width="825" RadiusX="7.5" RadiusY="7.5" Fill="#FF0D0A0A" Stroke="#FF271E1E"/>
+                        <Rectangle Height="50" Width="825" RadiusX="7.5" RadiusY="7.5" Fill="#FF151515" Stroke="#FF151515"/>
                         <!-- Text placed there is just an placeholder. -->
                         <TextBlock x:Name="handler_content_description_warning_label" FontSize="13" FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych." Opacity="0.75" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Grid>
 
                     <Grid x:Name="handler_content_description_pages" Width="200" HorizontalAlignment="Right">
-                        <Rectangle Height="50" Width="150" RadiusX="7.5" RadiusY="7.5" Fill="#FF0D0A0A" Stroke="#FF271E1E"/>
+                        <Rectangle Height="50" Width="150" RadiusX="7.5" RadiusY="7.5" Fill="#FF151515" Stroke="#FF151515"/>
                         <StackPanel x:Name="handler_content_description_pages_display" Orientation="Horizontal" HorizontalAlignment="Center">
                             <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8"/>
-                            <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
-                            <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
-                            <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
                             <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
                         </StackPanel>
                     </Grid>

@@ -3,8 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net.Http;
+using System.Net.NetworkInformation;
+using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media.Animation;
@@ -25,22 +26,32 @@ namespace zstio_tv
             _Instance = this;
         }
 
+        public static bool CheckForInternetConnection(int timeoutMs = 10000, string url = null)
+        {
+            try
+            {
+                Ping myPing = new Ping();
+                String host = "google.com";
+                byte[] buffer = new byte[32];
+                int timeout = 1000;
+                PingOptions pingOptions = new PingOptions();
+                PingReply reply = myPing.Send(host, timeout, buffer, pingOptions);
+                return (reply.Status == IPStatus.Success);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
+
             // Reload the Replacements functionality, start the replacements scrolling
             ReplacementsGETAPI_Tick(null, null);
             ReplacementsCALC_Tick(null, null);
             GetWeatherTick(null, null);
             ClockTimerTick(null, null);
-            try
-            {
-                SpotifyAuth.AuthorizeSpotify();
-            } catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show($"Failed to authorize spotify. ({ex})");
-            }
-            ConfigWindow ConfigWindow_Manager = new ConfigWindow();
-            ConfigWindow_Manager.Show();
 
             Process[] processes = Process.GetProcessesByName("node");
             foreach (Process process in processes)
@@ -75,8 +86,6 @@ namespace zstio_tv
             float DisplayScaleFactor = (float)Math.Min(this.Width / 1366.0, this.Height / 768.0);
             handler_scale.ScaleX = DisplayScaleFactor;
             handler_scale.ScaleY = DisplayScaleFactor;
-
-            ConfigWindow._Instance.modulescount.Content = $"Zaladowane moduly: {ModulesManager.ModulesCount()}";
 
             DispatcherTimer ClockTimer = new DispatcherTimer();
             ClockTimer.Interval = TimeSpan.FromSeconds(10);
@@ -161,7 +170,7 @@ namespace zstio_tv
                         }
 
                         // Set the text, authors, image of zstiofm.
-                        handler_bar_zstiofm_title.Content = SongName;
+                        handler_bar_zstiofm_title.Text = SongName;
                         handler_bar_zstiom_authors.Content = SongAuthors;
 
                         BitmapImage SongImageBitmap = new BitmapImage(new Uri(SongImage));
@@ -345,5 +354,24 @@ namespace zstio_tv
         }
 
         private void developerbadgeMD(object sender, System.Windows.Input.MouseButtonEventArgs e) => this.Close();
+
+        public static bool ConfigWindowState = false;
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Escape)
+            {
+                ConfigWindow cf_win = new ConfigWindow();
+                ConfigWindowState = !ConfigWindowState;
+
+                if (ConfigWindowState)
+                {
+                    cf_win.Show();
+                }
+                else
+                {
+                    cf_win.Close();
+                }
+            }
+        }
     }
 }

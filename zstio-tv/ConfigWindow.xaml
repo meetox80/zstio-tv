@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:zstio_tv"
         mc:Ignorable="d"
-        Title="ConfigWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Background="#FF101010" Loaded="WindowLoaded">
+        Title="ConfigWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Background="#FF101010" Loaded="WindowLoaded" KeyDown="Window_KeyDownConfig">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
@@ -37,7 +37,7 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10">
-            <Button Cursor="Hand" Height="30" Width="120" Content="Minimalizuj" FontFamily="/Font/InterBold/#Inter" Opacity="0.5" Foreground="White" Background="#FF151515" BorderBrush="#FF5A4343" Click="Button_Click_1" Margin="10,0,0,0"/>
+            <Button Cursor="Hand" Height="30" Width="160" Content="Zautoryzuj spotify" FontFamily="/Font/InterBold/#Inter" Opacity="0.5" Foreground="White" Background="#FF151515" BorderBrush="#FF5A4343" Click="Button_Click_1" Margin="10,0,0,0"/>
             <Button Cursor="Hand" Height="30" Width="90" Content="Zastosuj" FontFamily="/Font/InterBold/#Inter" Foreground="White" Background="#FF151515" BorderBrush="#FFA94646" Click="Button_Click" Margin="10,0,0,0"/>
         </StackPanel>
 

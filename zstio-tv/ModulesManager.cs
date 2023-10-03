@@ -19,7 +19,8 @@ namespace zstio_tv
 
                 foreach (string module in modulesList)
                 {
-                    completeList.Add(Path.GetFileName(module));
+                    if (module.Contains("tvmodule"))
+                        completeList.Add(Path.GetFileName(module));
                 }
             }
 

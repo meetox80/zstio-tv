@@ -19,7 +19,7 @@ namespace zstio_tv.Helpers
                 {
                     CurrentLessonIndex = i;
                     TimeSpan RemainingTime = LessonEndTime - CurrentTime;
-                    return new string[] { $"Czas do końca {CurrentLessonIndex + 1} lekcji: ", $"{RemainingTime.ToString(@"hh\:mm\:ss")}" };
+                    return new string[] { $"Czas do końca {CurrentLessonIndex + 1} lekcji: ", $"{RemainingTime.ToString(@"mm\:ss")}" };
                 }
             }
 

@@ -1,20 +1,10 @@
-﻿using System.Runtime.InteropServices;
-using System;
+﻿using System.Threading;
 using System.Windows;
-using System.Windows.Interop;
+using System.Windows.Input;
+using zstio_tv.Modules;
 
 namespace zstio_tv
 {
-    internal class Win32
-    {
-        public const int GWL_STYLE = -16;
-        public const int WS_SYSMENU = 0x80000;
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-        [DllImport("user32.dll")]
-        public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-    }
-
     public partial class ConfigWindow : Window
     {
         public static ConfigWindow _Instance;
@@ -47,10 +37,28 @@ namespace zstio_tv
             ReloadReplacements();
         }
 
-        public static void ReloadReplacements()
+        public void ReloadReplacements()
         {
-            MainWindow.ReplacementsGETAPI_Tick(null, null);
-            MainWindow.ReplacementsCALC_Tick(null, null);
+            if (checkbox_short.IsChecked == true)
+            {
+                MainWindow.ReplacementsGETAPI_Tick(null, null);
+                MainWindow.ReplacementsCALC_Tick(null, null);
+            }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            SpotifyAuth.AuthorizeSpotify();
+        }
+
+        private void Window_KeyDownConfig(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                this.Close();
+                MainWindow.ConfigWindowState = false;
+                Thread.Sleep(250);
+            }
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -58,15 +66,8 @@ namespace zstio_tv
             TempLessonTimes = Config.LessonTimes;
             TempBreakTimes = Config.BreakTimes;
 
-            var hwnd = new WindowInteropHelper(this).Handle;
-            Win32.SetWindowLong(hwnd, Win32.GWL_STYLE, Win32.GetWindowLong(hwnd, Win32.GWL_STYLE) & ~Win32.WS_SYSMENU);
-
             input_warning.Text = Config.Warning;
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            this.WindowState = WindowState.Minimized;
+            modulescount.Content = $"Zaladowane moduly: {ModulesManager.ModulesCount()}";
         }
     }
 }

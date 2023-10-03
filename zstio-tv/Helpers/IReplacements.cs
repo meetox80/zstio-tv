@@ -101,7 +101,7 @@ namespace zstio_tv.Helpers
             Rectangle HandlerRectangle = new Rectangle();
             HandlerRectangle.Height = 45;
             HandlerRectangle.Width = 1000;
-            HandlerRectangle.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF0E0B0B"));
+            HandlerRectangle.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF0A0A0A"));
             HandlerRectangle.RadiusX = 5;
             HandlerRectangle.RadiusY = 5;
             HandlerGrid.Children.Add(HandlerRectangle);
@@ -117,8 +117,7 @@ namespace zstio_tv.Helpers
             LessonNumberRectangle.Width = 45;
             LessonNumberRectangle.RadiusX = 5;
             LessonNumberRectangle.RadiusY = 5;
-            LessonNumberRectangle.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF111010"));
-            LessonNumberRectangle.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF271E1E"));
+            LessonNumberRectangle.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF151515"));
             LessonNumberGrid.Children.Add(LessonNumberRectangle);
             TextBlock LessonNumberTextBlock = new TextBlock();
             LessonNumberTextBlock.Text = $"{LessonNumber}";
@@ -133,7 +132,10 @@ namespace zstio_tv.Helpers
             Grid BranchGrid = new Grid();
             BranchGrid.Width = 190 - SpacingWidth;
             TextBlock BranchTextBlock = new TextBlock();
+
+
             BranchTextBlock.Text = $"{branch}";
+            BranchTextBlock.Text = BranchTextBlock.Text.Replace("+", Environment.NewLine);
             BranchTextBlock.FontFamily = new FontFamily(new Uri("pack://application:,,,/"), "./Font/InterBold/#Inter");
             BranchTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFFFF"));
             BranchTextBlock.FontSize = 16;
@@ -191,8 +193,7 @@ namespace zstio_tv.Helpers
             Rectangle ClassroomBackground = new Rectangle();
             ClassroomBackground.RadiusX = 5;
             ClassroomBackground.RadiusY = 5;
-            ClassroomBackground.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF111010"));
-            ClassroomBackground.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF271E1E"));
+            ClassroomBackground.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF151515"));
             ClassroomGrid.Children.Add(ClassroomBackground);
             ClassroomGrid.Children.Add(ClassroomTextBlock);
             HandlerPanel.Children.Add(ClassroomGrid);
