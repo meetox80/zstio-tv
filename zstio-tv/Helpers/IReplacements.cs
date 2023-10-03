@@ -36,48 +36,57 @@ namespace zstio_tv.Helpers
         public static int CurrentLessonIndexBackup;
         public static void ConfigureReplacements()
         {
-            if (ILesson.CurrentLessonIndex > CurrentLessonIndexBackup)
+            try
             {
-                CurrentLessonIndexBackup = ILesson.CurrentLessonIndex;
-            }
-            MainWindow._Instance.handler_content_tabcontrol_replacements_fields.Children.Clear();
-
-            Root root = JsonConvert.DeserializeObject<Root>(LocalMemory.ReplacementsAPIResponse);
-
-            foreach (var table in root.tables)
-            {
-                int TableNum = 0; TableNum++;
-                if (TableNum == 1)
+                if (LocalMemory.ReplacementsAPIResponse != "")
                 {
-                    foreach (var substitution in table.zastepstwa)
+                    if (ILesson.CurrentLessonIndex > CurrentLessonIndexBackup)
                     {
-                        // Forgot to tag this as an line for development/debugging.
-                        // Console.WriteLine(ILesson.CurrentLessonIndex + 1);
-                        if (CurrentLessonIndexBackup < Int32.Parse(substitution.lesson.Split(',')[0]))
+                        CurrentLessonIndexBackup = ILesson.CurrentLessonIndex;
+                    }
+                    MainWindow._Instance.handler_content_tabcontrol_replacements_fields.Children.Clear();
+
+                    Root root = JsonConvert.DeserializeObject<Root>(LocalMemory.ReplacementsAPIResponse);
+
+                    foreach (var table in root.tables)
+                    {
+                        int TableNum = 0; TableNum++;
+                        if (TableNum == 1)
                         {
-                            string replacement;
-                            if (substitution.message == "")
+                            foreach (var substitution in table.zastepstwa)
                             {
-                                replacement = substitution.@case;
-                            }
-                            else
-                            {
-                                replacement = substitution.message;
-                            }
+                                // Forgot to tag this as an line for development/debugging.
+                                // Console.WriteLine(ILesson.CurrentLessonIndex + 1);
+                                if (CurrentLessonIndexBackup < Int32.Parse(substitution.lesson.Split(',')[0]))
+                                {
+                                    string replacement;
+                                    if (substitution.message == "")
+                                    {
+                                        replacement = substitution.@case;
+                                    }
+                                    else
+                                    {
+                                        replacement = substitution.message;
+                                    }
 
-                            if (substitution.@class == "")
-                            {
-                                substitution.@class = "-";
+                                    if (substitution.@class == "")
+                                    {
+                                        substitution.@class = "-";
+                                    }
+
+                                    substitution.branch = substitution.branch.Replace("|", " - ");
+
+                                    PlaceElement(substitution.lesson.Split(',')[0], substitution.branch, substitution.subject, replacement, substitution.@class);
+                                }
                             }
-
-                            substitution.branch = substitution.branch.Replace("|", " - ");
-
-                            PlaceElement(substitution.lesson.Split(',')[0], substitution.branch, substitution.subject, replacement, substitution.@class);
                         }
+
+                        MainWindow._Instance.handler_content_tabcontrol_replacements_titledate.Text = $"Zastępstwa na dzień {table.time.Substring(7)}";
                     }
                 }
-
-                MainWindow._Instance.handler_content_tabcontrol_replacements_titledate.Text = $"Zastępstwa na dzień {table.time.Substring(7)}";
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
         }
 

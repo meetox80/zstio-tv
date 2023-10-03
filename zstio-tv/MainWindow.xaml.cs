@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Forms;
@@ -31,7 +32,13 @@ namespace zstio_tv
             ReplacementsCALC_Tick(null, null);
             GetWeatherTick(null, null);
             ClockTimerTick(null, null);
-            SpotifyAuth.AuthorizeSpotify();
+            try
+            {
+                SpotifyAuth.AuthorizeSpotify();
+            } catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Failed to authorize spotify. ({ex})");
+            }
             ConfigWindow ConfigWindow_Manager = new ConfigWindow();
             ConfigWindow_Manager.Show();
 
@@ -49,13 +56,13 @@ namespace zstio_tv
             handler_content_description_warning_label.Text = Config.Warning;
 
             // Setup the display height and width, make it fullscreen
-            this.Height = LocalMemory.Display[0];
-            this.Width = LocalMemory.Display[1];
-            Screen firstScreen = Screen.AllScreens.FirstOrDefault();
-
-            if (firstScreen != null)
+            Screen[] screens = Screen.AllScreens; int screenNumber = 0;
+            Screen selectedScreen = screens[screenNumber];
+            this.Height = selectedScreen.Bounds.Height;
+            this.Width = selectedScreen.Bounds.Width;
+            if (screens.Length > 0)
             {
-                // Set the window's position to the top-left corner of the first screen
+                Screen firstScreen = screens[0];
                 Left = firstScreen.WorkingArea.Left;
                 Top = firstScreen.WorkingArea.Top;
             }
@@ -65,7 +72,7 @@ namespace zstio_tv
                 developerbadge.Visibility = Visibility.Visible;
 
             // Setup the scaling - fit on every tv without knowing the size.
-            float DisplayScaleFactor = Math.Min(LocalMemory.Display[1] / 1366.0f, LocalMemory.Display[0] / 768.0f);
+            float DisplayScaleFactor = (float)Math.Min(this.Width / 1366.0, this.Height / 768.0);
             handler_scale.ScaleX = DisplayScaleFactor;
             handler_scale.ScaleY = DisplayScaleFactor;
 
@@ -104,63 +111,74 @@ namespace zstio_tv
         private void GetWeatherTick(object sender, EventArgs e)
         {
             LocalMemory.WeatherAPIResponse = IWeather.GetWeatherData();
-            Console.WriteLine(LocalMemory.WeatherAPIResponse);
-            if (LocalMemory.WeatherAPIResponse != null && LocalMemory.WeatherAPIResponse != "" && LocalMemory.WeatherAPIResponse != "{}")
+            try
             {
-                JObject WeatherData = JObject.Parse(LocalMemory.WeatherAPIResponse);
-
-                if (WeatherData["current"] != null && WeatherData["current"].ToString() != "")
+                if (LocalMemory.WeatherAPIResponse != null && LocalMemory.WeatherAPIResponse != "" && LocalMemory.WeatherAPIResponse != "{}")
                 {
-                    handler_bar_weatherwidget_header_title.Text = $"{Config.WeatherCity}: {WeatherData["current"]["temp_c"].ToString()}°C";
+                    JObject WeatherData = JObject.Parse(LocalMemory.WeatherAPIResponse);
+
+                    if (WeatherData["current"] != null && WeatherData["current"].ToString() != "")
+                    {
+                        handler_bar_weatherwidget_header_title.Text = $"{Config.WeatherCity}: {WeatherData["current"]["temp_c"].ToString()}°C";
+                    }
                 }
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
         }
 
         private void SpotifyCurrentPlaying_Tick(object sender, EventArgs e)
         {
-            string Response = SpotifyAuth.GetAPI("me/player/currently-playing").ToString();
+            try {
+                string Response = SpotifyAuth.GetAPI("me/player/currently-playing").ToString();
 
-            if (Response.Contains("ERRinternal") || Response == null || Response == "")
-            {
-                LocalMemory.SongPlaying = false;
-            } else
-            {
-                JObject SongResponse = JObject.Parse(Response);
-                if (SongResponse["item"] != null)
+                if (Response.Contains("ERRinternal") || Response == null || Response == "")
                 {
-                    string SongName = SongResponse["item"]["name"].ToString();
-
-                    JArray artistsArray = (JArray)SongResponse["item"]["artists"];
-                    List<string> authors = artistsArray.Select(artist => artist["name"].ToString()).ToList();
-                    string SongAuthors = string.Join(", ", authors);
-
-                    JObject album = (JObject)SongResponse["item"]["album"];
-                    string SongImage = "";
-                    if (album["images"] != null)
-                    {
-                        JArray images = (JArray)album["images"];
-
-                        if (images.Count > 0)
-                        {
-                            SongImage = images[0]["url"].ToString();
-                        }
-                    }
-
-                    // Set the text, authors, image of zstiofm.
-                    handler_bar_zstiofm_title.Content = SongName;
-                    handler_bar_zstiom_authors.Content = SongAuthors;
-
-                    BitmapImage SongImageBitmap = new BitmapImage(new Uri(SongImage));
-                    handler_bar_zstiofm_image.Source = SongImageBitmap;
-
-                    LocalMemory.SongPlaying = true;
-
-                    // SpotifyQR Integration
-                    string SpotifyQR = $"https://scannables.scdn.co/uri/plain/png/000000/white/640/{SongResponse["item"]["uri"].ToString()}";
-                    BitmapImage SpotifyQR_Bitmap = new BitmapImage(new Uri(SpotifyQR));
-                    handler_spotifyqr_code.ImageSource = SpotifyQR_Bitmap;
-                    handler_spotifyqr_background.ImageSource = SongImageBitmap;
+                    LocalMemory.SongPlaying = false;
                 }
+                else
+                {
+                    JObject SongResponse = JObject.Parse(Response);
+                    if (SongResponse["item"] != null)
+                    {
+                        string SongName = SongResponse["item"]["name"].ToString();
+
+                        JArray artistsArray = (JArray)SongResponse["item"]["artists"];
+                        List<string> authors = artistsArray.Select(artist => artist["name"].ToString()).ToList();
+                        string SongAuthors = string.Join(", ", authors);
+
+                        JObject album = (JObject)SongResponse["item"]["album"];
+                        string SongImage = "";
+                        if (album["images"] != null)
+                        {
+                            JArray images = (JArray)album["images"];
+
+                            if (images.Count > 0)
+                            {
+                                SongImage = images[0]["url"].ToString();
+                            }
+                        }
+
+                        // Set the text, authors, image of zstiofm.
+                        handler_bar_zstiofm_title.Content = SongName;
+                        handler_bar_zstiom_authors.Content = SongAuthors;
+
+                        BitmapImage SongImageBitmap = new BitmapImage(new Uri(SongImage));
+                        handler_bar_zstiofm_image.Source = SongImageBitmap;
+
+                        LocalMemory.SongPlaying = true;
+
+                        // SpotifyQR Integration
+                        string SpotifyQR = $"https://scannables.scdn.co/uri/plain/png/000000/white/640/{SongResponse["item"]["uri"].ToString()}";
+                        BitmapImage SpotifyQR_Bitmap = new BitmapImage(new Uri(SpotifyQR));
+                        handler_spotifyqr_code.ImageSource = SpotifyQR_Bitmap;
+                        handler_spotifyqr_background.ImageSource = SongImageBitmap;
+                    }
+                }
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
 
             if (LocalMemory.SongPlaying == true && LocalMemory.SongPlayingBackup == false)
@@ -316,8 +334,14 @@ namespace zstio_tv
 
         private void ClockTimerTick(object sender, EventArgs e)
         {
-            handler_bar_clock.Text = IDateTime.CalculateClock();
-            handler_bar_date.Text = IDateTime.CalculateDate();
+            try
+            {
+                handler_bar_clock.Text = IDateTime.CalculateClock();
+                handler_bar_date.Text = IDateTime.CalculateDate();
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
 
         private void developerbadgeMD(object sender, System.Windows.Input.MouseButtonEventArgs e) => this.Close();
