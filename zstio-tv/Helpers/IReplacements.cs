@@ -44,9 +44,9 @@ namespace zstio_tv.Helpers
                     {
                         CurrentLessonIndexBackup = ILesson.CurrentLessonIndex;
                     }
-                    MainWindow._Instance.handler_content_tabcontrol_replacements_fields.Children.Clear();
 
                     Root root = JsonConvert.DeserializeObject<Root>(LocalMemory.ReplacementsAPIResponse);
+                    MainWindow._Instance.handler_content_tabcontrol_replacements_fields.Children.Clear();
 
                     foreach (var table in root.tables)
                     {
@@ -84,6 +84,14 @@ namespace zstio_tv.Helpers
                         MainWindow._Instance.handler_content_tabcontrol_replacements_titledate.Text = $"Zastępstwa na dzień {table.time.Substring(7)}";
                     }
                 }
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+
+            try
+            {
+
             } catch (Exception ex)
             {
                 Console.WriteLine(ex);

@@ -63,7 +63,7 @@
                             </StackPanel>
                         </Grid>
 
-                        <Grid x:Name="handler_bar_happynumberwidget"  Height="50" Width="250" Margin="0,15,0,0">
+                        <Grid Visibility="Collapsed" x:Name="handler_bar_happynumberwidget" Height="50" Width="250" Margin="0,15,0,0">
                             <Rectangle RadiusX="10" RadiusY="10" Fill="#FF050505" Stroke="#FF272727">
                                 <Rectangle.Effect>
                                     <DropShadowEffect ShadowDepth="0" Direction="0" BlurRadius="15"/>
@@ -92,8 +92,8 @@
                         <StackPanel Orientation="Horizontal">
                             <Grid Width="180" Margin="20,20,0,0">
                                 <StackPanel>
-                                    <Grid Width="200" HorizontalAlignment="Left" Margin="4,0,0,0">
-                                        <TextBlock Width="Auto" x:Name="handler_bar_zstiofm_title" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="20" Text="Brak danych" Margin="0,0,0,0"/>
+                                    <Grid Width="200" HorizontalAlignment="Left">
+                                        <TextBlock Margin="-50,0,0,0" x:Name="handler_bar_zstiofm_title" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="20" Text="Just a boring sample text. This is an example."/>
                                     </Grid>
                                     <Label x:Name="handler_bar_zstiom_authors" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="15" Content="Wczytywanie aplikacji" Opacity="0.75" Margin="0,-7.5,0,0"/>
                                 </StackPanel>
@@ -148,6 +148,7 @@
                                     // Field example, to see in designer; uncomment and remove this.
                                     // Made to port into raw c# from xaml
                                     -->
+
                                     <Grid VerticalAlignment="Top" Margin="0,10,0,0">
                                         <Rectangle Height="45" Width="1000" Fill="#FF0A0A0A" RadiusX="5" RadiusY="5"/>
                                         <StackPanel Orientation="Horizontal">
@@ -172,8 +173,10 @@
                                             </Grid>
                                         </StackPanel>
                                     </Grid>
-                                    
+
                                 </StackPanel>
+                                
+                                <TextBlock x:Name="no_replacements" Visibility="Collapsed" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="20" Text="Brak zastępstw." HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.75"/>
                             </Grid>
                         </Grid>
                     </TabItem>
@@ -239,6 +242,7 @@
                 </TabControl>
 
                 <Label Visibility="Collapsed" x:Name="loadingmodules" FontSize="20" Foreground="White" FontFamily="/Font/InterBold/#Inter" Content="Ladowanie modułow, proszę czekać." HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Label Visibility="Collapsed" x:Name="noreplacements" FontSize="32" Opacity="0.5" Foreground="White" FontFamily="/Font/InterBold/#Inter" Content="Brak zastępstw." HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                 <Rectangle>
                     <!-- Fading Overlay -->

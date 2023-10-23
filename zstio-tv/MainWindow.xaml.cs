@@ -100,7 +100,7 @@ namespace zstio_tv
             TabTimer.Tick += TabTimerTick;
             TabTimer.Start();
             DispatcherTimer ReplacementsGETAPI = new DispatcherTimer();
-            ReplacementsGETAPI.Interval = TimeSpan.FromHours(1);
+            ReplacementsGETAPI.Interval = TimeSpan.FromHours(16);
             ReplacementsGETAPI.Tick += ReplacementsGETAPI_Tick;
             ReplacementsGETAPI.Start();
             DispatcherTimer ReplacementsCALC = new DispatcherTimer();
@@ -115,6 +115,9 @@ namespace zstio_tv
             GetWeather.Interval = TimeSpan.FromHours(1);
             GetWeather.Tick += GetWeatherTick;
             GetWeather.Start();
+
+            handler_bar_zstiofm_title.Text = "123456789012345678901234567890";
+            System.Windows.MessageBox.Show(handler_bar_zstiofm_title.ActualWidth + "");
         }
 
         private void GetWeatherTick(object sender, EventArgs e)
