@@ -238,6 +238,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Display\MediaWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -250,9 +254,13 @@
     <Compile Include="ConfigWindow.xaml.cs">
       <DependentUpon>ConfigWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Display\MediaWindow.xaml.cs">
+      <DependentUpon>MediaWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\IDateTime.cs" />
     <Compile Include="Helpers\ILesson.cs" />
     <Compile Include="Helpers\IReplacements.cs" />
+    <Compile Include="Helpers\IVersion.cs" />
     <Compile Include="Helpers\IWeather.cs" />
     <Compile Include="LocalMemory.cs" />
     <Compile Include="MainWindow.xaml.cs">
@@ -299,6 +307,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\zstio-splash.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\dropimage.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

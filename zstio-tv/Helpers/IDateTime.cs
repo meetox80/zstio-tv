@@ -9,6 +9,11 @@ namespace zstio_tv.Helpers
             return DateTime.Now.ToString("HH:mm");
         }
 
+        public static string CalculateReplacementsDate()
+        {
+            return $"Zastępstwa na dzień {DateTime.Now.ToString("dd.MM.yyyy")}";
+        }
+
         public static string CalculateDate()
         {
             string Day = DateTime.Now.ToString("%d");

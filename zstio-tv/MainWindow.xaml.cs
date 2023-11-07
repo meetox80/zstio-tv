@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.NetworkInformation;
-using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media.Animation;
@@ -46,6 +45,11 @@ namespace zstio_tv
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
+            string ServerVersion = IVersion.GetVersion(); if (ServerVersion == Config.Version)
+            {
+                System.Windows.Forms.MessageBox.Show($"Prosimy o aktualizacje klienta. v{Config.Version} -> v{ServerVersion}");
+                Process.Start("https://github.com/lemonekq/zstio-tv/");
+            }
 
             // Reload the Replacements functionality, start the replacements scrolling
             ReplacementsGETAPI_Tick(null, null);
@@ -115,9 +119,6 @@ namespace zstio_tv
             GetWeather.Interval = TimeSpan.FromHours(1);
             GetWeather.Tick += GetWeatherTick;
             GetWeather.Start();
-
-            handler_bar_zstiofm_title.Text = "123456789012345678901234567890";
-            System.Windows.MessageBox.Show(handler_bar_zstiofm_title.ActualWidth + "");
         }
 
         private void GetWeatherTick(object sender, EventArgs e)
@@ -350,6 +351,7 @@ namespace zstio_tv
             {
                 handler_bar_clock.Text = IDateTime.CalculateClock();
                 handler_bar_date.Text = IDateTime.CalculateDate();
+                handler_content_tabcontrol_replacements_titledate.Text = IDateTime.CalculateReplacementsDate();
             } catch (Exception ex)
             {
                 Console.WriteLine(ex);

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using zstio_tv.Modules;
@@ -58,6 +59,18 @@ namespace zstio_tv
                 this.Close();
                 MainWindow.ConfigWindowState = false;
                 Thread.Sleep(250);
+            }
+        }
+
+        MediaWindow wnd_media = new MediaWindow();
+        private void MediaWindowButton(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                wnd_media.Show();
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
         }
 

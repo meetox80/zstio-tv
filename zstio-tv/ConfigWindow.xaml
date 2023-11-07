@@ -27,13 +27,23 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <StackPanel Orientation="Horizontal" Margin="15,15,0,0" Height="30" VerticalAlignment="Top">
-                <Label Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="15" Content="Ostrzezenie: " Height="30"/>
-                <TextBox x:Name="input_warning" Width="650" Height="20" Background="#FF1B1B1B" BorderBrush="{x:Null}" Foreground="White" Text="..." SelectionBrush="#FFA94646" MaxLength="125"/>
+        <StackPanel Orientation="Vertical" Margin="15">
+            <StackPanel Margin="0,0,0,0">
+                <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" TextAlignment="Center" Opacity="0.5" Text="Globalne"/>
+                <StackPanel Orientation="Horizontal" Margin="15,0,0,0" Height="30" VerticalAlignment="Top">
+                    <Label Foreground="White" FontFamily="/Font/InterBold/#Inter" FontSize="15" Content="Ostrzezenie: " Height="30"/>
+                    <TextBox x:Name="input_warning" Width="650" Height="20" Background="#FF1B1B1B" BorderBrush="{x:Null}" Foreground="White" Text="..." SelectionBrush="#FFA94646" MaxLength="125"/>
+                </StackPanel>
+
+                <CheckBox x:Name="checkbox_short" Content="Skrocone lekcje" Foreground="White" FontFamily="/Font/InterBold/#Inter" Height="16" Margin="20,0,0,0"/>
             </StackPanel>
 
-            <CheckBox x:Name="checkbox_short" Content="Skrocone lekcje" Foreground="White" FontFamily="/Font/InterBold/#Inter" Height="16" Margin="20,5,0,0"/>
+            <StackPanel Margin="0,0,0,0">
+                <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" TextAlignment="Center" Opacity="0.5" Text="Media"/>
+
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0"></StackPanel>
+                <Button Cursor="Hand" Height="30" Width="180" Content="Dostosowywanie grafik" FontFamily="/Font/InterBold/#Inter" Foreground="White" Background="#FF151515" BorderBrush="#FFA94646" Click="MediaWindowButton" Margin="10,0,0,0"/>
+            </StackPanel>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10">
@@ -41,6 +51,9 @@
             <Button Cursor="Hand" Height="30" Width="90" Content="Zastosuj" FontFamily="/Font/InterBold/#Inter" Foreground="White" Background="#FF151515" BorderBrush="#FFA94646" Click="Button_Click" Margin="10,0,0,0"/>
         </StackPanel>
 
-        <Label x:Name="modulescount" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="10" HorizontalAlignment="Left" VerticalAlignment="Bottom" Content="Zaladowane moduly: 0" Opacity="0.5" Margin="15,0,0,15"/>
+        <StackPanel Orientation="Horizontal">
+            <Label x:Name="modulescount" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="10" HorizontalAlignment="Left" VerticalAlignment="Bottom" Content="Zaladowane moduly: 0" Opacity="0.5" Margin="15,0,0,15"/>
+            <Label x:Name="applicationversion" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="10" HorizontalAlignment="Left" VerticalAlignment="Bottom" Content="Wersja aplikacji:" Opacity="0.5" Margin="0,0,0,15"/>
+        </StackPanel>
     </Grid>
 </Window>

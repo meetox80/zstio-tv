@@ -98,8 +98,6 @@ namespace zstio_tv.Helpers
             }
         }
 
-        // nie ruszaj tego kodu, chyba ze jestes pewien co robisz
-        // edit: wtedy tez sie lepiej zastanow
         public static void PlaceElement(string LessonNumber, string branch, string teacher, string replacement, string classroom)
         {
             Grid HandlerGrid = new Grid();

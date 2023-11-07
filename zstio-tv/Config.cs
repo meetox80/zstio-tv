@@ -2,7 +2,15 @@
 {
     internal class Config
     {
+        #region Application
+        public static string Version = "0.24";
         public static bool Developer = false;
+
+        public static string Warning = "Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych.";
+        #endregion
+
+        #region API's
+        public static string VersionAPI = "https://raw.githubusercontent.com/lemonekq/zstio-tv/main/.version";
         public static string ReplacementsAPI = "https://zastepstwa.awfulworld.space/api/getSubstitutions";
 
         public static string SpotifyID = "859de286484544ad859832003ac4e6b4";
@@ -10,7 +18,9 @@
 
         public static string WeatherAuth = "50959cb1663e428b968170326232609";
         public static string WeatherCity = "Jaroslaw";
+        #endregion
 
+        #region Timing
         public static string[] LessonTimes = {
             "8:00 - 8:45",
             "8:50 - 9:35",
@@ -43,7 +53,6 @@
             "18:10 - 18:15",
             "19:00 - 00:00"
         };
-
 
         // Short lesson times
         public static string[] ShortLessonTimes =
@@ -79,7 +88,6 @@
             "15:05 - 15:10",
             "15:40 - 00:00"
         };
-
-        public static string Warning = "Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych.";
+        #endregion
     }
 }
