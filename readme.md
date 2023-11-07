@@ -14,16 +14,16 @@
 # Building - Modules
 > As for example there, we will chose the happynumber module. Building modules is a bit harder than building the whole application. Before you will do anything with it, read the most important things about it.
 
-- Structure of .tvmodule file
-	`.tvmodule` file is an zstio-tv module packed into an **.7z** format. Every module can contain mostly api's that are required for the app in order to run with every single information avalible.
+- Structure of .tvmodule file:
+	- `.tvmodule` file is an zstio-tv module packed into an **.7z** format. Every module can contain mostly api's that are required for the app in order to run with every single information avalible.
 
-- Purpose of .tvmodule file
-	We use them only for the easier implementation of things that could been done in c# - `We got an already done api in nodejs, why we wont use it?` thats why we made modules.
+- Purpose of .tvmodule file:
+	- We use them only for the easier implementation of things that could been done in c# - `We got an already done api in nodejs, why we wont use it?` thats why we made modules.
 
-- Configuration of .tvmodule
-	In every single .tvmodule file, there should be an `executable` file without an extension, it will contain the command that will be executed in module folder.
+- Configuration of .tvmodule: 
+	- In every single .tvmodule file, there should be an `executable` file without an extension, it will contain the command that will be executed in module folder.
 	
-	`address` file will contain information useful for making powerful nodejs apis. for example; `localhost:2023` - an address for happynumber module.
+	- `address` file will contain information useful for making powerful nodejs apis. for example; `localhost:2023` - an address for happynumber module.
 
 1. Compress it into an .7z archive. Remember to make the filename same as the directory inside the archive that contains the module code.
 2. Rename the extension into `.tvmodule` file
@@ -31,10 +31,12 @@
 # Running
 > In order to run the app, just double-click on the executable of zstio-tv. It will automatically create an `modules` folder, where you can drop your built "binaries". You implement your modules yourself. You customize what modules you want.
 >
-> Modules loading times are different for every single system - matters from cpu. After the modules will be loaded, an config window will bump-up. After this step you will need around 10 seconds (API ratelimits, cooldown in order to avoid network issues) to fully calculate the replacements/substitutions on page 1.
+> Modules loading times are different for every single system - matters from cpu.
 
 # Spotify integration
->If you want to run it on your own, replace the Config.cs spotify data. Users are added in spotify development panel as long our spotify app isnt verified. If 1st authorization will fail, the zstio-tv will exit.
+>If you want to run it on your own, replace the Config.cs spotify data. Users are added in spotify development panel as long our spotify app isnt verified.
+>
+>Update: zstio-tv is skipping spotify integration by default. Enable it via config window [ESC]
 
 <hr>
 
