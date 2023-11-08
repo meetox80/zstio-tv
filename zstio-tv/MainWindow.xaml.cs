@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
-using System.Net.NetworkInformation;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media.Animation;
@@ -23,24 +22,6 @@ namespace zstio_tv
         {
             InitializeComponent();
             _Instance = this;
-        }
-
-        public static bool CheckForInternetConnection(int timeoutMs = 10000, string url = null)
-        {
-            try
-            {
-                Ping myPing = new Ping();
-                String host = "google.com";
-                byte[] buffer = new byte[32];
-                int timeout = 1000;
-                PingOptions pingOptions = new PingOptions();
-                PingReply reply = myPing.Send(host, timeout, buffer, pingOptions);
-                return (reply.Status == IPStatus.Success);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -103,10 +84,6 @@ namespace zstio_tv
             TabTimer.Interval = TimeSpan.FromSeconds(1);
             TabTimer.Tick += TabTimerTick;
             TabTimer.Start();
-            DispatcherTimer ReplacementsGETAPI = new DispatcherTimer();
-            ReplacementsGETAPI.Interval = TimeSpan.FromHours(16);
-            ReplacementsGETAPI.Tick += ReplacementsGETAPI_Tick;
-            ReplacementsGETAPI.Start();
             DispatcherTimer ReplacementsCALC = new DispatcherTimer();
             ReplacementsCALC.Interval = TimeSpan.FromSeconds(10);
             ReplacementsCALC.Tick += ReplacementsCALC_Tick;
@@ -265,9 +242,14 @@ namespace zstio_tv
             }
         }
 
-        int PageTime = 0; int PageIndex = 0; public static int PageLength = 30;
+        int PageTime = 0; int PageIndex = 0; public static int PageLength = 30, Pages = 2;
         private void TabTimerTick(object sender, EventArgs e)
         {
+            for (int i = 0; i < handler_content_description_pages_display.Children.Count; i++)
+            {
+                ((Ellipse)handler_content_description_pages_display.Children[i]).Visibility = (i < Pages) ? Visibility.Visible : Visibility.Collapsed;
+            }
+
             if (!LocalMemory.SongPlaying)
             {
                 handler_spotifyqr_title.Text = "Ostatnio grane";
@@ -285,7 +267,7 @@ namespace zstio_tv
             if (PageTime == PageLength)
             {
                 PageIndex++;
-                if (PageIndex == 2)
+                if (PageIndex == Pages)
                 {
                     PageIndex = 0;
                 }

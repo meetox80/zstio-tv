@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Windows;
-using System.Drawing;
-using System.Windows.Media.Imaging;
+using System.Data;
 using System.IO;
-using System.Windows.Media;
-using System.Runtime.InteropServices;
-using System.Windows.Interop;
+using System.Linq;
+using System.Windows;
+using System.Windows.Forms;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace zstio_tv
 {
@@ -16,40 +16,63 @@ namespace zstio_tv
             InitializeComponent();
         }
 
-        private const int GWL_STYLE = -16;
-        private const int WS_SYSMENU = 0x80000;
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-        [DllImport("user32.dll")]
-        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        int SlideBackup = 0;
 
-        private void Rectangle_Drop(object sender, DragEventArgs e)
+        DispatcherTimer BannerTimer = new DispatcherTimer();
+        DispatcherTimer SlideTimer = new DispatcherTimer();
+        private void WindowLoaded(object sender, RoutedEventArgs e)
         {
+            SlideBackup = MainWindow.Pages;
+
+            BannerTimer.Interval = TimeSpan.FromSeconds((int)bannerslider.Value);
+            BannerTimer.Tick += BannerTimer_Tick;
+
+            SlideTimer.Interval = TimeSpan.FromSeconds((int)slideslider.Value);
+            SlideTimer.Tick += SlideTimer_Tick;
+        }
+
+        int BannerSlide = 0;
+        private void BannerTimer_Tick(object sender, EventArgs e)
+        {
+            BannerSlide++;
+            if (BannerSlide == BannerFileCount)
+            {
+                BannerSlide = 0;
+            }
             try
             {
-                var DropData = e.Data.GetData(DataFormats.FileDrop);
-                if (DropData != null)
-                {
-                    var DropDataFilenames = DropData as string[];
-                    if (DropDataFilenames.Length > 0)
-                    {
-                        Image image = Image.FromFile(DropDataFilenames[0]);
+                string ImagePath = Path.Combine(BannerDirectory, BannerFiles[BannerSlide]);
 
-                        using (MemoryStream stream = new MemoryStream())
-                        {
-                            image.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                            stream.Seek(0, SeekOrigin.Begin);
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.UriSource = new Uri(ImagePath, UriKind.RelativeOrAbsolute);
+                bitmapImage.EndInit();
 
-                            BitmapImage bitmapImage = new BitmapImage();
-                            bitmapImage.BeginInit();
-                            bitmapImage.StreamSource = stream;
-                            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                            bitmapImage.EndInit();
+                MainWindow._Instance.handler_bar_banner_panel_image.ImageSource = bitmapImage;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
 
-                            previewsource.ImageSource = bitmapImage;
-                        }
-                    }
-                }
+        int SlideSlide = 0;
+        private void SlideTimer_Tick(object sender, EventArgs e)
+        {
+            SlideSlide++;
+            if (SlideSlide == SlideFileCount)
+            {
+                SlideSlide = 0;
+            }
+            try
+            {
+                string ImagePath = Path.Combine(SlideDirectory, SlideFiles[SlideSlide]);
+
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.UriSource = new Uri(ImagePath, UriKind.RelativeOrAbsolute);
+                bitmapImage.EndInit();
+
+                MainWindow._Instance.customslideimages_image.ImageSource = bitmapImage;
             }
             catch (Exception ex)
             {
@@ -57,32 +80,115 @@ namespace zstio_tv
             }
         }
 
-        ImageSource NoImage;
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void slidevisibility_Click(object sender, RoutedEventArgs e)
         {
-            var hwnd = new WindowInteropHelper(this).Handle;
-            SetWindowLong(hwnd, GWL_STYLE, GetWindowLong(hwnd, GWL_STYLE) & ~WS_SYSMENU);
-
-            NoImage = previewsource.ImageSource;
-        }
-
-        private void ApplyButton(object sender, RoutedEventArgs e)
-        {
-            if (previewsource.ImageSource == NoImage)
+            if (slidevisibility.IsChecked == true)
             {
-                MessageBox.Show("Prosze wrzucic obrazek.");
-                return;
+                MainWindow.Pages = SlideBackup + 1;
+                SlideTimer.Interval = TimeSpan.FromSeconds((int)slideslider.Value);
+                SlideTimer.Start();
+            } else
+            {
+                MainWindow.Pages = SlideBackup;
+                SlideTimer.Interval = TimeSpan.FromSeconds((int)slideslider.Value);
+                SlideTimer.Stop();
             }
-
-            MainWindow._Instance.handler_bar_banner_panel_image.ImageSource = previewsource.ImageSource;
-            MainWindow._Instance.handler_bar_banner.Visibility = Visibility.Visible;
-            this.Hide();
         }
 
-        private void HideButton(object sender, RoutedEventArgs e)
+        private void bannervisibility_Click(object sender, RoutedEventArgs e)
         {
-            this.Hide();
-            MainWindow._Instance.handler_bar_banner.Visibility = Visibility.Collapsed;
+            if (bannervisibility.IsChecked == true)
+            {
+                MainWindow._Instance.handler_bar_banner.Visibility = Visibility.Visible;
+                BannerTimer.Interval = TimeSpan.FromSeconds((int)bannerslider.Value);
+                BannerTimer.Start();
+            } else
+            {
+                MainWindow._Instance.handler_bar_banner.Visibility = Visibility.Collapsed;
+                BannerTimer.Interval = TimeSpan.FromSeconds((int)bannerslider.Value);
+                BannerTimer.Stop();
+            }
+        }
+
+        int BannerFileCount = 0; string BannerDirectory; string[] BannerFiles;
+        private void BannerSelectFolderClick(object sender, RoutedEventArgs e)
+        {
+            using (var FolderDialog = new FolderBrowserDialog())
+            {
+                DialogResult DialogResult = FolderDialog.ShowDialog();
+
+                if (DialogResult == DialogResult.OK && !string.IsNullOrWhiteSpace(FolderDialog.SelectedPath))
+                {
+                    BannerDirectory = FolderDialog.SelectedPath;
+
+                    BannerFiles = Directory.GetFiles(FolderDialog.SelectedPath)
+                        .Where(file => Config.ImageExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase))
+                        .ToArray();
+
+                    DataTable FilesDataTable = new DataTable();
+                    FilesDataTable.Columns.Add("FileCount", typeof(int));
+                    FilesDataTable.Columns.Add("FileName", typeof(string));
+
+                    foreach (string FileName in BannerFiles)
+                    {
+                        BannerFileCount++;
+                        DataRow FilesRow = FilesDataTable.NewRow();
+                        FilesRow["FileCount"] = BannerFileCount;
+                        FilesRow["FileName"] = Path.GetFileName(FileName);
+                        FilesDataTable.Rows.Add(FilesRow);
+                        bannerdata.ItemsSource = FilesDataTable.DefaultView;
+                    }
+                }
+            }
+        }
+
+        int SlideFileCount = 0; string SlideDirectory; string[] SlideFiles;
+        private void SlideSelectFolderClick(object sender, RoutedEventArgs e)
+        {
+            using (var FolderDialog = new FolderBrowserDialog())
+            {
+                DialogResult DialogResult = FolderDialog.ShowDialog();
+
+                if (DialogResult == DialogResult.OK && !string.IsNullOrWhiteSpace(FolderDialog.SelectedPath))
+                {
+                    SlideDirectory = FolderDialog.SelectedPath;
+
+                    SlideFiles = Directory.GetFiles(FolderDialog.SelectedPath)
+                        .Where(file => Config.ImageExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase))
+                        .ToArray();
+
+                    DataTable FilesDataTable = new DataTable();
+                    FilesDataTable.Columns.Add("FileCount", typeof(int));
+                    FilesDataTable.Columns.Add("FileName", typeof(string));
+
+                    foreach (string FileName in SlideFiles)
+                    {
+                        SlideFileCount++;
+                        DataRow FilesRow = FilesDataTable.NewRow();
+                        FilesRow["FileCount"] = SlideFileCount;
+                        FilesRow["FileName"] = Path.GetFileName(FileName);
+                        FilesDataTable.Rows.Add(FilesRow);
+                        slidedata.ItemsSource = FilesDataTable.DefaultView;
+                    }
+                }
+            }
+        }
+
+        private void BannerSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (bannerslider != null && bannerslidertext != null)
+                bannerslidertext.Content = $"{(int)bannerslider.Value}s";
+        }
+        private void SlideSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (slideslider != null && slideslidertext != null)
+                slideslidertext.Content = $"{(int)slideslider.Value}s";
+        }
+
+        private void Apply(object sender, RoutedEventArgs e)
+        {
+            BannerTimer.Interval = TimeSpan.FromSeconds((int)bannerslider.Value);
+            SlideTimer.Interval = TimeSpan.FromSeconds((int)slideslider.Value);
         }
     }
 }

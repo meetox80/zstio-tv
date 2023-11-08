@@ -159,11 +159,12 @@
 
                             <Grid x:Name="handler_content_tabcontrol_replacements_viewer" Margin="0,75,0,0" Height="600">
                                 <StackPanel Margin="0,0,0,0" x:Name="handler_content_tabcontrol_replacements_fields">
+                                    <TextBlock Text="Brak zastępstw na dziś." FontFamily="/Font/InterBold/#Inter" Foreground="White" TextAlignment="Center" FontSize="15" Margin="0,20,0,0" Opacity="0.75"/>
+
                                     <!--
                                     
                                     // Field example, to see in designer; uncomment and remove this.
                                     // Made to port into raw c# from xaml
-                                    -->
 
                                     <Grid VerticalAlignment="Top" Margin="0,10,0,0">
                                         <Rectangle Height="45" Width="1000" Fill="#FF0A0A0A" RadiusX="5" RadiusY="5"/>
@@ -189,9 +190,9 @@
                                             </Grid>
                                         </StackPanel>
                                     </Grid>
-
+                                    -->
                                 </StackPanel>
-                                
+
                                 <TextBlock x:Name="no_replacements" Visibility="Collapsed" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="20" Text="Brak zastępstw." HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.75"/>
                             </Grid>
                         </Grid>
@@ -240,7 +241,11 @@
 
                     <TabItem Header="TabItem" Foreground="{x:Null}" BorderBrush="{x:Null}" Background="{x:Null}" Visibility="Collapsed">
                         <Grid>
-                            <Label Content="tab3" Foreground="White"/>
+                            <Rectangle x:Name="customslideimages" RadiusX="15" RadiusY="15" HorizontalAlignment="Center" VerticalAlignment="Center" Height="600" Width="1000" Margin="0,0,0,70">
+                                <Rectangle.Fill>
+                                    <ImageBrush x:Name="customslideimages_image"/>
+                                </Rectangle.Fill>
+                            </Rectangle>
                         </Grid>
                     </TabItem>
 
@@ -282,6 +287,9 @@
                         <Rectangle Height="50" Width="150" RadiusX="7.5" RadiusY="7.5" Fill="#FF151515" Stroke="#FF151515"/>
                         <StackPanel x:Name="handler_content_description_pages_display" Orientation="Horizontal" HorizontalAlignment="Center">
                             <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8"/>
+                            <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
+                            <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
+                            <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
                             <Ellipse Margin="5,0,0,0" Fill="White" Height="8" Width="8" Opacity="0.5"/>
                         </StackPanel>
                     </Grid>

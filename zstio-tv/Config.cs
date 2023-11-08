@@ -4,7 +4,8 @@
     {
         #region Application
         public static string Version = "0.24";
-        public static bool Developer = false;
+        public static bool Developer = true;
+        public static string[] ImageExtensions = { ".png", ".jpg", ".jpeg" };
 
         public static string Warning = "Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych.";
         #endregion

@@ -46,8 +46,10 @@ namespace zstio_tv.Helpers
                 }
             }
 
+            int TemponaryState = 0;
             if (NextLessonOrBreakStartTime == DateTime.MaxValue)
             {
+                TemponaryState = 1;
                 return new string[] { "Brak lekcji na dziś", "" };
             }
 
@@ -55,8 +57,13 @@ namespace zstio_tv.Helpers
 
             if (TimeToNextLessonOrBreak.TotalMinutes <= 0)
             {
+                TemponaryState = 0;
                 return new string[] { "Przerwa", "00:00:00" };
             }
+
+            // replace the api after lessons
+            if (TemponaryState == 1)
+                MainWindow.ReplacementsGETAPI_Tick(null, null);
 
             return new string[] { "Przerwa", $"{TimeToNextLessonOrBreak.ToString(@"hh\:mm\:ss")}" };
         }

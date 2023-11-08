@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:zstio_tv"
         mc:Ignorable="d"
-        Title="ConfigWindow" Loaded="Window_Loaded" Height="270" Width="800" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Background="#FF101010">
+        Title="MediaWindow" Loaded="WindowLoaded" Height="600" Width="500" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Background="#FF101010">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
@@ -27,25 +27,43 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <Grid Margin="15,15,15,55">
-            <TabControl BorderBrush="White" Background="{x:Null}">
-                <TabItem Header="Banner" BorderBrush="{x:Null}">
-                    <Grid Background="#FF101010">
-                        <Rectangle Width="230" Height="80" RadiusX="10" RadiusY="10" VerticalAlignment="Top" Margin="0,15,0,0" DragDrop.Drop="Rectangle_Drop" AllowDrop="True">
-                            <Rectangle.Fill>
-                                <ImageBrush x:Name="previewsource" ImageSource="/Resources/dropimage.png"/>
-                            </Rectangle.Fill>
-                        </Rectangle>
+        <TabControl Margin="15,15,15,50">
+            <TabItem Header="Banner">
+                <Grid Background="#FF151515">
+                    <DataGrid x:Name="bannerdata" BorderBrush="{x:Null}" Background="{x:Null}" Height="420" VerticalAlignment="Top" CanUserDeleteRows="False"/>
 
-                        <Label Content="Prosimy o umieszczanie grafik w Ratio 23:8" Foreground="White" FontFamily="/Font/InterBold/#Inter" Opacity="0.75" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10"/>
-                    </Grid>
-                </TabItem>
-            </TabControl>
-        </Grid>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="10">
+                        <Button Cursor="Hand" Height="30" Width="120" Content="Wybierz folder" FontFamily="/Font/InterBold/#Inter" Foreground="White" Background="#FF151515" BorderBrush="#FFA94646" Margin="10,0,0,0" Click="BannerSelectFolderClick"/>
+                        <StackPanel Orientation="Horizontal" Margin="10,0,0,0" Height="25">
+                            <Slider x:Name="bannerslider" Width="150" Minimum="2" Maximum="30" Height="22" ValueChanged="BannerSlider_ValueChanged"/>
+                            <Label x:Name="bannerslidertext" Foreground="White" FontFamily="/Font/InterBold/#Inter" Content="9s"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Slajd">
+                <Grid Background="#FF151515">
+                    <DataGrid x:Name="slidedata" BorderBrush="{x:Null}" Background="{x:Null}" Height="420" VerticalAlignment="Top" CanUserDeleteRows="False"/>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10">
-            <Button Cursor="Hand" Height="30" Width="60" Content="Wyjdz" FontFamily="/Font/InterBold/#Inter" Foreground="White" Background="#FF151515" BorderBrush="#FFA94646" Margin="10,0,0,0" Click="HideButton"/>
-            <Button Cursor="Hand" Height="30" Width="90" Content="Zastosuj" FontFamily="/Font/InterBold/#Inter" Foreground="White" Background="#FF151515" BorderBrush="#FFA94646" Margin="10,0,0,0" Click="ApplyButton"/>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="10">
+                        <Button Cursor="Hand" Height="30" Width="120" Content="Wybierz folder" FontFamily="/Font/InterBold/#Inter" Foreground="White" Background="#FF151515" BorderBrush="#FFA94646" Margin="10,0,0,0" Click="SlideSelectFolderClick"/>
+                        <StackPanel Orientation="Horizontal" Margin="10,0,0,0" Height="25">
+                            <Slider x:Name="slideslider" Width="150" Minimum="2" Maximum="30" Height="22" ValueChanged="SlideSlider_ValueChanged"/>
+                            <Label x:Name="slideslidertext" Foreground="White" FontFamily="/Font/InterBold/#Inter" Content="9s"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="15,0,0,10">
+            <CheckBox x:Name="bannervisibility" Foreground="White" Content="Widocznosc Banneru" Click="bannervisibility_Click"/>
+            <CheckBox x:Name="slidevisibility" Foreground="White" Content="Widocznosc Slajdu" Click="slidevisibility_Click"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,15,10">
+            <Button Cursor="Hand" Height="30" Width="60" Content="Wyjdź" FontFamily="/Font/InterBold/#Inter" Opacity="0.5" Foreground="White" Background="#FF151515" BorderBrush="#FF5A4343" Margin="10,0,0,0"/>
+            <Button Cursor="Hand" Height="30" Width="90" Content="Zastosuj" FontFamily="/Font/InterBold/#Inter" Foreground="White" Background="#FF151515" BorderBrush="#FFA94646" Margin="10,0,0,0" Click="Apply"/>
         </StackPanel>
     </Grid>
 </Window>
