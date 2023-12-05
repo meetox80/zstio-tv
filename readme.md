@@ -1,4 +1,4 @@
-# zstio-tv - Management software for ZSTIO TV's
+# ZSTIO-TV - Management software for ZSTIO TV's
 
 <p align="center"><img src="https://raw.githubusercontent.com/lemonekq/zstio-tv/main/img/head.png"></p>
 <hr>
