@@ -76,7 +76,7 @@
                             </StackPanel>
                         </Grid>
 
-                        <Grid Visibility="Collapsed" x:Name="handler_bar_banner" Height="100" Width="250" Margin="0,15,0,0">
+                        <Grid Visibility="Visible" x:Name="handler_bar_banner" Height="250" Width="250" Margin="0,15,0,0">
                             <Rectangle RadiusX="10" RadiusY="10" Fill="#FF050505" Stroke="#FF272727">
                                 <Rectangle.Effect>
                                     <DropShadowEffect ShadowDepth="0" Direction="0" BlurRadius="15"/>
@@ -84,9 +84,9 @@
                             </Rectangle>
 
                             <StackPanel x:Name="handler_bar_banner_panel" Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Rectangle RadiusX="10" RadiusY="10" Width="230" Height="80">
+                                <Rectangle RadiusX="10" RadiusY="10" Width="200" Height="200">
                                     <Rectangle.Fill>
-                                        <ImageBrush x:Name="handler_bar_banner_panel_image" ImageSource="/Resources/zstio-splash.png"/>
+                                        <ImageBrush x:Name="handler_bar_banner_panel_image" Stretch="Fill" ImageSource="/Resources/zstio-splash.png"/>
                                     </Rectangle.Fill>
                                 </Rectangle>
                             </StackPanel>
@@ -95,8 +95,8 @@
                 </StackPanel>
 
                 <Grid x:Name="zstiofm_movementhandler" Margin="0,0,0,0">
-                    <Image x:Name="handler_bar_zstiofm_image" Margin="0,0,0,-100" Width="298" Height="300" VerticalAlignment="Bottom"/>
-                    <Rectangle Height="201" Width="298" VerticalAlignment="Bottom">
+                    <Image x:Name="handler_bar_zstiofm_image" Margin="0,0,0,-100" Width="298" Height="200" Stretch="UniformToFill" VerticalAlignment="Bottom"/>
+                    <Rectangle Height="100" Width="298" VerticalAlignment="Bottom">
                         <Rectangle.Fill>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="#BF020202" Offset="1"/>
@@ -111,7 +111,7 @@
                                     <Grid Width="200" HorizontalAlignment="Left">
                                         <TextBlock Margin="5,0,0,0" x:Name="handler_bar_zstiofm_title" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="20" Text="Wczytywanie..."/>
                                     </Grid>
-                                    <Label x:Name="handler_bar_zstiom_authors" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="15" Content="Wczytywanie aplikacji" Opacity="0.75" Margin="0,-7.5,0,0"/>
+                                    <Label x:Name="handler_bar_zstiofm_authors" FontFamily="/Font/InterBold/#Inter" Foreground="White" FontSize="15" Content="Wczytywanie aplikacji" Opacity="0.75" Margin="0,-7.5,0,0"/>
                                 </StackPanel>
                             </Grid>
                             <Grid Width="96">

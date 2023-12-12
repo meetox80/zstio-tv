@@ -152,7 +152,7 @@ namespace zstio_tv
 
                         // Set the text, authors, image of zstiofm.
                         handler_bar_zstiofm_title.Text = SongName;
-                        handler_bar_zstiom_authors.Content = SongAuthors;
+                        handler_bar_zstiofm_authors.Content = SongAuthors;
 
                         BitmapImage SongImageBitmap = new BitmapImage(new Uri(SongImage));
                         handler_bar_zstiofm_image.Source = SongImageBitmap;
