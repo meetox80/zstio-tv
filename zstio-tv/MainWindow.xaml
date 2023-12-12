@@ -76,7 +76,7 @@
                             </StackPanel>
                         </Grid>
 
-                        <Grid Visibility="Visible" x:Name="handler_bar_banner" Height="250" Width="250" Margin="0,15,0,0">
+                        <Grid Visibility="Collapsed" x:Name="handler_bar_banner" Height="250" Width="250" Margin="0,15,0,0">
                             <Rectangle RadiusX="10" RadiusY="10" Fill="#FF050505" Stroke="#FF272727">
                                 <Rectangle.Effect>
                                     <DropShadowEffect ShadowDepth="0" Direction="0" BlurRadius="15"/>
