@@ -151,7 +151,7 @@
                                     <!-- Mark:Zastępstwo -->
 
                                     <Grid Width="180" HorizontalAlignment="Left" Height="20">
-                                        <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Sala" TextAlignment="Center" HorizontalAlignment="Center"/>
+                                        <TextBlock FontFamily="/Font/InterBold/#Inter" Foreground="White" Text="Poprzednia sala" TextAlignment="Center" HorizontalAlignment="Center"/>
                                     </Grid>
                                     <!-- Mark:Sala -->
                                 </StackPanel>

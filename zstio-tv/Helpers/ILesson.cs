@@ -63,7 +63,7 @@ namespace zstio_tv.Helpers
 
             // replace the api after lessons
             if (TemponaryState == 1)
-                MainWindow.ReplacementsGETAPI_Tick(null, null);
+                MainWindow.ReplacementsCALC_Tick(null, null);
 
             return new string[] { "Przerwa", $"{TimeToNextLessonOrBreak.ToString(@"hh\:mm\:ss")}" };
         }

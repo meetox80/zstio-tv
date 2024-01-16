@@ -42,7 +42,6 @@ namespace zstio_tv
         {
             if (checkbox_short.IsChecked == true)
             {
-                MainWindow.ReplacementsGETAPI_Tick(null, null);
                 MainWindow.ReplacementsCALC_Tick(null, null);
             }
         }

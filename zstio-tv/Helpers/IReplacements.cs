@@ -1,13 +1,75 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Linq;
 
 namespace zstio_tv.Helpers
 {
+
+    /*
+     * 
+     * See the deprecated API from zstio-substitutions: https://github.com/rvyk/zstio-substitutions/blob/main/src/pages/api/getSubstitutions.ts
+     *      -> Archived, and moved into an one repo (rvyk/zstio-timetable)
+     * 
+     */
+    internal class IReplacementsAPI
+    {
+        public static string GetReplacements()
+        {
+            using (var Client = new HttpClient())
+            {
+                try
+                {
+                    var RawContent = Client.GetStringAsync(Config.ReplacementsAPI).Result;
+                    var Document = new HtmlAgilityPack.HtmlDocument();
+                    Document.LoadHtml(RawContent);
+
+                    var TimeNode = Document.DocumentNode.SelectSingleNode("//h2");
+                    var Time = TimeNode?.InnerText.Trim();
+                    var TableNodes = Document.DocumentNode.SelectNodes("//table");
+
+                    var Tables = TableNodes?.Select(table => new
+                    {
+                        Time = table.SelectSingleNode(".//tr[1]")?.InnerText.Trim(),
+                        Zastepstwa = table.SelectNodes(".//tr[position()>1]")
+                            ?.Select(row => row.SelectNodes(".//td")?.Select(td => td.InnerText.Trim()).ToArray())
+                            ?.Where(cols => cols != null && !string.IsNullOrEmpty(cols[0]))
+                            ?.Select(cols => new
+                            {
+                                lesson = cols[0],
+                                teacher = cols[1],
+                                branch = cols[2],
+                                subject = cols[3],
+                                @class = cols[4],
+                                @case = cols[5],
+                                message = cols[6]
+                            })
+                            ?.ToList()
+                    })?.ToList();
+
+                    if (Tables != null)
+                    {
+                        var Result = new { time = Time, tables = Tables };
+                        var JsonResult = JsonConvert.SerializeObject(Result);
+
+                        return JsonResult;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }
+
+            return "{}";
+        }
+    }
+
     internal class IReplacements
     {
         public class Substitution
@@ -36,6 +98,8 @@ namespace zstio_tv.Helpers
         public static int CurrentLessonIndexBackup;
         public static void ConfigureReplacements()
         {
+            LocalMemory.ReplacementsAPIResponse = IReplacementsAPI.GetReplacements();
+
             try
             {
                 if (LocalMemory.ReplacementsAPIResponse != "")
@@ -69,6 +133,8 @@ namespace zstio_tv.Helpers
                                         replacement = substitution.message;
                                     }
 
+                                    replacement = replacement.Split(new String[] { " - " }, StringSplitOptions.None)[0]; // 
+
                                     if (substitution.@class == "")
                                     {
                                         substitution.@class = "-";
@@ -101,7 +167,7 @@ namespace zstio_tv.Helpers
         public static void PlaceElement(string LessonNumber, string branch, string teacher, string replacement, string classroom)
         {
             Grid HandlerGrid = new Grid();
-            HandlerGrid.VerticalAlignment = VerticalAlignment.Top;
+            HandlerGrid.VerticalAlignment = System.Windows.VerticalAlignment.Top;
             HandlerGrid.Margin = new Thickness(0, 10, 0, 0);
 
             Rectangle HandlerRectangle = new Rectangle();
@@ -113,7 +179,7 @@ namespace zstio_tv.Helpers
             HandlerGrid.Children.Add(HandlerRectangle);
 
             StackPanel HandlerPanel = new StackPanel();
-            HandlerPanel.Orientation = Orientation.Horizontal;
+            HandlerPanel.Orientation = System.Windows.Controls.Orientation.Horizontal;
 
             Grid LessonNumberGrid = new Grid();
             LessonNumberGrid.Width = 45;
@@ -146,7 +212,7 @@ namespace zstio_tv.Helpers
             BranchTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFFFF"));
             BranchTextBlock.FontSize = 16;
             BranchTextBlock.TextAlignment = TextAlignment.Center;
-            BranchTextBlock.VerticalAlignment = VerticalAlignment.Center;
+            BranchTextBlock.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             BranchGrid.Children.Add(BranchTextBlock);
             HandlerPanel.Children.Add(BranchGrid);
             Rectangle BranchSpacingRectangle = new Rectangle();
@@ -162,7 +228,7 @@ namespace zstio_tv.Helpers
             TeacherTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFFFF"));
             TeacherTextBlock.FontSize = 16;
             TeacherTextBlock.TextAlignment = TextAlignment.Center;
-            TeacherTextBlock.VerticalAlignment = VerticalAlignment.Center;
+            TeacherTextBlock.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             TeacherGrid.Children.Add(TeacherTextBlock);
             HandlerPanel.Children.Add(TeacherGrid);
             Rectangle TeacherSpacingRectangle = new Rectangle();
@@ -183,7 +249,7 @@ namespace zstio_tv.Helpers
             ReplacementTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFFFF"));
             ReplacementTextBlock.FontSize = 16;
             ReplacementTextBlock.TextAlignment = TextAlignment.Center;
-            ReplacementTextBlock.VerticalAlignment = VerticalAlignment.Center;
+            ReplacementTextBlock.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             ReplacementGrid.Children.Add(ReplacementTextBlock);
             HandlerPanel.Children.Add(ReplacementGrid);
 
@@ -195,7 +261,7 @@ namespace zstio_tv.Helpers
             ClassroomTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFFFFFF"));
             ClassroomTextBlock.FontSize = 16;
             ClassroomTextBlock.TextAlignment = TextAlignment.Center;
-            ClassroomTextBlock.VerticalAlignment = VerticalAlignment.Center;
+            ClassroomTextBlock.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             Rectangle ClassroomBackground = new Rectangle();
             ClassroomBackground.RadiusX = 5;
             ClassroomBackground.RadiusY = 5;

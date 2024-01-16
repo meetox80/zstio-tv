@@ -33,7 +33,6 @@ namespace zstio_tv
             }
 
             // Reload the Replacements functionality, start the replacements scrolling
-            ReplacementsGETAPI_Tick(null, null);
             ReplacementsCALC_Tick(null, null);
             GetWeatherTick(null, null);
             ClockTimerTick(null, null);
@@ -85,7 +84,7 @@ namespace zstio_tv
             TabTimer.Tick += TabTimerTick;
             TabTimer.Start();
             DispatcherTimer ReplacementsCALC = new DispatcherTimer();
-            ReplacementsCALC.Interval = TimeSpan.FromSeconds(10);
+            ReplacementsCALC.Interval = TimeSpan.FromMinutes(5);
             ReplacementsCALC.Tick += ReplacementsCALC_Tick;
             ReplacementsCALC.Start();
             DispatcherTimer SpotifyCurrentPlaying = new DispatcherTimer();
@@ -226,21 +225,6 @@ namespace zstio_tv
         }
 
         public static void ReplacementsCALC_Tick(object sender, EventArgs e) => IReplacements.ConfigureReplacements();
-        
-        public static void ReplacementsGETAPI_Tick(object sender, EventArgs e)
-        {
-            using (HttpClient Client = new HttpClient())
-            {
-                try
-                {
-                    LocalMemory.ReplacementsAPIResponse = Client.GetStringAsync(Config.ReplacementsAPI).Result;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-                }
-            }
-        }
 
         int PageTime = 0; int PageIndex = 0; public static int PageLength = 30, Pages = 2;
         private void TabTimerTick(object sender, EventArgs e)

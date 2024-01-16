@@ -12,7 +12,7 @@
 
         #region API's
         public static string VersionAPI = "https://raw.githubusercontent.com/lemonekq/zstio-tv/main/.version";
-        public static string ReplacementsAPI = "https://zastepstwa.awfulworld.space/api/getSubstitutions";
+        public static string ReplacementsAPI = "http://kristofc.webd.pro/plan/InformacjeOZastepstwach.html";
 
         public static string SpotifyID = "859de286484544ad859832003ac4e6b4";
         public static string SpotifyAuth = "f10212b6f8d74b058f5685edfdc92704";
