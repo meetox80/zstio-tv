@@ -248,13 +248,13 @@ namespace zstio_tv
             if (PageTime == PageLength - 1)
                 TabTransition(1, 0);
 
-            if (PageTime == PageLength)
+            if (PageTime > PageLength)
             {
-                if (PageIndex == Pages)
+                PageIndex++;
+                if (PageIndex > Pages)
                 {
                     PageIndex = 0;
                 }
-                PageIndex++;
                 PageTime = 0;
                 handler_content_tabcontrol.SelectedIndex = PageIndex;
 
