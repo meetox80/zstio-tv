@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 
 [assembly: AssemblyTitle("zstio-tv")]
-[assembly: AssemblyDescription("Management software for tv's in zstio")]
+[assembly: AssemblyDescription("Management software for tv's")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ox80")]
 [assembly: AssemblyProduct("zstio-tv")]
