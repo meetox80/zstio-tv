@@ -5,8 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:zstio_tv"
         mc:Ignorable="d"
-        Title="zstio-tv" Width="1280" Height="720" Loaded="WindowLoaded">
-    <Grid>
-        
+        Title="zstio-tv" Width="1280" Height="720" Loaded="WindowLoaded" ResizeMode="NoResize" WindowStyle="None">
+    <Grid Background="Black">
+        <Grid x:Name="Handler" Background="Red" Width="1280" Height="720" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid Height="150" Width="150" Background="Blue" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Grid>
+        </Grid>
     </Grid>
 </Window>
