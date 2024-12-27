@@ -200,39 +200,13 @@ public partial class Loader : Window
     }
 
     #region Movement
-    
-    private Point _StartPoint;
-    private bool _IsDragging = false;
 
     private void WindowMove_Pressed(object? sender, PointerPressedEventArgs e)
     {
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
-            _StartPoint = e.GetPosition(this);
-            _IsDragging = true;
+            this.BeginMoveDrag(e);
         }
-    }
-
-    private void WindowMove_Moved(object? sender, PointerEventArgs e)
-    {
-        if (_IsDragging)
-        {
-            Point CurrentPosition = e.GetPosition(this);
-
-            double Offset_X = CurrentPosition.X - _StartPoint.X;
-            double Offset_Y = CurrentPosition.Y - _StartPoint.Y;
-
-            Position = new PixelPoint(
-                Position.X + (int)Offset_X,
-                Position.Y + (int)Offset_Y
-            );
-        }
-    }
-
-    protected override void OnPointerReleased(PointerReleasedEventArgs e)
-    {
-        _IsDragging = false;
-        base.OnPointerReleased(e);
     }
         
     #endregion

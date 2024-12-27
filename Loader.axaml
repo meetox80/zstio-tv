@@ -13,11 +13,11 @@
         Background="Transparent" 
         ExtendClientAreaToDecorationsHint="True"
         CanResize="False"
-        Loaded="OnLoaded">
+        Loaded="OnLoaded"
+        >
     <Border 
         CornerRadius="20" Background="#E3E3E3"
-        PointerPressed="WindowMove_Pressed"
-        PointerMoved="WindowMove_Moved">
+        PointerPressed="WindowMove_Pressed">
         <Grid x:Name="Handler">
             <Grid x:Name="HandlerBackground">
                 <TextBlock
@@ -30,7 +30,7 @@
                     VerticalAlignment="Center"
                     Padding="-275,-250,0,0"
                     PointerPressed="WindowMove_Pressed"
-                    PointerMoved="WindowMove_Moved"/>
+                    />
                 <Rectangle>
                     <Rectangle.Fill>
                         <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
@@ -54,13 +54,15 @@
                             BorderThickness="1"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Margin="0,-20,0,0" />
+                            Margin="0,-20,0,0" 
+                            />
                         <TextBlock
                             Text="Setup Displays"
                             FontSize="32"
                             FontFamily="{StaticResource SemiBold-Syne}"
                             Foreground="#FF3E3E3E"
-                            HorizontalAlignment="Center" />
+                            HorizontalAlignment="Center" 
+                            />
                     </Grid>
                     <Grid Height="310">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="HandlerUIDisplays">
@@ -75,7 +77,8 @@
                         Content="*Select the screen on which zstio-tv will be displayed"
                         FontFamily="Arial"
                         Foreground="#919191"
-                        VerticalAlignment="Center" />
+                        VerticalAlignment="Center" 
+                        />
                     <Button
                         Width="100"
                         Height="32"
@@ -87,7 +90,8 @@
                         Cursor="Hand">
                         <TextBlock
                             Text="Continue"
-                            TextAlignment="Center" />
+                            TextAlignment="Center" 
+                            />
                     </Button>
                 </Grid>
             </Grid>
