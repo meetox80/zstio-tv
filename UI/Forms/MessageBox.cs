@@ -52,7 +52,7 @@ public class MessageBox
             return await _Window.ShowDialog<bool>(parentWindow);
         }
 
-        return await _Window.ShowDialog<bool>(null);
+        return await _Window.ShowDialog<bool>(_Window);
     }
 }
 
