@@ -84,7 +84,7 @@ public class RadialGradientTextControl : Control
             Text,
             CultureInfo.CurrentCulture,
             FlowDirection.LeftToRight,
-            new Typeface(FontFamily?.Name ?? "Arial"),
+            new Typeface(FontFamily.Name ?? "Arial"),
             FontSize,
             Brushes.Transparent
         );
