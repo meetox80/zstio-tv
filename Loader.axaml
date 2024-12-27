@@ -14,7 +14,10 @@
         ExtendClientAreaToDecorationsHint="True"
         CanResize="False"
         Loaded="OnLoaded">
-    <Border CornerRadius="20" Background="#E3E3E3">
+    <Border 
+        CornerRadius="20" Background="#E3E3E3"
+        PointerPressed="WindowMove_Pressed"
+        PointerMoved="WindowMove_Moved">
         <Grid x:Name="Handler">
             <Grid x:Name="HandlerBackground">
                 <TextBlock
@@ -25,7 +28,9 @@
                     Foreground="#EDEDED"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Padding="-275,-250,0,0" />
+                    Padding="-275,-250,0,0"
+                    PointerPressed="WindowMove_Pressed"
+                    PointerMoved="WindowMove_Moved"/>
                 <Rectangle>
                     <Rectangle.Fill>
                         <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
@@ -35,6 +40,7 @@
                     </Rectangle.Fill>
                 </Rectangle>
             </Grid>
+            
             <Grid x:Name="HandlerUI">
                 <StackPanel Orientation="Vertical" Margin="15">
                     <Grid Margin="0,25,0,0">

@@ -168,9 +168,14 @@ public partial class Loader : Window
 
     private async void OnLoaded(object? sender, RoutedEventArgs e)
     {
+        #region Animations
+        
         LoadAnimations();
+
+        #endregion
         
         #region ScreenInfo:GET
+        
         IReadOnlyList<Screen> _AllScreens = Screens.All;
         for (int i = 0; i < _AllScreens.Count; i++)
         {
@@ -185,9 +190,50 @@ public partial class Loader : Window
                 Height = _CurrentScreen.Bounds.Height
             });
         }
+        
         #endregion
         #region ScreenInfo:PUT
+        
         RenderScreens();
+        
         #endregion
     }
+
+    #region Movement
+    
+    private Point _StartPoint;
+    private bool _IsDragging = false;
+
+    private void WindowMove_Pressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            _StartPoint = e.GetPosition(this);
+            _IsDragging = true;
+        }
+    }
+
+    private void WindowMove_Moved(object? sender, PointerEventArgs e)
+    {
+        if (_IsDragging)
+        {
+            Point CurrentPosition = e.GetPosition(this);
+
+            double Offset_X = CurrentPosition.X - _StartPoint.X;
+            double Offset_Y = CurrentPosition.Y - _StartPoint.Y;
+
+            Position = new PixelPoint(
+                Position.X + (int)Offset_X,
+                Position.Y + (int)Offset_Y
+            );
+        }
+    }
+
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        _IsDragging = false;
+        base.OnPointerReleased(e);
+    }
+        
+    #endregion
 }
