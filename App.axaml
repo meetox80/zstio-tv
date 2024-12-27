@@ -7,8 +7,8 @@
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
     </Application.Styles>
     <Application.Resources>
-        <FontFamily x:Key="SemiBold-Syne">avares://zstio-tv/Assets/Fonts/SemiBold/#Syne</FontFamily>
-        <FontFamily x:Key="SemiBold-Inter">avares://zstio-tv/Assets/Fonts/SemiBold/#Inter</FontFamily>
-        <FontFamily x:Key="SemiBold-NotoSansJP">avares://zstio-tv/Assets/Fonts/SemiBold/#Noto Sans</FontFamily>
+        <FontFamily x:Key="SemiBold-Syne">avares://zstio_tv/Assets/Fonts/SemiBold/#Syne</FontFamily>
+        <FontFamily x:Key="SemiBold-Inter">avares://zstio_tv/Assets/Fonts/SemiBold/#Inter</FontFamily>
+        <FontFamily x:Key="SemiBold-NotoSansJP">avares://zstio_tv/Assets/Fonts/SemiBold/#Noto Sans</FontFamily>
     </Application.Resources>
 </Application>

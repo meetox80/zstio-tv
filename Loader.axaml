@@ -84,7 +84,7 @@
                                 
                                 <Grid VerticalAlignment="Bottom" Margin="15">
                                         <Label
-                                                Content="*Select the screen on which zstio-tv will be displayed"
+                                                Content="*Select the screen on which zstio_tv will be displayed"
                                                         
                                                 FontFamily="Arial"
                                                 Foreground="#919191"

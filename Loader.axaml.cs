@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -25,6 +26,7 @@ public class ScreenInfo
 public class Memory
 {
     public static List<ScreenInfo> Screens = new List<ScreenInfo>();
+    public static ScreenInfo SelectedScreen = null;
 }
 
 public partial class Loader : Window
@@ -103,9 +105,74 @@ public partial class Loader : Window
         }
         #endregion
     }
+    
+    private void RenderScreens()
+    {
+        HandlerUIDisplays.Children.Clear();
+        
+        foreach (ScreenInfo _CurrentScreen in Memory.Screens)
+        {
+            Border _ScreenBorder = new Border
+            {
+                Width = _CurrentScreen.Width / 8,
+                Height = _CurrentScreen.Height / 8,
+                
+                MaxWidth = 300,
+                MaxHeight = 300,
+                
+                CornerRadius = new CornerRadius(20),
+                Background = new SolidColorBrush(Color.Parse("#E3E3E3")),
+                BorderThickness = new Thickness(1),
+                Cursor = Cursor.Parse("Hand"),
+                
+                Margin = new Thickness(5)
+            };
+
+            if (_CurrentScreen == Memory.SelectedScreen)
+            {
+                _ScreenBorder.BorderBrush = new SolidColorBrush(Colors.Black);
+            }
+            else
+            {
+                _ScreenBorder.BorderBrush = new SolidColorBrush(Color.Parse("#909090"));
+            }
+
+            _ScreenBorder.PointerPressed += (sender, e) =>
+            {
+                Memory.SelectedScreen = _CurrentScreen;
+                RenderScreens();
+            };
+
+            _ScreenBorder.Effect = new DropShadowEffect
+            {
+                Color = Color.Parse("#40000000"),
+                
+                BlurRadius = 10,
+                OffsetX = 0,
+                OffsetY = 0
+            };
+
+            TextBlock _ScreenTextBlock = new TextBlock
+            {
+                Text = _CurrentScreen.Index.ToString(),
+                
+                FontSize = 24,
+                FontFamily = (FontFamily)Application.Current.Resources["SemiBold-Inter"],
+                Foreground = new SolidColorBrush(Color.Parse("#909090")),
+                
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            _ScreenBorder.Child = _ScreenTextBlock;
+            HandlerUIDisplays.Children.Add(_ScreenBorder);
+        }
+    }
 
     private async void OnLoaded(object? sender, RoutedEventArgs e)
     {
+        LoadAnimations();
+        
         #region ScreenInfo:GET
         IReadOnlyList<Screen> _AllScreens = Screens.All;
         for (int i = 0; i < _AllScreens.Count; i++)
@@ -125,42 +192,7 @@ public partial class Loader : Window
         }
         #endregion
         #region ScreenInfo:PUT
-        foreach (ScreenInfo _CurrentScreen in Memory.Screens)
-        {
-            Border _ScreenBorder = new Border
-            {
-                Width = _CurrentScreen.Width / 8,
-                Height = _CurrentScreen.Height / 8,
-                
-                CornerRadius = new CornerRadius(20),
-                Background = new SolidColorBrush(Color.Parse("#E3E3E3")),
-                BorderBrush = new SolidColorBrush(Colors.Black),
-                BorderThickness = new Thickness(1)
-            };
-
-            _ScreenBorder.Effect = new DropShadowEffect
-            {
-                Color = Color.Parse("#40000000"),
-                
-                BlurRadius = 10,
-                OffsetX = 0,
-                OffsetY = 0
-            };
-
-            TextBlock _ScreenTextBlock = new TextBlock
-            {
-                Text = _CurrentScreen.Index.ToString(),
-                
-                FontSize = 24,
-                FontFamily = (FontFamily)Application.Current.Resources["SemiBold-Inter"],
-                Foreground = new SolidColorBrush(Color.Parse("#909090")),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-
-            _ScreenBorder.Child = _ScreenTextBlock;
-            HandlerUIDisplays.Children.Add(_ScreenBorder);
-        }
+        RenderScreens();
         #endregion
     }
 }

@@ -136,13 +136,13 @@ public class RadialGradientTextControl : Control
             }
         };
         context.DrawGeometry(
-            Brushes.Transparent, 
-            null, 
+            Brushes.Transparent,
+            null,
             TextGeometry
         );
         context.DrawGeometry(
-            Brush_Glow, 
-            null, 
+            Brush_Glow,
+            null,
             TextGeometry
         );
     }
