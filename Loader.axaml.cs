@@ -11,6 +11,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using zstio_tv.UI.Controls;
 
 namespace zstio_tv;
 
@@ -116,15 +117,12 @@ public partial class Loader : Window
             {
                 Width = _CurrentScreen.Width / 8,
                 Height = _CurrentScreen.Height / 8,
-                
                 MaxWidth = 300,
                 MaxHeight = 300,
-                
                 CornerRadius = new CornerRadius(20),
                 Background = new SolidColorBrush(Color.Parse("#E3E3E3")),
                 BorderThickness = new Thickness(1),
                 Cursor = Cursor.Parse("Hand"),
-                
                 Margin = new Thickness(5)
             };
 
@@ -141,12 +139,13 @@ public partial class Loader : Window
             {
                 Memory.SelectedScreen = _CurrentScreen;
                 RenderScreens();
+
+                MessageBox.ShowAsync("huj", _CurrentScreen.Index.ToString());
             };
 
             _ScreenBorder.Effect = new DropShadowEffect
             {
                 Color = Color.Parse("#40000000"),
-                
                 BlurRadius = 10,
                 OffsetX = 0,
                 OffsetY = 0
@@ -155,11 +154,9 @@ public partial class Loader : Window
             TextBlock _ScreenTextBlock = new TextBlock
             {
                 Text = _CurrentScreen.Index.ToString(),
-                
                 FontSize = 24,
                 FontFamily = (FontFamily)Application.Current.Resources["SemiBold-Inter"],
                 Foreground = new SolidColorBrush(Color.Parse("#909090")),
-                
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
@@ -182,10 +179,8 @@ public partial class Loader : Window
             Memory.Screens.Add(new ScreenInfo
             {
                 Index = i,
-                
                 X = _CurrentScreen.Bounds.X,
                 Y = _CurrentScreen.Bounds.Y,
-                
                 Width = _CurrentScreen.Bounds.Width,
                 Height = _CurrentScreen.Bounds.Height
             });
