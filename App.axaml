@@ -1,0 +1,14 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="zstio_tv.App"
+             RequestedThemeVariant="Light">
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+    </Application.Styles>
+    <Application.Resources>
+        <FontFamily x:Key="SemiBold-Syne">avares://zstio-tv/Assets/Fonts/SemiBold/#Syne</FontFamily>
+        <FontFamily x:Key="SemiBold-Inter">avares://zstio-tv/Assets/Fonts/SemiBold/#Inter</FontFamily>
+        <FontFamily x:Key="SemiBold-NotoSansJP">avares://zstio-tv/Assets/Fonts/SemiBold/#Noto Sans</FontFamily>
+    </Application.Resources>
+</Application>

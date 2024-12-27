@@ -1,0 +1,166 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Avalonia.Platform;
+using Avalonia.Styling;
+
+namespace zstio_tv;
+
+public class ScreenInfo
+{
+    public int Index { get; set; }
+    public double X { get; set; }
+    public double Y { get; set; }
+    public double Width { get; set; }
+    public double Height { get; set; }
+}
+
+public class Memory
+{
+    public static List<ScreenInfo> Screens = new List<ScreenInfo>();
+}
+
+public partial class Loader : Window
+{
+    public Loader()
+    {
+        InitializeComponent();
+    }
+
+    private async void LoadAnimations()
+    {
+        #region Animation:HandlerBackgroundStyling
+        Control _HandlerBackgroundStyling = this.FindControl<TextBlock>("HandlerBackgroundStyling");
+        _HandlerBackgroundStyling.Opacity = 0.0f;
+        
+        if (_HandlerBackgroundStyling != null)
+        {
+            var _HandlerBackgroundStyling_PaddingAnimation = new Animation
+            {
+                Delay = TimeSpan.FromSeconds(1),
+                Duration = TimeSpan.FromSeconds(2.5),
+                Easing = new CubicEaseOut(),
+                Children =
+                {
+                    new KeyFrame
+                    {
+                        Cue = new Cue(0),
+                        Setters =
+                        {
+                            new Setter(PaddingProperty, new Thickness(-275,0,0,0))
+                        }
+                    },
+                    new KeyFrame
+                    {
+                        Cue = new Cue(1),
+                        Setters =
+                        {
+                            new Setter(PaddingProperty, new Thickness(-275,-250,0,0))
+                        }
+                    }
+                }
+            };
+
+            var _HandlerBackgroundStyling_OpacityAnimation = new Animation
+            {
+                Delay = TimeSpan.FromSeconds(1),
+                Duration = TimeSpan.FromSeconds(2.5),
+                Easing = new CubicEaseOut(),
+                Children =
+                {
+                    new KeyFrame
+                    {
+                        Cue = new Cue(0),
+                        Setters =
+                        {
+                            new Setter(OpacityProperty, _HandlerBackgroundStyling.Opacity)
+                        }
+                    },
+                    new KeyFrame
+                    {
+                        Cue = new Cue(1),
+                        Setters =
+                        {
+                            new Setter(OpacityProperty, 1.0)
+                        }
+                    }
+                }
+            };
+
+            await Task.WhenAll(
+                _HandlerBackgroundStyling_PaddingAnimation.RunAsync(_HandlerBackgroundStyling),
+                _HandlerBackgroundStyling_OpacityAnimation.RunAsync(_HandlerBackgroundStyling)
+            );
+            
+            _HandlerBackgroundStyling.Opacity = 1.0;
+        }
+        #endregion
+    }
+
+    private async void OnLoaded(object? sender, RoutedEventArgs e)
+    {
+        #region ScreenInfo:GET
+        IReadOnlyList<Screen> _AllScreens = Screens.All;
+        for (int i = 0; i < _AllScreens.Count; i++)
+        {
+            Screen _CurrentScreen = _AllScreens[i];
+            
+            Memory.Screens.Add(new ScreenInfo
+            {
+                Index = i,
+                
+                X = _CurrentScreen.Bounds.X,
+                Y = _CurrentScreen.Bounds.Y,
+                
+                Width = _CurrentScreen.Bounds.Width,
+                Height = _CurrentScreen.Bounds.Height
+            });
+        }
+        #endregion
+        #region ScreenInfo:PUT
+        foreach (ScreenInfo _CurrentScreen in Memory.Screens)
+        {
+            Border _ScreenBorder = new Border
+            {
+                Width = _CurrentScreen.Width / 8,
+                Height = _CurrentScreen.Height / 8,
+                
+                CornerRadius = new CornerRadius(20),
+                Background = new SolidColorBrush(Color.Parse("#E3E3E3")),
+                BorderBrush = new SolidColorBrush(Colors.Black),
+                BorderThickness = new Thickness(1)
+            };
+
+            _ScreenBorder.Effect = new DropShadowEffect
+            {
+                Color = Color.Parse("#40000000"),
+                
+                BlurRadius = 10,
+                OffsetX = 0,
+                OffsetY = 0
+            };
+
+            TextBlock _ScreenTextBlock = new TextBlock
+            {
+                Text = _CurrentScreen.Index.ToString(),
+                
+                FontSize = 24,
+                FontFamily = (FontFamily)Application.Current.Resources["SemiBold-Inter"],
+                Foreground = new SolidColorBrush(Color.Parse("#909090")),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            _ScreenBorder.Child = _ScreenTextBlock;
+            HandlerUIDisplays.Children.Add(_ScreenBorder);
+        }
+        #endregion
+    }
+}

@@ -1,0 +1,117 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:zstio_tv.UI.Controls"
+        mc:Ignorable="d" 
+        
+        d:DesignWidth="800" d:DesignHeight="450"
+        Width="800" Height="450"
+        
+        x:Class="zstio_tv.Loader"
+        Title="zstio_tv"
+        
+        ExtendClientAreaChromeHints="NoChrome" 
+        TransparencyLevelHint="Transparent" 
+        Background="Transparent" 
+        ExtendClientAreaToDecorationsHint="True"
+        CanResize="False"
+        
+        Loaded="OnLoaded">
+        <Border CornerRadius="20" Background="#E3E3E3">
+                <Grid x:Name="Handler">
+                        <Grid x:Name="HandlerBackground">
+                                <TextBlock
+                                        x:Name="HandlerBackgroundStyling"
+                                        Text="表"
+                                
+                                        FontFamily="{StaticResource SemiBold-NotoSansJP}"
+                                        FontSize="1400"
+                                        Foreground="#EDEDED"
+                                
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Padding="-275,-250,0,0"
+                                />
+                        
+                                <Rectangle>
+                                        <Rectangle.Fill>
+                                                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                                        <GradientStop Color="#00D9D9D9" Offset="0"/>
+                                                        <GradientStop Color="#FFD9D9D9" Offset="1"/>
+                                                </LinearGradientBrush>
+                                        </Rectangle.Fill>
+                                </Rectangle>
+                        </Grid>
+                        
+                        <Grid x:Name="HandlerUI">
+                                <StackPanel Orientation="Vertical" Margin="15">
+                                        <Grid Margin="0,25,0,0">
+                                                <controls:RadialGradientTextControl
+                                                        Text="セットアップ表示"
+                                                        
+                                                        FontSize="48"
+                                                        FontFamily="{StaticResource SemiBold-NotoSansJP}"
+                                                        CenterColor="#00000000"
+                                                        EdgeColor="#40000000"
+                                                        BorderColor="#40000000"
+                                                        BorderThickness="1"
+                                                        
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        Margin="0,-20,0,0"
+                                                        />
+                                                <TextBlock
+                                                        Text="Setup Displays"
+                                                        
+                                                        FontSize="32"
+                                                        FontFamily="{StaticResource SemiBold-Syne}"
+                                                        Foreground="#FF3E3E3E"
+                                                        
+                                                        HorizontalAlignment="Center"
+                                                        />
+                                        </Grid>
+                                        
+                                        <Grid Height="310">
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="HandlerUIDisplays">
+                                                        <!--
+                                                                ...
+                                                        -->
+                                                </StackPanel>
+                                        </Grid>
+                                </StackPanel>
+                                
+                                
+                                <Grid VerticalAlignment="Bottom" Margin="15">
+                                        <Label
+                                                Content="*Select the screen on which zstio-tv will be displayed"
+                                                        
+                                                FontFamily="Arial"
+                                                Foreground="#919191"
+                                                
+                                                VerticalAlignment="Center"
+                                        />
+                                        <Button
+                                                Width="100"
+                                                Height="32"
+                                                
+                                                FontFamily="{StaticResource SemiBold-Inter}"
+                                                Background="#282828"
+                                                Foreground="#E3E3E3"
+                                                
+                                                HorizontalAlignment="Right"
+                                                CornerRadius="10"
+                                                
+                                                Cursor="Hand"
+                                                >
+                                                <TextBlock
+                                                        Text="Continue"
+                                                        
+                                                        TextAlignment="Center"
+                                                        />
+                                        </Button>
+                                </Grid>
+                        </Grid>
+                </Grid>
+        </Border>
+</Window>
