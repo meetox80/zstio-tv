@@ -12,6 +12,7 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
 using zstio_tv.UI.Controls;
+using zstio_tv.UI.Functions;
 
 namespace zstio_tv;
 
@@ -39,72 +40,40 @@ public partial class Loader : Window
 
     private async void LoadAnimations()
     {
-        #region Animation:HandlerBackgroundStyling
+        #region Animation: Background
+
         Control _HandlerBackgroundStyling = this.FindControl<TextBlock>("HandlerBackgroundStyling");
-        _HandlerBackgroundStyling.Opacity = 0.0f;
-        
         if (_HandlerBackgroundStyling != null)
         {
-            var _HandlerBackgroundStyling_PaddingAnimation = new Animation
-            {
-                Delay = TimeSpan.FromSeconds(1),
-                Duration = TimeSpan.FromSeconds(2.5),
-                Easing = new CubicEaseOut(),
-                Children =
-                {
-                    new KeyFrame
-                    {
-                        Cue = new Cue(0),
-                        Setters =
-                        {
-                            new Setter(PaddingProperty, new Thickness(-275,0,0,0))
-                        }
-                    },
-                    new KeyFrame
-                    {
-                        Cue = new Cue(1),
-                        Setters =
-                        {
-                            new Setter(PaddingProperty, new Thickness(-275,-250,0,0))
-                        }
-                    }
-                }
-            };
-
-            var _HandlerBackgroundStyling_OpacityAnimation = new Animation
-            {
-                Delay = TimeSpan.FromSeconds(1),
-                Duration = TimeSpan.FromSeconds(2.5),
-                Easing = new CubicEaseOut(),
-                Children =
-                {
-                    new KeyFrame
-                    {
-                        Cue = new Cue(0),
-                        Setters =
-                        {
-                            new Setter(OpacityProperty, _HandlerBackgroundStyling.Opacity)
-                        }
-                    },
-                    new KeyFrame
-                    {
-                        Cue = new Cue(1),
-                        Setters =
-                        {
-                            new Setter(OpacityProperty, 1.0)
-                        }
-                    }
-                }
-            };
+            _HandlerBackgroundStyling.Opacity = 0.0f;
 
             await Task.WhenAll(
-                _HandlerBackgroundStyling_PaddingAnimation.RunAsync(_HandlerBackgroundStyling),
-                _HandlerBackgroundStyling_OpacityAnimation.RunAsync(_HandlerBackgroundStyling)
+                AnimationManager.Animate(
+                    _Delay: TimeSpan.FromSeconds(1),
+                    _Duration: TimeSpan.FromSeconds(2.5),
+                    _Property: PaddingProperty,
+                    _FromValue: new Thickness(-275, 0, 0, 0),
+                    _ToValue: new Thickness(-275, -250, 0, 0),
+                    _Element: _HandlerBackgroundStyling,
+                    _Easing: new CubicEaseOut()
+                ),
+                AnimationManager.Animate(
+                    _Delay: TimeSpan.FromSeconds(1),
+                    _Duration: TimeSpan.FromSeconds(2.5),
+                    _Property: OpacityProperty,
+                    _FromValue: 0.0,
+                    _ToValue: 1.0,
+                    _Element: _HandlerBackgroundStyling,
+                    _Easing: new CubicEaseOut()
+                )
             );
-            
+
             _HandlerBackgroundStyling.Opacity = 1.0;
         }
+
         #endregion
+        
+        
     }
     
     private void RenderScreens()
