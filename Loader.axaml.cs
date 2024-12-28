@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia;
-using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -10,8 +9,6 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform;
-using Avalonia.Styling;
-using zstio_tv.UI.Controls;
 using zstio_tv.UI.Functions;
 
 namespace zstio_tv;
@@ -108,8 +105,6 @@ public partial class Loader : Window
             {
                 Memory.SelectedScreen = _CurrentScreen;
                 RenderScreens();
-
-                MessageBox.ShowAsync("huj", _CurrentScreen.Index.ToString());
             };
 
             _ScreenBorder.Effect = new DropShadowEffect
@@ -179,4 +174,9 @@ public partial class Loader : Window
     }
         
     #endregion
+
+    private void SelectClicked(object? sender, RoutedEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
 }

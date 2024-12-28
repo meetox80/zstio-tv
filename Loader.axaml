@@ -87,7 +87,8 @@
                         Foreground="#E3E3E3"
                         HorizontalAlignment="Right"
                         CornerRadius="10"
-                        Cursor="Hand">
+                        Cursor="Hand"
+                        Click="SelectClickedSelectClicked">
                         <TextBlock
                             Text="Continue"
                             TextAlignment="Center" 
