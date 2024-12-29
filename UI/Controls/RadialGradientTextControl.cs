@@ -8,6 +8,7 @@ namespace zstio_tv.UI.Controls;
 public class RadialGradientTextControl : Control
 {
     #region Properties
+    
     public static readonly StyledProperty<string> TextProperty = 
         AvaloniaProperty.Register<RadialGradientTextControl, string>(nameof(Text));
     
@@ -28,9 +29,14 @@ public class RadialGradientTextControl : Control
     
     public static readonly StyledProperty<Color> BorderColorProperty = 
         AvaloniaProperty.Register<RadialGradientTextControl, Color>(nameof(BorderColor));
+    
+    public static readonly StyledProperty<string> BorderAlignmentProperty = 
+        AvaloniaProperty.Register<RadialGradientTextControl, string>(nameof(BorderAlignment));
+
     #endregion
 
-    #region Structures
+    #region Structs
+
     public string Text
     {
         get => GetValue(TextProperty);
@@ -72,13 +78,21 @@ public class RadialGradientTextControl : Control
         get => GetValue(BorderColorProperty);
         set => SetValue(BorderColorProperty, value);
     }
+
+    public string BorderAlignment
+    {
+        get => GetValue(BorderAlignmentProperty);
+        set => SetValue(BorderAlignmentProperty, value);
+    }
+
     #endregion
 
     #region Rendering
-    public override void Render(DrawingContext context)
+
+    
+    public override void Render(DrawingContext Context)
     {
-        if (string.IsNullOrEmpty(Text))
-            return;
+        if (string.IsNullOrEmpty(Text)) return;
 
         FormattedText _FormattedText = new FormattedText(
             Text,
@@ -88,40 +102,38 @@ public class RadialGradientTextControl : Control
             FontSize,
             Brushes.Transparent
         );
-
+        
         Size _TextBounds = new Size(
             _FormattedText.Width,
             _FormattedText.Height
         );
+        
         Point _CenterPoint = new Point(
             Bounds.Width / 2 - _TextBounds.Width / 2,
             Bounds.Height / 2 - _TextBounds.Height / 2
         );
-
+        
         Geometry TextGeometry = _FormattedText.BuildGeometry(_CenterPoint);
-        if (TextGeometry == null)
-            return;
+        if (TextGeometry == null) return;
 
-        RadialGradientBrush Brush_Border = new RadialGradientBrush
+        double Thickness = BorderAlignment switch
         {
-            Center = new RelativePoint(0.5, 0.5, RelativeUnit.Relative),
-            GradientOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Relative),
-            RadiusX = new RelativeScalar(0.5, RelativeUnit.Relative),
-            RadiusY = new RelativeScalar(0.5, RelativeUnit.Relative),
-            SpreadMethod = GradientSpreadMethod.Pad,
-            GradientStops =
-            {
-                new GradientStop(Color.FromArgb(0, 0, 0, 0), 0),
-                new GradientStop(BorderColor, 1)
-            }
+            "Inside" => BorderThickness / 2,
+            "Outside" => BorderThickness * 1.5,
+            _ => BorderThickness
         };
-        context.DrawGeometry(
-            Brushes.Transparent,
-            new Pen(Brush_Border, BorderThickness),
-            TextGeometry
+
+        Pen BorderPen = new Pen(
+            new SolidColorBrush(BorderColor), 
+            Thickness
+        );
+        
+        Context.DrawGeometry(
+            Brushes.Transparent, 
+            BorderPen, TextGeometry
         );
 
-        RadialGradientBrush Brush_Glow = new RadialGradientBrush
+        var GlowBrush = new RadialGradientBrush
         {
             Center = new RelativePoint(0.5, 0.5, RelativeUnit.Relative),
             GradientOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Relative),
@@ -135,16 +147,13 @@ public class RadialGradientTextControl : Control
                 new GradientStop(Color.FromArgb(30, 0, 0, 0), 1)
             }
         };
-        context.DrawGeometry(
-            Brushes.Transparent,
-            null,
-            TextGeometry
-        );
-        context.DrawGeometry(
-            Brush_Glow,
-            null,
+
+        Context.DrawGeometry(
+            GlowBrush, 
+            null, 
             TextGeometry
         );
     }
+
     #endregion
 }
