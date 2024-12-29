@@ -75,7 +75,7 @@
                 <Grid VerticalAlignment="Bottom" Margin="15">
                     <Label
                         Content="*Select the screen on which zstio-tv will be displayed"
-                        FontFamily="Arial"
+                        FontFamily="{StaticResource SemiBold-Inter}"
                         Foreground="#6E6E6E"
                         VerticalAlignment="Center" 
                         />
