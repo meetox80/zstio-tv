@@ -9,6 +9,8 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform;
+using zstio_tv.UI;
+using zstio_tv.UI.Controls;
 using zstio_tv.UI.Functions;
 
 namespace zstio_tv;
@@ -30,14 +32,16 @@ public class Memory
 
 public partial class Loader : Window
 {
+    public static Loader _Instance;
     public Loader()
     {
         InitializeComponent();
+        _Instance = this;
     }
 
     private async void LoadAnimations()
     {
-        #region Animation: Background
+        #region Animation:Background
 
         Control _HandlerBackgroundStyling = this.FindControl<TextBlock>("HandlerBackgroundStyling");
         if (_HandlerBackgroundStyling != null)
@@ -69,14 +73,17 @@ public partial class Loader : Window
         }
 
         #endregion
-        
-        
+
+        #region Animation:Displays
+
+        Control _HandlerUIDisplays = this.FindControl<StackPanel>("HandlerUIDisplays");
+
+        #endregion
     }
     
     private void RenderScreens()
     {
         HandlerUIDisplays.Children.Clear();
-        
         foreach (ScreenInfo _CurrentScreen in Memory.Screens)
         {
             Border _ScreenBorder = new Border
@@ -86,7 +93,7 @@ public partial class Loader : Window
                 MaxWidth = 300,
                 MaxHeight = 300,
                 CornerRadius = new CornerRadius(20),
-                Background = new SolidColorBrush(Color.Parse("#E3E3E3")),
+                Background = new SolidColorBrush(Color.Parse("#1C1C1C")),
                 BorderThickness = new Thickness(1),
                 Cursor = Cursor.Parse("Hand"),
                 Margin = new Thickness(5)
@@ -94,11 +101,11 @@ public partial class Loader : Window
 
             if (_CurrentScreen == Memory.SelectedScreen)
             {
-                _ScreenBorder.BorderBrush = new SolidColorBrush(Colors.Black);
+                _ScreenBorder.BorderBrush = new SolidColorBrush(Colors.White);
             }
             else
             {
-                _ScreenBorder.BorderBrush = new SolidColorBrush(Color.Parse("#909090"));
+                _ScreenBorder.BorderBrush = new SolidColorBrush(Color.Parse("#6E6E6E"));
             }
 
             _ScreenBorder.PointerPressed += (sender, e) =>
@@ -109,7 +116,7 @@ public partial class Loader : Window
 
             _ScreenBorder.Effect = new DropShadowEffect
             {
-                Color = Color.Parse("#40000000"),
+                Color = Color.Parse("#40FFFFFF"),
                 BlurRadius = 10,
                 OffsetX = 0,
                 OffsetY = 0
@@ -120,7 +127,7 @@ public partial class Loader : Window
                 Text = _CurrentScreen.Index.ToString(),
                 FontSize = 24,
                 FontFamily = (FontFamily)Application.Current.Resources["SemiBold-Inter"],
-                Foreground = new SolidColorBrush(Color.Parse("#909090")),
+                Foreground = new SolidColorBrush(Color.Parse("#C1C1C1")),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
@@ -175,8 +182,32 @@ public partial class Loader : Window
         
     #endregion
 
-    private void SelectClicked(object? sender, RoutedEventArgs e)
+    #region ContinueButton
+    
+    private void ContinueButton_Clicked(object? sender, RoutedEventArgs e)
     {
-        throw new NotImplementedException();
+        if (Memory.SelectedScreen == null)
+        {
+            MessageBox.ShowAsync(this.GetType().Name, "Please select a Display.");
+            
+            return;
+        }
+        
+        Window Interface = new Interface();
+        Interface.Show();
+        
+        this.Close();
     }
+
+    private void ContinueButton_OnPointerEntered(object? sender, PointerEventArgs e)
+    {
+        ContinueButtonTextBlock.Foreground = new SolidColorBrush(Color.Parse("#E3E3E3"));
+    }
+
+    private void ContinueButton_OnPointerExited(object? sender, PointerEventArgs e)
+    {
+        ContinueButtonTextBlock.Foreground = new SolidColorBrush(Color.Parse("#282828"));
+    }
+    
+    #endregion
 }
