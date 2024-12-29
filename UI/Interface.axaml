@@ -8,6 +8,7 @@
         Width="1280"
         Height="720"
         x:Class="zstio_tv.UI.Interface"
-        Title="Interface">
+        Title="Interface"
+        Loaded="OnLoaded">
     Welcome to Avalonia!
 </Window>

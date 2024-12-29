@@ -15,23 +15,10 @@ using zstio_tv.UI.Functions;
 
 namespace zstio_tv;
 
-public class ScreenInfo
-{
-    public int Index { get; set; }
-    public double X { get; set; }
-    public double Y { get; set; }
-    public double Width { get; set; }
-    public double Height { get; set; }
-}
-
-public class Memory
-{
-    public static List<ScreenInfo> Screens = new List<ScreenInfo>();
-    public static ScreenInfo SelectedScreen = null;
-}
-
 public partial class Loader : Window
 {
+    #region Initialization
+
     public static Loader _Instance;
     public Loader()
     {
@@ -39,6 +26,10 @@ public partial class Loader : Window
         _Instance = this;
     }
 
+    #endregion
+
+    #region Animations
+    
     private async void LoadAnimations()
     {
         #region Animation:Background
@@ -80,11 +71,15 @@ public partial class Loader : Window
 
         #endregion
     }
+
+    #endregion
+
+    #region Window
     
     private void RenderScreens()
     {
         HandlerUIDisplays.Children.Clear();
-        foreach (ScreenInfo _CurrentScreen in Memory.Screens)
+        foreach (Structures.ScreenInfo _CurrentScreen in Memory.Screens)
         {
             Border _ScreenBorder = new Border
             {
@@ -136,23 +131,23 @@ public partial class Loader : Window
             HandlerUIDisplays.Children.Add(_ScreenBorder);
         }
     }
-
+    
     private async void OnLoaded(object? sender, RoutedEventArgs e)
     {
         #region Animations
-        
+
         LoadAnimations();
 
         #endregion
-        
+
         #region ScreenInfo:GET
-        
+
         IReadOnlyList<Screen> _AllScreens = Screens.All;
         for (int i = 0; i < _AllScreens.Count; i++)
         {
             Screen _CurrentScreen = _AllScreens[i];
-            
-            Memory.Screens.Add(new ScreenInfo
+
+            Memory.Screens.Add(new Structures.ScreenInfo
             {
                 Index = i,
                 X = _CurrentScreen.Bounds.X,
@@ -161,16 +156,15 @@ public partial class Loader : Window
                 Height = _CurrentScreen.Bounds.Height
             });
         }
-        
+
         #endregion
+
         #region ScreenInfo:PUT
-        
+
         RenderScreens();
-        
+
         #endregion
     }
-
-    #region Movement
 
     private void WindowMove_Pressed(object? sender, PointerPressedEventArgs e)
     {
@@ -179,7 +173,7 @@ public partial class Loader : Window
             this.BeginMoveDrag(e);
         }
     }
-        
+
     #endregion
 
     #region ContinueButton
@@ -189,7 +183,6 @@ public partial class Loader : Window
         if (Memory.SelectedScreen == null)
         {
             MessageBox.ShowAsync(this.GetType().Name, "Please select a Display.");
-            
             return;
         }
         
