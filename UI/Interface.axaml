@@ -9,6 +9,24 @@
         Height="720"
         x:Class="zstio_tv.UI.Interface"
         Title="Interface"
-        Loaded="OnLoaded">
-    Welcome to Avalonia!
+        Loaded="OnLoaded"
+        
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        SystemDecorations="None">
+        <Grid 
+                x:Name="Application" 
+                Background="Red"
+                >
+                <Grid 
+                        x:Name="Handler"
+                        Background="Blue"
+                        Width="1280"
+                        Height="720"
+                        >
+                        <!--
+                                ...
+                        -->
+                </Grid>
+        </Grid>
 </Window>

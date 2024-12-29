@@ -13,7 +13,8 @@
         Background="Transparent" 
         ExtendClientAreaToDecorationsHint="True"
         CanResize="False"
-        Loaded="OnLoaded">
+        Loaded="OnLoaded"
+        >
     <Border 
         CornerRadius="20" Background="#1C1C1C"
         PointerPressed="WindowMove_Pressed">

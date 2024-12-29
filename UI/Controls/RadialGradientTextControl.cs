@@ -88,7 +88,6 @@ public class RadialGradientTextControl : Control
     #endregion
 
     #region Rendering
-
     
     public override void Render(DrawingContext Context)
     {
