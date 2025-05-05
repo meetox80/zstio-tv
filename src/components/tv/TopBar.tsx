@@ -1,5 +1,6 @@
 import React from "react";
 import LessonWidget from "./widgets/LessonWIdget";
+import TextWidget from "./widgets/TextWidget";
 
 export default function TopBar() {
   const FirstSectionWidth = 300;
@@ -15,7 +16,9 @@ export default function TopBar() {
       </div>
       
       <div className="mx-[15px]" style={{ width: `${CenterSectionWidth}px` }}>
-        <div className="w-full h-[60px] rounded-[7px] border border-[#2F2F2F] bg-[#151515]/80 backdrop-blur-md shadow-[0_4px_12px_rgba(0,0,0,0.15)]"></div>
+        <div className="w-full h-[60px] rounded-[7px] border border-[#2F2F2F] bg-[#151515]/80 backdrop-blur-md shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+          <TextWidget />
+        </div>
       </div>
       
       <div className="flex items-center" style={{ width: `${ThirdSectionWidth}px` }}>

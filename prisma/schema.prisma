@@ -23,3 +23,8 @@ model Spotify {
   refreshToken String
   expiresAt    BigInt
 }
+
+model widgetsdata {
+  id          Int    @id @default(1)
+  widget_text String @default("Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych.")
+}
