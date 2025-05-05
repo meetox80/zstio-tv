@@ -38,7 +38,7 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}?error=token_error`)
     }
     
-    SaveSpotifyTokens(
+    await SaveSpotifyTokens(
       TokenData.access_token,
       TokenData.refresh_token,
       TokenData.expires_in

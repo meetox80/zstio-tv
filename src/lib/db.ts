@@ -1,25 +1,19 @@
-import Database from 'better-sqlite3'
-import type { _Users } from '../types/db'
+import { Prisma } from './prisma'
+import type { User } from '../generated/prisma'
 
-const _Db = new Database('users.db')
-
-_Db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL
-  )
-`)
-
-const _GetUserByUsername = _Db.prepare('SELECT * FROM users WHERE username = ?')
-const _CreateUser = _Db.prepare('INSERT INTO users (username, password) VALUES (?, ?)')
-
-export function GetUserByUsername(username: string): _Users | null {
-  return _GetUserByUsername.get(username) as _Users | null
+export async function GetUserByUsername(Username: string): Promise<User | null> {
+  return await Prisma.user.findUnique({
+    where: {
+      username: Username
+    }
+  })
 }
 
-export function CreateUser(username: string, password: string): void {
-  _CreateUser.run(username, password)
-}
-
-export default _Db 
+export async function CreateUser(Username: string, Password: string): Promise<void> {
+  await Prisma.user.create({
+    data: {
+      username: Username,
+      password: Password
+    }
+  })
+} 
