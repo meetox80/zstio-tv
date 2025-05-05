@@ -1,15 +1,29 @@
 import { GetCurrentTrack, GetSpotifyTokens } from "@/lib/spotify.server";
-import SpotifyPlayer from "../components/SpotifyPlayer";
+import BottomBar from "@/components/tv/BottomBar";
+import { TrackData } from "@/types/spotify";
+import { Inter } from "next/font/google";
+
+const InterFont = Inter({ subsets: ["latin"], weight: ["700"] });
 
 export default async function Home() {
-  const _TrackData = await GetCurrentTrack();
+  const _RawTrackData = await GetCurrentTrack();
   const _IsAuthenticated = !!GetSpotifyTokens();
   
+  // Convert property names to match our expected format
+  const _TrackData: TrackData = _RawTrackData ? {
+    IsPlaying: _RawTrackData.isPlaying,
+    Title: _RawTrackData.title,
+    Artist: _RawTrackData.artist,
+    AlbumArt: _RawTrackData.albumArt,
+    AlbumName: _RawTrackData.albumName,
+    Duration: _RawTrackData.duration,
+    Progress: _RawTrackData.progress,
+    IsAuthenticated: _IsAuthenticated
+  } : null;
+  
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black">
-      <div className="w-full max-w-md px-4">
-        <SpotifyPlayer initialTrackData={_TrackData} isAuthenticated={_IsAuthenticated} />
-      </div>
+    <div className={`fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#101010] overflow-hidden ${InterFont.className}`} style={{ width: "1920px", height: "1080px" }}>      
+      <BottomBar TrackData={_TrackData} IsAuthenticated={_IsAuthenticated} />
     </div>
   );
 }
