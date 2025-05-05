@@ -1,0 +1,450 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  
+  /* Screens */
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  
+  /* Colors */
+  --color-black: #000;
+  --color-white: #fff;
+  
+  /* Indigo */
+  --color-indigo-50: #eef2ff;
+  --color-indigo-100: #e0e7ff;
+  --color-indigo-200: #c7d2fe;
+  --color-indigo-300: #a5b4fc;
+  --color-indigo-400: #818cf8;
+  --color-indigo-500: #6366f1;
+  --color-indigo-600: #4f46e5;
+  --color-indigo-700: #4338ca;
+  --color-indigo-800: #3730a3;
+  --color-indigo-900: #312e81;
+  --color-indigo-950: #1e1b4b;
+  
+  /* Purple */
+  --color-purple-50: #f5f3ff;
+  --color-purple-100: #ede9fe;
+  --color-purple-200: #ddd6fe;
+  --color-purple-300: #c4b5fd;
+  --color-purple-400: #a78bfa;
+  --color-purple-500: #8b5cf6;
+  --color-purple-600: #7c3aed;
+  --color-purple-700: #6d28d9;
+  --color-purple-800: #5b21b6;
+  --color-purple-900: #4c1d95;
+  --color-purple-950: #2e1065;
+  
+  /* Pink */
+  --color-pink-50: #fdf2f8;
+  --color-pink-100: #fce7f3;
+  --color-pink-200: #fbcfe8;
+  --color-pink-300: #f9a8d4;
+  --color-pink-400: #f472b6;
+  --color-pink-500: #ec4899;
+  --color-pink-600: #db2777;
+  --color-pink-700: #be185d;
+  --color-pink-800: #9d174d;
+  --color-pink-900: #831843;
+  --color-pink-950: #500724;
+  
+  /* Orange */
+  --color-orange-50: #fff7ed;
+  --color-orange-100: #ffedd5;
+  --color-orange-200: #fed7aa;
+  --color-orange-300: #fdba74;
+  --color-orange-400: #fb923c;
+  --color-orange-500: #f97316;
+  --color-orange-600: #ea580c;
+  --color-orange-700: #c2410c;
+  --color-orange-800: #9a3412;
+  --color-orange-900: #7c2d12;
+  --color-orange-950: #431407;
+  
+  /* Gray */
+  --color-gray-50: #F9F7F8;
+  --color-gray-100: #F1EEEF;
+  --color-gray-200: #E8E3E5;
+  --color-gray-300: #DAD2D5;
+  --color-gray-400: #AB9CA2;
+  --color-gray-500: #7F6C73;
+  --color-gray-600: #554B55;
+  --color-gray-700: #543B44;
+  --color-gray-800: #251925;
+  --color-gray-900: #110409;
+  
+  /* YellowGreen */
+  --color-yellowGreen-50: #FDFEFB;
+  --color-yellowGreen-100: #F7FCED;
+  --color-yellowGreen-200: #EFFADB;
+  --color-yellowGreen-300: #E2F6C0;
+  --color-yellowGreen-400: #D1F19C;
+  --color-yellowGreen-500: #BCEB70;
+  --color-yellowGreen-600: #A3E33A;
+  --color-yellowGreen-700: #85C51C;
+  --color-yellowGreen-800: #70A617;
+  --color-yellowGreen-900: #588212;
+  
+  /* Red */
+  --color-red-50: #FEFBFB;
+  --color-red-100: #FDF3F1;
+  --color-red-200: #FDEEEC;
+  --color-red-300: #FBD6D0;
+  --color-red-400: #F9BDB4;
+  --color-red-500: #F48B7C;
+  --color-red-600: #EF5944;
+  --color-red-700: #D7503D;
+  --color-red-800: #B34333;
+  --color-red-900: #8F3529;
+  
+  /* Teal */
+  --color-teal-50: #F9FBF9;
+  --color-teal-100: #F2F8F4;
+  --color-teal-200: #DEEDE3;
+  --color-teal-300: #C4DECC;
+  --color-teal-400: #A3CCAF;
+  --color-teal-500: #7CB68D;
+  --color-teal-600: #579E6C;
+  --color-teal-700: #417751;
+  --color-teal-800: #2B4F36;
+  --color-teal-900: #073517;
+  
+  /* Green */
+  --color-green-50: #FBFEFC;
+  --color-green-100: #F4FDF7;
+  --color-green-200: #EAFAF0;
+  --color-green-300: #CAF4D9;
+  --color-green-400: #AAEDC3;
+  --color-green-500: #6ADF95;
+  --color-green-600: #2AD168;
+  --color-green-700: #26BC5E;
+  --color-green-800: #209D4E;
+  --color-green-900: #197D3E;
+  
+  /* Cyan */
+  --color-cyan-50: #e9f6f5;
+  --color-cyan-100: #bde6e2;
+  --color-cyan-200: #a7ddd9;
+  --color-cyan-300: #92d5cf;
+  --color-cyan-400: #7ccdc6;
+  --color-cyan-500: #66c4bc;
+  --color-cyan-600: #50bcb3;
+  --color-cyan-700: #3ab4a9;
+  --color-cyan-800: #25aca0;
+  --color-cyan-900: #1d8980;
+  
+  /* CyanGreen */
+  --color-cyanGreen-50: #eef9da;
+  --color-cyanGreen-100: #e6f6c8;
+  --color-cyanGreen-200: #ddf3b5;
+  --color-cyanGreen-300: #d5f1a3;
+  --color-cyanGreen-400: #cdee91;
+  --color-cyanGreen-500: #c4eb7e;
+  --color-cyanGreen-600: #bce86c;
+  --color-cyanGreen-700: #b4e55a;
+  --color-cyanGreen-800: #ace348;
+  --color-cyanGreen-900: #9acc40;
+  
+  /* Yellow */
+  --color-yellow-50: #FFFCF5;
+  --color-yellow-100: #FFFAEB;
+  --color-yellow-200: #FEF0C7;
+  --color-yellow-300: #FEDF89;
+  --color-yellow-400: #FEC84B;
+  --color-yellow-500: #FDB022;
+  --color-yellow-600: #F79009;
+  --color-yellow-700: #DC6803;
+  --color-yellow-800: #B54708;
+  --color-yellow-900: #93370D;
+  
+  /* Blue */
+  --color-blue-50: #F5FAFF;
+  --color-blue-100: #EFF8FF;
+  --color-blue-200: #D1E9FF;
+  --color-blue-300: #B2DDFF;
+  --color-blue-400: #84CAFF;
+  --color-blue-500: #53B1FD;
+  --color-blue-600: #2E90FA;
+  --color-blue-700: #1570EF;
+  --color-blue-800: #175CD3;
+  --color-blue-900: #1849A9;
+  
+  /* Spacing */
+  --spacing-px: 1px;
+  --spacing-0: 0px;
+  --spacing-0\.5: 0.125rem;
+  --spacing-1: 0.25rem;
+  --spacing-1\.5: 0.375rem;
+  --spacing-2: 0.5rem;
+  --spacing-2\.5: 0.625rem;
+  --spacing-3: 0.75rem;
+  --spacing-3\.5: 0.875rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-7: 1.75rem;
+  --spacing-8: 2rem;
+  --spacing-9: 2.25rem;
+  --spacing-10: 2.5rem;
+  --spacing-11: 2.75rem;
+  --spacing-12: 3rem;
+  --spacing-14: 3.5rem;
+  --spacing-16: 4rem;
+  --spacing-18: 4.5rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+  --spacing-28: 7rem;
+  --spacing-32: 8rem;
+  --spacing-36: 9rem;
+  --spacing-40: 10rem;
+  --spacing-44: 11rem;
+  --spacing-48: 12rem;
+  --spacing-52: 13rem;
+  --spacing-56: 14rem;
+  --spacing-60: 15rem;
+  --spacing-64: 16rem;
+  --spacing-72: 18rem;
+  --spacing-80: 20rem;
+  --spacing-96: 24rem;
+  --spacing-112: 28rem;
+  --spacing-128: 32rem;
+  
+  /* Blur */
+  --blur-none: 0px;
+  --blur-xs: 4px;
+  --blur-sm: 16px;
+  --blur-DEFAULT: 20px;
+  --blur-md: 16px;
+  --blur-lg: 24px;
+  --blur-xl: 28px;
+  --blur-2xl: 40px;
+  --blur-3xl: 64px;
+  
+  /* Border Radius */
+  --radius-none: 0px;
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.875rem;
+  --radius-full: 9999px;
+  
+  /* Border Width */
+  --border-0: 0px;
+  --border-2: 2px;
+  --border-4: 4px;
+  --border-8: 8px;
+  --border-DEFAULT: 1px;
+  
+  /* Shadow */
+  --shadow-xs: 0px 1px 2px 0px rgba(156, 163, 175, 0.30);
+  --shadow-sm: 0px 6px 10px -2px rgba(85, 105, 135, 0.04), 0px 2px 4px -2px rgba(85, 105, 135, 0.02);
+  --shadow-md: 0px 12px 16px -4px rgba(85, 105, 135, 0.04), 0px 4px 6px -2px rgba(85, 105, 135, 0.02);
+  --shadow-lg: 0px 20px 24px -4px rgba(85, 105, 135, 0.04), 0px 8px 8px -4px rgba(85, 105, 135, 0.02);
+  --shadow-xl: 0px 2px 4px -2px rgba(42, 51, 66, 0.03), 0px 6px 10px -2px rgba(42, 51, 66, 0.06);
+  --shadow-2xl: 0px 32px 64px -12px rgba(85, 105, 135, 0.08);
+  --shadow-3xl: 0px 0px 8px 0px rgba(255, 255, 255, 0.20);
+  --shadow-4xl: 0px 0px 8px 0px rgba(209, 213, 219, 0.50);
+  --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+  --shadow-none: none;
+  
+  /* Font Family */
+  --font-body: Figtree, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-heading: Figtree, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: Figtree, "DM Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  
+  /* Font Size */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+  --text-7xl: 4.5rem;
+  
+  /* Line Height */
+  --leading-xs: 1.5;
+  --leading-sm: 1.25;
+  --leading-base: 1.5;
+  --leading-lg: 1.5;
+  --leading-xl: 1.5;
+  --leading-2xl: 1.3;
+  --leading-3xl: 1.3;
+  --leading-4xl: 1.2;
+  --leading-5xl: 1.25;
+  --leading-6xl: 1.2;
+  --leading-7xl: 1.25;
+  
+  /* Background Image */
+  --bg-gradient-to-t: linear-gradient(to top, var(--tw-gradient-stops));
+  --bg-gradient-to-tr: linear-gradient(to top right, var(--tw-gradient-stops));
+  --bg-gradient-to-r: linear-gradient(to right, var(--tw-gradient-stops));
+  --bg-gradient-to-br: linear-gradient(to bottom right, var(--tw-gradient-stops));
+  --bg-gradient-to-b: linear-gradient(to bottom, var(--tw-gradient-stops));
+  --bg-gradient-to-bl: linear-gradient(to bottom left, var(--tw-gradient-stops));
+  --bg-gradient-to-l: linear-gradient(to left, var(--tw-gradient-stops));
+  --bg-gradient-to-tl: linear-gradient(to top left, var(--tw-gradient-stops));
+  --bg-radial: radial-gradient(var(--tw-gradient-stops));
+  --bg-radial-dark-green: radial-gradient(446.50% 301.92% at 50.09% 3.49%, #052410 13.21%, #75A274 27.92%, #A0CAAC 34.17%);
+  --bg-radial-dark-red: radial-gradient(446.50% 301.92% at 50.09% 3.49%, #240505 13.21%, #A27474 27.92%, #CAA0A0 34.17%);
+  
+  /* Animation */
+  --animate-none: none;
+  --animate-spin: spin 1s linear infinite;
+  --animate-ping: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+  --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-bounce: bounce 1s infinite;
+  --animate-movingLeft: movingLeft 35s linear infinite;
+  --animate-movingRight: movingRight 35s linear infinite;
+  --animate-pulseText: pulseText 10s ease-in-out infinite;
+  --animate-pulseTextDark: pulseTextDark 10s ease-in-out infinite;
+  --animate-pulseTextRed: pulseTextRed 10s ease-in-out infinite;
+  --animate-showLine: showLine 5s linear infinite;
+  --animate-searchInput: showSearchInput 1s linear;
+  --animate-fill: animFill 500ms linear both;
+  
+  /* Default Ring */
+  --default-ring-width: 3px;
+  --default-ring-color: var(--color-blue-500);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+  
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+  }
+  
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  
+  dialog {
+    margin: auto;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom Utilities */
+@utility bg-radial-dark-green {
+  background-image: radial-gradient(446.50% 301.92% at 50.09% 3.49%, #052410 13.21%, #75A274 27.92%, #A0CAAC 34.17%);
+}
+
+@utility bg-radial-dark-red {
+  background-image: radial-gradient(446.50% 301.92% at 50.09% 3.49%, #240505 13.21%, #A27474 27.92%, #CAA0A0 34.17%);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes ping {
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes pulse {
+  50% { opacity: .5; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+  50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
+}
+
+@keyframes movingLeft {
+  0% { transform: translateX(0px); }
+  50% { transform: translateX(-700px); }
+  100% { transform: translateX(0px); }
+}
+
+@keyframes movingRight {
+  0% { transform: translateX(0px); }
+  50% { transform: translateX(700px); }
+  100% { transform: translateX(0px); }
+}
+
+@keyframes pulseText {
+  0% { color: #110409; }
+  25% { color: #E8E3E5; }
+  70% { color: #E8E3E5; }
+  100% { color: #110409; }
+}
+
+@keyframes pulseTextDark {
+  0% { color: #251925; }
+  25% { color: #FFF; }
+  70% { color: #FFF; }
+  100% { color: #251925; }
+}
+
+@keyframes pulseTextGreen {
+  0% { color: #2B4F36; }
+  25% { color: #FFF; }
+  70% { color: #FFF; }
+  100% { color: #2B4F36; }
+}
+
+@keyframes pulseTextRed {
+  0% { color: #541E26; }
+  25% { color: #FFF; }
+  70% { color: #FFF; }
+  100% { color: #541E26; }
+}
+
+@keyframes showLine {
+  0% { width: 200px; }
+  25% { width: 600px; }
+  50% { width: 600px; }
+  100% { width: 200px; }
+}
+
+@keyframes showSearchInput {
+  0% { width: 0px; }
+  100% { width: 180px; }
+}
+
+@keyframes animFill {
+  0% { width: 0px; }
+  100% { width: 100%; }
+}

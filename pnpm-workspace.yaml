@@ -1,0 +1,7 @@
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - bcrypt
+  - better-sqlite3
+  - sharp
+  - sqlite3
+  - unrs-resolver
