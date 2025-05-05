@@ -14,7 +14,7 @@ export default function SpotifyPlayer({ TrackData, IsAuthenticated }: SpotifyPla
       {TrackData?.AlbumArt && (
         <div className="absolute inset-0 overflow-hidden">
           <div 
-            className="absolute inset-0 bg-cover bg-center blur-xl opacity-10" 
+            className="absolute inset-0 bg-cover bg-center blur-xl opacity-5" 
             style={{ backgroundImage: `url(${TrackData.AlbumArt})` }}
           />
         </div>
@@ -26,8 +26,8 @@ export default function SpotifyPlayer({ TrackData, IsAuthenticated }: SpotifyPla
             className="absolute inset-0 bg-cover bg-right-bottom opacity-25" 
             style={{ 
               backgroundImage: `url(${TrackData.AlbumArt})`,
-              maskImage: 'radial-gradient(ellipse at calc(100% + 150px) bottom, rgba(0,0,0,1) 20%, transparent 70%)',
-              WebkitMaskImage: 'radial-gradient(ellipse at calc(100% + 150px) bottom, rgba(0,0,0,1) 20%, transparent 70%)'
+              maskImage: 'radial-gradient(ellipse at calc(100% + 1500px) bottom, rgba(0,0,0,1) 20%, transparent 70%)',
+              WebkitMaskImage: 'radial-gradient(ellipse at calc(100% + 1500px) bottom, rgba(0,0,0,1) 20%, transparent 70%)'
             }}
           />
         </div>
