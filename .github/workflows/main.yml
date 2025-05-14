@@ -1,0 +1,46 @@
+name: Deploy zstio-tv
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  Deploy:
+    runs-on:
+      - self-hosted
+      - linux
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install pnpm & PM2
+        run: |
+          npm install -g pnpm
+          npm install -g pm2
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prepare Env
+        run: |
+          echo DATABASE_URL="file:./prisma.db" > .env
+          
+          echo NEXTAUTH_URL=http://localhost:3000 >> .env
+          echo NEXTAUTH_SECRET=$(openssl rand -hex 128) >> .env
+          
+          echo SPOTIFY_ID=${{ secrets.SPOTIFY_ID }} >> .env
+          echo SPOTIFY_SECRET=${{ secrets.SPOTIFY_SECRET }} >> .env
+          echo SPOTIFY_REDIRECT=http://tv.ox80.me/api/spotify/auth >> .env
+
+      - name: Build App
+        run: pnpm build
+
+      - name: Deploy via PM2
+        run: |
+          pm2 start npm --name NextApp -- run start || pm2 reload NextApp
+          pm2 save
