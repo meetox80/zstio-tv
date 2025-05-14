@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Repository Checkout
-        uses: actions/checkout@4
+        uses: actions/checkout@v4
 
       - name: Prepare pnpm
         run: |
