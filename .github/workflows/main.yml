@@ -14,8 +14,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -23,11 +21,13 @@ jobs:
           node-version: '22'
           cache: 'pnpm'
 
-      - name: Install global dependencies
+      - name: Install pnpm
         run: |
-          npm install -g pnpm@latest pm2@latest
-          pnpm --version
-          pm2 --version
+          curl -fsSL https://get.pnpm.io/install.sh | sh -
+          echo "$HOME/.local/share/pnpm" >> $GITHUB_PATH
+
+      - name: Install PM2 globally
+        run: npm install -g pm2@latest
 
       - name: Install project dependencies
         run: pnpm install --frozen-lockfile --prod=false
@@ -36,11 +36,11 @@ jobs:
         run: |
           cat <<EOF > .env
           DATABASE_URL="file:./prisma.db"
-          NEXTAUTH_URL=https://tv.ox80.me/
+          NEXTAUTH_URL=https://tv.ox80.me
           NEXTAUTH_SECRET=$(openssl rand -hex 128)
           SPOTIFY_ID=${{ secrets.SPOTIFY_ID }}
           SPOTIFY_SECRET=${{ secrets.SPOTIFY_SECRET }}
-          SPOTIFY_REDIRECT=http://tv.ox80.me/api/spotify/auth
+          SPOTIFY_REDIRECT=https://tv.ox80.me/api/spotify/auth
           EOF
 
       - name: Build application
@@ -58,4 +58,4 @@ jobs:
       - name: Verify deployment
         run: |
           pm2 list
-          curl -I http://localhost:3000 || true
+          curl -I https://127.0.0.1:3000/ || true
