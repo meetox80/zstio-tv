@@ -6,42 +6,56 @@ on:
       - main
 
 jobs:
-  Deploy:
-    runs-on:
-      - self-hosted
-      - linux
+  deploy:
+    runs-on: self-hosted
+    name: Deploy application
+    environment: production
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'pnpm'
 
-      - name: Install pnpm & PM2
+      - name: Install global dependencies
         run: |
-          npm install -g pnpm
-          npm install -g pm2
-          pnpm --version  # Check if pnpm is installed correctly
+          npm install -g pnpm@latest pm2@latest
+          pnpm --version
+          pm2 --version
 
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Install project dependencies
+        run: pnpm install --frozen-lockfile --prod=false
 
-      - name: Prepare Env
+      - name: Setup environment variables
         run: |
-          echo DATABASE_URL="file:./prisma.db" > .env
-          echo NEXTAUTH_URL=http://localhost:3000 >> .env
-          echo NEXTAUTH_SECRET=$(openssl rand -hex 128) >> .env
-          echo SPOTIFY_ID=${{ secrets.SPOTIFY_ID }} >> .env
-          echo SPOTIFY_SECRET=${{ secrets.SPOTIFY_SECRET }} >> .env
-          echo SPOTIFY_REDIRECT=http://tv.ox80.me/api/spotify/auth >> .env
+          cat <<EOF > .env
+          DATABASE_URL="file:./prisma.db"
+          NEXTAUTH_URL=https://tv.ox80.me/
+          NEXTAUTH_SECRET=$(openssl rand -hex 128)
+          SPOTIFY_ID=${{ secrets.SPOTIFY_ID }}
+          SPOTIFY_SECRET=${{ secrets.SPOTIFY_SECRET }}
+          SPOTIFY_REDIRECT=http://tv.ox80.me/api/spotify/auth
+          EOF
 
-      - name: Build App
+      - name: Build application
         run: pnpm build
 
-      - name: Deploy via PM2
+      - name: Deploy with PM2
         run: |
-          pm2 start npm --name zstio-tv -- run start || pm2 reload zstio-tv
+          pm2 delete zstio-tv || true
+          pm2 start npm --name zstio-tv -- run start
+          
           pm2 save
+          pm2 startup
+          pm2 save --force
+
+      - name: Verify deployment
+        run: |
+          pm2 list
+          curl -I http://localhost:3000 || true
