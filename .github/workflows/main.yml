@@ -20,7 +20,7 @@ jobs:
           npm config set store-dir .pnpm-store
 
       - name: Node Environment
-        uses: actions/setup-node@4
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: pnpm
