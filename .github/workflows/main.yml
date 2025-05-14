@@ -2,35 +2,33 @@ name: Deploy zstio-tv
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  deploy:
+  Deploy:
     runs-on: self-hosted
-    name: Deploy application
-    environment: production
+    environment: Production
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Repository Checkout
+        uses: actions/checkout@4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-
-      - name: Install pnpm
+      - name: Prepare pnpm
         run: |
           curl -fsSL https://get.pnpm.io/install.sh | sh -
-          echo "$HOME/.local/share/pnpm" >> $GITHUB_PATH
+          echo "/root/.local/share/pnpm/bin" >> $GITHUB_PATH
+          npm config set store-dir .pnpm-store
 
-      - name: Install PM2 globally
-        run: npm install -g pm2@latest
+      - name: Node Environment
+        uses: actions/setup-node@4
+        with:
+          node-version: '22'
+          cache: pnpm
 
-      - name: Install project dependencies
-        run: pnpm install --frozen-lockfile --prod=false
+      - name: Dependencies
+        run: |
+          pnpm install --frozen-lockfile
+          npm install -g pm2
 
       - name: Setup environment variables
         run: |
@@ -43,19 +41,18 @@ jobs:
           SPOTIFY_REDIRECT=https://tv.ox80.me/api/spotify/auth
           EOF
 
-      - name: Build application
+      - name: Build
         run: pnpm build
 
-      - name: Deploy with PM2
+      - name: Push to PM2
         run: |
-          pm2 delete zstio-tv || true
-          pm2 start npm --name zstio-tv -- run start
-          
+          pm2 delete ZstioTv || true
+          pm2 start pnpm --name ZstioTv -- start
           pm2 save
           pm2 startup
-          pm2 save --force
+          pm2 save -f
 
-      - name: Verify deployment
+      - name: Health Verification
         run: |
           pm2 list
-          curl -I https://127.0.0.1:3000/ || true
+          curl -sSf http://localhost:3000 -o /dev/null
