@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from "react"
-import TimeDisplay from "./TimeDisplay"
-import SpotifyPlayer from "./SpotifyPlayer"
+import TimeDisplay from "./addons/TimeDisplay"
+import SpotifyPlayer from "./addons/SpotifyPlayer"
 import { TrackData } from "@/types/spotify"
 import { GetNowPlaying } from "@/lib/spotify.client"
 
