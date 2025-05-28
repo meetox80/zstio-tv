@@ -14,8 +14,15 @@ export default function SpotifyPlayer({ TrackData, IsAuthenticated }: SpotifyPla
   const [_IsTransitioning, SetIsTransitioning] = useState(false)
   const _TimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const _PreloadImageRef = useRef<HTMLImageElement | null>(null)
+  const _IsFirstRender = useRef<boolean>(true)
 
   useEffect(() => {
+    if (_IsFirstRender.current && TrackData) {
+      SetPreviousTrack(TrackData)
+      _IsFirstRender.current = false
+      return
+    }
+
     if (TrackData?.AlbumArt && (!_PreviousTrack || TrackData.Title !== _PreviousTrack.Title)) {
       if (_TimeoutRef.current) {
         clearTimeout(_TimeoutRef.current)
@@ -85,27 +92,36 @@ export default function SpotifyPlayer({ TrackData, IsAuthenticated }: SpotifyPla
       <div className="absolute bottom-0 right-0 h-[200px] flex items-center px-12 z-10">
         {TrackData?.IsPlaying ? (
           <div className="flex items-center">
-            <div className="flex flex-col items-end mr-4 overflow-hidden">
-              <div className="relative h-[45px] overflow-hidden mt-2">
-                {_PreviousTrack?.Title && (
-                  <h2 className={`text-[36px] font-bold text-white leading-tight absolute w-full text-right transition-all duration-500 ${_IsTransitioning ? 'opacity-0 transform -translate-y-8' : 'opacity-100'}`}>
-                    {_PreviousTrack.Title || "Unknown Track"}
+            <div className="flex flex-col items-end mr-4">
+              {_IsTransitioning ? (
+                <>
+                  <div className="h-[45px] relative overflow-hidden">
+                    <h2 className="text-[36px] font-bold text-white leading-tight text-right animate-slide-up">
+                      {_PreviousTrack?.Title || "Unknown Track"}
+                    </h2>
+                    <h2 className="text-[36px] font-bold text-white leading-tight text-right animate-slide-up-in">
+                      {TrackData.Title || "Unknown Track"}
+                    </h2>
+                  </div>
+                  <div className="h-[30px] relative overflow-hidden">
+                    <p className="text-[24px] text-gray-300 opacity-75 text-right animate-slide-up">
+                      {_PreviousTrack?.Artist || "Unknown Artist"}
+                    </p>
+                    <p className="text-[24px] text-gray-300 opacity-75 text-right animate-slide-up-in">
+                      {TrackData.Artist || "Unknown Artist"}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-[36px] font-bold text-white leading-tight text-right">
+                    {_PreviousTrack?.Title || TrackData.Title || "Unknown Track"}
                   </h2>
-                )}
-                <h2 className={`text-[36px] font-bold text-white leading-tight text-right transition-all duration-500 ${_IsTransitioning ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'}`}>
-                  {TrackData.Title || "Unknown Track"}
-                </h2>
-              </div>
-              <div className="relative h-[30px] overflow-hidden">
-                {_PreviousTrack?.Artist && (
-                  <p className={`text-[24px] text-gray-300 -mt-1 opacity-75 absolute w-full text-right transition-all duration-500 ${_IsTransitioning ? 'opacity-0 transform -translate-y-8' : 'opacity-75'}`}>
-                    {_PreviousTrack.Artist || "Unknown Artist"}
+                  <p className="text-[24px] text-gray-300 opacity-75 text-right">
+                    {_PreviousTrack?.Artist || TrackData.Artist || "Unknown Artist"}
                   </p>
-                )}
-                <p className={`text-[24px] text-gray-300 -mt-1 text-right transition-all duration-500 ${_IsTransitioning ? 'opacity-75 transform translate-y-0' : 'opacity-0 transform translate-y-8'}`}>
-                  {TrackData.Artist || "Unknown Artist"}
-                </p>
-              </div>
+                </>
+              )}
             </div>
             <div className="h-[72px] flex items-center ml-2">
               <Image 
@@ -140,6 +156,20 @@ export default function SpotifyPlayer({ TrackData, IsAuthenticated }: SpotifyPla
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+          from { transform: translateY(0); }
+          to { transform: translateY(-100%); }
+        }
+        @keyframes slideUpIn {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+        .animate-slide-up {
+          animation: slideUp 0.5s forwards;
+        }
+        .animate-slide-up-in {
+          animation: slideUpIn 0.5s forwards;
         }
       `}</style>
     </>

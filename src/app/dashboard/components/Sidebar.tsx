@@ -85,6 +85,42 @@ const Sidebar: FC<SidebarProps> = ({
             </Link>
             <Link
               href="#"
+              onClick={() => _ToggleTab('slajdy')}
+              className={`flex items-center px-5 py-3.5 rounded-xl border ${
+                _ActiveTab === 'slajdy' 
+                  ? 'bg-gradient-to-r from-rose-500/20 to-rose-500/10 text-white border-rose-500/50 shadow-[0_0_15px_rgba(244,63,94,0.2)]' 
+                  : 'text-gray-300 hover:text-white border-transparent hover:bg-rose-500/10 hover:border-rose-500/30'
+              } group transition-all duration-300`}
+            >
+              <div className={`w-6 h-6 mr-4 flex items-center justify-center ${
+                _ActiveTab === 'slajdy' 
+                  ? 'text-rose-300' 
+                  : 'text-gray-400 group-hover:text-rose-300'
+              } transition-colors duration-300`}>
+                <i className="fas fa-images"></i>
+              </div>
+              <span className="tracking-wide font-medium">Slajdy</span>
+            </Link>
+            <Link
+              href="#"
+              onClick={() => _ToggleTab('songrequests')}
+              className={`flex items-center px-5 py-3.5 rounded-xl border ${
+                _ActiveTab === 'songrequests' 
+                  ? 'bg-gradient-to-r from-rose-500/20 to-rose-500/10 text-white border-rose-500/50 shadow-[0_0_15px_rgba(244,63,94,0.2)]' 
+                  : 'text-gray-300 hover:text-white border-transparent hover:bg-rose-500/10 hover:border-rose-500/30'
+              } group transition-all duration-300`}
+            >
+              <div className={`w-6 h-6 mr-4 flex items-center justify-center ${
+                _ActiveTab === 'songrequests' 
+                  ? 'text-rose-300' 
+                  : 'text-gray-400 group-hover:text-rose-300'
+              } transition-colors duration-300`}>
+                <i className="fas fa-music"></i>
+              </div>
+              <span className="tracking-wide font-medium">Propozycje</span>
+            </Link>
+            <Link
+              href="#"
               onClick={() => _ToggleTab('settings')}
               className={`flex items-center px-5 py-3.5 rounded-xl border ${
                 _ActiveTab === 'settings' 
@@ -99,7 +135,7 @@ const Sidebar: FC<SidebarProps> = ({
               } transition-colors duration-300`}>
                 <i className="fas fa-cog"></i>
               </div>
-              <span className="tracking-wide font-medium">Settings</span>
+              <span className="tracking-wide font-medium">Ustawienia</span>
             </Link>
           </nav>
           
@@ -180,6 +216,48 @@ const Sidebar: FC<SidebarProps> = ({
                 <Link
                   href="#"
                   onClick={() => {
+                    _ToggleTab('slajdy');
+                    _ToggleMobileMenu();
+                  }}
+                  className={`flex items-center px-5 py-3.5 rounded-xl border ${
+                    _ActiveTab === 'slajdy' 
+                      ? 'bg-gradient-to-r from-rose-500/20 to-rose-500/10 text-white border-rose-500/50 shadow-[0_0_15px_rgba(244,63,94,0.2)]' 
+                      : 'text-gray-300 hover:text-white border-transparent hover:bg-rose-500/10 hover:border-rose-500/30'
+                  } group transition-all duration-300`}
+                >
+                  <div className={`w-6 h-6 mr-4 flex items-center justify-center ${
+                    _ActiveTab === 'slajdy' 
+                      ? 'text-rose-300' 
+                      : 'text-gray-400 group-hover:text-rose-300'
+                  } transition-colors duration-300`}>
+                    <i className="fas fa-images"></i>
+                  </div>
+                  <span className="tracking-wide font-medium">Slajdy</span>
+                </Link>
+                <Link
+                  href="#"
+                  onClick={() => {
+                    _ToggleTab('songrequests');
+                    _ToggleMobileMenu();
+                  }}
+                  className={`flex items-center px-5 py-3.5 rounded-xl border ${
+                    _ActiveTab === 'songrequests' 
+                      ? 'bg-gradient-to-r from-rose-500/20 to-rose-500/10 text-white border-rose-500/50 shadow-[0_0_15px_rgba(244,63,94,0.2)]' 
+                      : 'text-gray-300 hover:text-white border-transparent hover:bg-rose-500/10 hover:border-rose-500/30'
+                  } group transition-all duration-300`}
+                >
+                  <div className={`w-6 h-6 mr-4 flex items-center justify-center ${
+                    _ActiveTab === 'songrequests' 
+                      ? 'text-rose-300' 
+                      : 'text-gray-400 group-hover:text-rose-300'
+                  } transition-colors duration-300`}>
+                    <i className="fas fa-music"></i>
+                  </div>
+                  <span className="tracking-wide font-medium">Propozycje</span>
+                </Link>
+                <Link
+                  href="#"
+                  onClick={() => {
                     _ToggleTab('settings');
                     _ToggleMobileMenu();
                   }}
@@ -196,7 +274,7 @@ const Sidebar: FC<SidebarProps> = ({
                   } transition-colors duration-300`}>
                     <i className="fas fa-cog"></i>
                   </div>
-                  <span className="tracking-wide font-medium">Settings</span>
+                  <span className="tracking-wide font-medium">Ustawienia</span>
                 </Link>
               </nav>
               

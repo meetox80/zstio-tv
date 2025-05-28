@@ -32,20 +32,17 @@ export default function SubstitutionsPage() {
 
   return (
     <div ref={_ContainerRef} className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden mt-12">
-      <div className="absolute inset-0 bg-[#101010]"></div>
+      <div className="absolute inset-0"></div>
       
       <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-5xl">
         <motion.div 
-          className="relative p-12 rounded-3xl backdrop-blur-md bg-[#151515]/40 border border-[#2F2F2F] shadow-[0_8px_32px_rgba(0,0,0,0.25)] overflow-hidden mb-12 w-full max-w-3xl"
+          className="relative p-12 rounded-3xl border border-[#2F2F2F] overflow-hidden mb-12 w-full max-w-3xl"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, ease: "easeOut" }}
         >
           <div className="relative z-10">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
               className="flex items-center justify-center mb-8"
             >
               <motion.div 
@@ -115,7 +112,7 @@ export default function SubstitutionsPage() {
         </motion.div>
         
         <motion.div
-          className="flex items-center gap-4 bg-[#151515]/60 py-3 px-6 rounded-full backdrop-blur-md border border-[#2F2F2F]"
+          className="flex items-center gap-4 py-3 px-6 rounded-full backdrop-blur-md border border-[#2F2F2F]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
@@ -123,16 +120,15 @@ export default function SubstitutionsPage() {
           <motion.div 
             className="w-3 h-3 rounded-full bg-red-400"
             animate={{ 
-              scale: [1, 1.5, 1],
-              opacity: [0.5, 1, 0.5],
+              opacity: [0.7, 0.9, 0.7],
               boxShadow: [
                 "0 0 0px rgba(255,70,70,0)",
-                "0 0 10px rgba(255,70,70,0.7)",
+                "0 0 5px rgba(255,70,70,0.4)",
                 "0 0 0px rgba(255,70,70,0)"
               ]
             }}
             transition={{ 
-              duration: 2,
+              duration: 3,
               repeat: Infinity,
               ease: "easeInOut"
             }}

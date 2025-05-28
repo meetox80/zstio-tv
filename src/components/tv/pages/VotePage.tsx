@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { QRCodeSVG } from 'qrcode.react'
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 
 type Song = {
   Id: string
@@ -12,178 +12,203 @@ type Song = {
 }
 
 export default function VotePage() {
-  const [_Songs, SetSongs] = useState<Song[]>([
-    { Id: "1", Title: "Bohemian Rhapsody", Artist: "Queen", Votes: 24 },
-    { Id: "2", Title: "Stairway to Heaven", Artist: "Led Zeppelin", Votes: 18 },
-    { Id: "3", Title: "Hotel California", Artist: "Eagles", Votes: 32 },
-    { Id: "4", Title: "Sweet Child O' Mine", Artist: "Guns N' Roses", Votes: 15 },
-    { Id: "5", Title: "Smells Like Teen Spirit", Artist: "Nirvana", Votes: 28 },
-    { Id: "6", Title: "Nothing Else Matters", Artist: "Metallica", Votes: 22 },
-    { Id: "7", Title: "Livin' On A Prayer", Artist: "Bon Jovi", Votes: 19 }
-  ])
-  const [_CurrentDate, SetCurrentDate] = useState(new Date())
-  const _ContainerRef = useRef<HTMLDivElement>(null)
+  const [FetchedSongs, SetFetchedSongs] = useState<Song[]>([])
   
-  const _QrCodeValue = "https://vote.zstio.edu.pl/music"
-  const _TopSongs = _Songs.sort((A, B) => B.Votes - A.Votes)
+  const ContainerRef = useRef<HTMLDivElement>(null)
+  const _QrCodeValue = "vote.ox80.me"
+  const [QrSize, SetQrSize] = useState(450)
+  
+  const TopSongs = [...FetchedSongs].sort((A, B) => B.Votes - A.Votes).slice(0, 5)
+
+  const GetSongPluralForm = (Count: number): string => {
+    if (Count === 1) {
+      return "utwór";
+    }
+    const LastDigit = Count % 10;
+    const LastTwoDigits = Count % 100;
+
+    if (LastDigit >= 2 && LastDigit <= 4 && (LastTwoDigits < 10 || LastTwoDigits > 20)) {
+      return "utwory";
+    }
+    return "utworów";
+  };
+
+  const FetchTopSongs = async () => {
+    try {
+      const Response = await fetch("/api/songs/proposals?pending=false&limit=7")
+      if (Response.ok) {
+        const Data = await Response.json()
+        if (Data.proposals) {
+          const MappedSongs: Song[] = Data.proposals.map((proposal: any) => ({
+            Id: proposal.Id,
+            Title: proposal.Title,
+            Artist: proposal.Artist,
+            Votes: proposal.Upvotes || 0,
+          }))
+          SetFetchedSongs(MappedSongs)
+        } else {
+          SetFetchedSongs([])
+        }
+      } else {
+        console.error("Failed to fetch top songs:", Response.statusText)
+        SetFetchedSongs([])
+      }
+    } catch (Error) {
+      console.error('Error fetching top songs:', Error)
+      SetFetchedSongs([])
+    }
+  }
   
   useEffect(() => {
-    const _Timer = setInterval(() => {
-      SetCurrentDate(new Date())
-    }, 1000)
-    
-    return () => {
-      clearInterval(_Timer)
+    FetchTopSongs()
+  }, [])
+
+  useEffect(() => {
+    const UpdateSize = () => {
+      if (typeof window !== "undefined") {
+        SetQrSize(Math.min(window.innerHeight * 0.6, window.innerWidth * 0.35, 450))
+      }
     }
+    UpdateSize()
+    window.addEventListener('resize', UpdateSize)
+    
+    return () => window.removeEventListener('resize', UpdateSize)
   }, [])
 
   return (
-    <div ref={_ContainerRef} className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden">
-      <div className="absolute inset-0 bg-[#101010]"></div>
-      
-      <div className="relative z-10 flex w-full h-full px-15 py-15">
+    <div ref={ContainerRef} className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden mt-5">
+      <div className="w-full h-full max-w-[1800px] px-8 py-4 z-10 flex flex-row items-center justify-center">
         <motion.div 
-          className="flex-1 flex items-center justify-center pr-8"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="w-[45%] flex flex-col items-center space-y-8"
         >
-          <div className="p-4 bg-white rounded-2xl shadow-[0_8px_32px_rgba(255,255,255,0.15)]">
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
+          <motion.div 
+            className="text-center mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+          >
+            <motion.h1 
+              className="text-6xl font-bold text-white mb-5"
+              initial={{ y: -20 }}
+              animate={{ y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <QRCodeSVG 
-                value={_QrCodeValue} 
-                size={Math.min(window.innerHeight - 100, 600)} 
-                bgColor={"#ffffff"} 
-                fgColor={"#000000"} 
-                level={"H"}
-                includeMargin={false}
-              />
+              Zagłosuj na<br />Utwór
+            </motion.h1>
+            <motion.p 
+              className="text-white/70 text-xl"
+              initial={{ y: 20 }}
+              animate={{ y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              Zeskanuj kod i wpłyń na playlistę
+            </motion.p>
+          </motion.div>
+          
+          <div className="relative">
+            <motion.div 
+              className="relative flex items-center justify-center p-2 backdrop-blur-md bg-[#1E1E1E]/50 rounded-3xl border border-[#2F2F2F] shadow-lg shadow-black/20"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.7, delay: 0.6 }}
+            >
+              <div className="bg-[#1A1A1A] p-6 rounded-2xl">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.9 }}
+                >
+                  <QRCodeSVG 
+                    value={_QrCodeValue} 
+                    size={QrSize} 
+                    bgColor={"#1A1A1A"} 
+                    fgColor={"#FFFFFF"}
+                    level={"H"}
+                    includeMargin={false}
+                    className="rounded-lg"
+                  />
+                </motion.div>
+              </div>
+            </motion.div>
+            <motion.div 
+              className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 px-8 py-2.5 bg-[#1A1A1A] border border-[#2F2F2F] rounded-full text-base text-white/90 font-medium shadow-lg"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 1.1 }}
+            >
+              {_QrCodeValue}
             </motion.div>
           </div>
         </motion.div>
         
-        <motion.div 
-          className="flex-1 flex flex-col pl-8"
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          <motion.h1 
-            className="text-6xl font-bold text-white mb-8 tracking-tighter"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: "easeOut", delay: 0.2 }}
-          >
-            <motion.span
-              animate={{
-                textShadow: [
-                  "0 0 0px rgba(66,153,225,0)",
-                  "0 0 10px rgba(66,153,225,0.5)",
-                  "0 0 0px rgba(66,153,225,0)"
-                ]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              Wybierz nastepny utwór
-            </motion.span>
-          </motion.h1>
-          
-          <motion.div 
-            className="rounded-3xl overflow-hidden backdrop-blur-md bg-[#151515]/40 border border-[#2F2F2F] shadow-[0_8px_32px_rgba(0,0,0,0.25)]"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: "easeOut", delay: 0.4 }}
-          >
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-[#2F2F2F]">
-                  <th className="px-8 py-5 text-left text-2xl font-bold text-white">Utwór</th>
-                  <th className="px-8 py-5 text-left text-2xl font-bold text-white">Artysta</th>
-                  <th className="px-8 py-5 text-center text-2xl font-bold text-white">Głosy</th>
-                </tr>
-              </thead>
-              <tbody>
-                {_TopSongs.map((Song, Index) => (
-                  <motion.tr 
-                    key={Song.Id} 
-                    className={`border-b border-[#2F2F2F] last:border-b-0 ${Index === 0 ? 'bg-blue-900/20' : ''}`}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.5 + Index * 0.1 }}
-                  >
-                    <td className="px-8 py-5 text-2xl text-white">{Song.Title}</td>
-                    <td className="px-8 py-5 text-2xl text-white/80">{Song.Artist}</td>
-                    <td className="px-8 py-5 text-center">
-                      <motion.span 
-                        className={`text-2xl font-bold text-white px-6 py-2 rounded-full ${Index === 0 ? 'bg-gradient-to-r from-blue-600 to-blue-400' : 'bg-blue-600'}`}
-                        animate={Index === 0 ? { 
-                          boxShadow: [
-                            "0 0 0px rgba(66,153,225,0)",
-                            "0 0 15px rgba(66,153,225,0.6)",
-                            "0 0 0px rgba(66,153,225,0)"
-                          ]
-                        } : {}}
-                        transition={{ 
-                          duration: 2,
-                          repeat: Infinity,
-                          ease: "easeInOut"
-                        }}
-                      >
-                        {Song.Votes}
-                      </motion.span>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </motion.div>
-          
-          <motion.div
-            className="flex items-center gap-4 mt-6 self-center bg-[#151515]/60 py-3 px-6 rounded-full backdrop-blur-md border border-[#2F2F2F]"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut", delay: 0.9 }}
-          >
-            <motion.div 
-              className="w-3 h-3 rounded-full bg-blue-400"
-              animate={{ 
-                scale: [1, 1.5, 1],
-                opacity: [0.5, 1, 0.5],
-                boxShadow: [
-                  "0 0 0px rgba(66,153,225,0)",
-                  "0 0 10px rgba(66,153,225,0.7)",
-                  "0 0 0px rgba(66,153,225,0)"
-                ]
-              }}
-              transition={{ 
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            ></motion.div>
-            <motion.p 
-              className="text-white/80 font-medium"
-              animate={{
-                opacity: [0.8, 1, 0.8]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              Zeskanuj kod QR aby zagłosować
-            </motion.p>
-          </motion.div>
-        </motion.div>
+        <div className="w-[55%] flex flex-col pl-12">
+          <div className="backdrop-blur-md bg-[#1E1E1E]/50 rounded-2xl border border-[#2F2F2F] p-8 shadow-lg shadow-black/20">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-3xl font-bold text-white">Ranking Tygodniowy</h2>
+              <span className="text-sm font-medium text-white/70 bg-[#2A2A2A] px-5 py-2 rounded-full">
+                {TopSongs.length} {GetSongPluralForm(TopSongs.length)}
+              </span>
+            </div>
+            
+            <div className="min-h-[37.50rem]">
+              <div className="grid gap-6 items-start">
+                <AnimatePresence>
+                  {TopSongs.map((SongItem, Index) => (
+                    <motion.div 
+                      key={SongItem.Id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.4,
+                        delay: 0.1 + (Index * 0.1)
+                      }}
+                      className={`
+                        flex items-center rounded-xl p-5
+                        ${Index === 0 ? 'bg-gradient-to-r from-rose-600/90 to-rose-500/80 border border-rose-500/50' : 'bg-[#222222] border border-[#2F2F2F]/50'}
+                      `}
+                    >
+                      <div className="mr-6 flex items-center justify-center">
+                        <div className={`
+                          h-16 w-16 rounded-xl flex items-center justify-center text-2xl font-bold
+                          ${Index === 0 
+                            ? 'bg-white/15 text-white' 
+                            : 'bg-[#2A2A2A] text-white/80'}
+                        `}>
+                          {Index + 1}
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <h3 className={`text-2xl font-semibold truncate ${Index === 0 ? 'text-white' : 'text-white'}`}>
+                          {SongItem.Title}
+                        </h3>
+                        <p className={`text-lg truncate ${Index === 0 ? 'text-white/80' : 'text-white/60'}`}>
+                          {SongItem.Artist}
+                        </p>
+                      </div>
+                      
+                      <div className="ml-6">
+                        <div className={`
+                          px-6 py-3 rounded-full min-w-24 text-center
+                          ${Index === 0 
+                            ? 'bg-white/15 text-white font-medium border border-white/20' 
+                            : 'bg-[#2A2A2A] text-white/80 border border-[#3F3F3F]/50'}
+                        `}>
+                          <span className="tabular-nums font-medium text-2xl">
+                            {SongItem.Votes}
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )

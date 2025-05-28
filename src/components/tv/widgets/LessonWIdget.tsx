@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { 
-  GetStandardLessonTimes, 
-  GetStandardBreakTimes, 
-  ParseTimeRange 
-} from "../../../lib/data/LessonTimes/LessonTimesUtil";
+  GetCurrentPeriodInfo, 
+  PeriodInfo,
+  SubscribeToLessonDuration,
+  InitializeLessonDuration
+} from "@/lib/data/LessonTimes/LessonTimesUtil";
 
 export default function LessonWidget() {
   const _CircleSize = 28;
   const _StrokeWidth = 5.5;
+  const [IsLoading, setIsLoading] = useState(true);
 
-  const [CurrentTime, setCurrentTime] = useState(new Date());
-  const [Progress, setProgress] = useState(0);
-  const [IsLesson, setIsLesson] = useState(true);
-  const [PeriodNumber, setPeriodNumber] = useState(1);
-  const [TimeDisplay, setTimeDisplay] = useState("00:00");
+  const [PeriodInfo, setPeriodInfo] = useState<PeriodInfo>({
+    IsLesson: false,
+    PeriodNumber: 0,
+    RemainingTime: "00:00",
+    ProgressPercent: 0
+  });
 
   const CalculateStrokeDashoffset = (Progress: number) => {
     const Circumference = 2 * Math.PI * ((_CircleSize - _StrokeWidth) / 2);
@@ -22,95 +25,50 @@ export default function LessonWidget() {
 
   const CircleStyles = {
     strokeDasharray: 2 * Math.PI * ((_CircleSize - _StrokeWidth) / 2),
-    strokeDashoffset: CalculateStrokeDashoffset(Progress),
-  };
-
-  const FormatTimeDisplay = (RemainingSeconds: number) => {
-    const Minutes = Math.floor(RemainingSeconds / 60);
-    const Seconds = Math.floor(RemainingSeconds % 60);
-    return `${String(Minutes).padStart(2, "0")}:${String(Seconds).padStart(2, "0")}`;
+    strokeDashoffset: CalculateStrokeDashoffset(PeriodInfo.ProgressPercent),
   };
 
   useEffect(() => {
-    const UpdateTimeAndStatus = () => {
-      const Now = new Date();
-      setCurrentTime(Now);
-
-      const CurrentHours = Now.getHours();
-      const CurrentMinutes = Now.getMinutes();
-      const CurrentSeconds = Now.getSeconds();
-      const CurrentTimeInMinutes = CurrentHours * 60 + CurrentMinutes + CurrentSeconds / 60;
-
-      const LessonTimes = GetStandardLessonTimes();
-      const BreakTimes = GetStandardBreakTimes();
-
-      let FoundPeriod = false;
-
-      for (let i = 0; i < LessonTimes.length; i++) {
-        const LessonTime = ParseTimeRange(LessonTimes[i]);
-        const [LessonStartHour, LessonStartMinute] = LessonTime.Start.split(":").map(Number);
-        const [LessonEndHour, LessonEndMinute] = LessonTime.End.split(":").map(Number);
-
-        const LessonStartInMinutes = LessonStartHour * 60 + LessonStartMinute;
-        const LessonEndInMinutes = LessonEndHour * 60 + LessonEndMinute;
-
-        if (CurrentTimeInMinutes >= LessonStartInMinutes && CurrentTimeInMinutes < LessonEndInMinutes) {
-          setIsLesson(true);
-          setPeriodNumber(i + 1);
-          
-          const TotalLessonMinutes = LessonEndInMinutes - LessonStartInMinutes;
-          const ElapsedMinutes = CurrentTimeInMinutes - LessonStartInMinutes;
-          const ProgressPercentage = (ElapsedMinutes / TotalLessonMinutes) * 100;
-          setProgress(ProgressPercentage);
-          
-          const RemainingSeconds = (LessonEndInMinutes - CurrentTimeInMinutes) * 60;
-          setTimeDisplay(FormatTimeDisplay(RemainingSeconds));
-          
-          FoundPeriod = true;
-          break;
-        }
-      }
-
-      if (!FoundPeriod) {
-        for (let i = 0; i < BreakTimes.length; i++) {
-          const BreakTime = ParseTimeRange(BreakTimes[i]);
-          const [BreakStartHour, BreakStartMinute] = BreakTime.Start.split(":").map(Number);
-          const [BreakEndHour, BreakEndMinute] = BreakTime.End.split(":").map(Number);
-
-          const BreakStartInMinutes = BreakStartHour * 60 + BreakStartMinute;
-          const BreakEndInMinutes = BreakEndHour * 60 + BreakEndMinute;
-
-          if (CurrentTimeInMinutes >= BreakStartInMinutes && CurrentTimeInMinutes < BreakEndInMinutes) {
-            setIsLesson(false);
-            setPeriodNumber(i + 1);
-            
-            const TotalBreakMinutes = BreakEndInMinutes - BreakStartInMinutes;
-            const ElapsedMinutes = CurrentTimeInMinutes - BreakStartInMinutes;
-            const ProgressPercentage = (ElapsedMinutes / TotalBreakMinutes) * 100;
-            setProgress(ProgressPercentage);
-            
-            const RemainingSeconds = (BreakEndInMinutes - CurrentTimeInMinutes) * 60;
-            setTimeDisplay(FormatTimeDisplay(RemainingSeconds));
-            
-            FoundPeriod = true;
-            break;
+    const FetchLessonDuration = async () => {
+      try {
+        const Response = await fetch('/api/settings');
+        if (Response.ok) {
+          const Settings = await Response.json();
+          if (Settings.lessonTime) {
+            InitializeLessonDuration(Settings.lessonTime);
           }
         }
-      }
-
-      if (!FoundPeriod) {
-        setIsLesson(false);
-        setPeriodNumber(0);
-        setProgress(0);
-        setTimeDisplay("00:00");
+      } catch (Error) {
+        console.error('Failed to fetch lesson duration:', Error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
+    FetchLessonDuration();
+  }, []);
+
+  useEffect(() => {
+    if (IsLoading) return;
+
+    const UpdateTimeAndStatus = () => {
+      const CurrentInfo = GetCurrentPeriodInfo();
+      setPeriodInfo(CurrentInfo);
+    };
+
     UpdateTimeAndStatus();
+
     const IntervalId = setInterval(UpdateTimeAndStatus, 1000);
 
-    return () => clearInterval(IntervalId);
-  }, []);
+    const Unsubscribe = SubscribeToLessonDuration(() => {
+      UpdateTimeAndStatus();
+    });
+
+    return () => {
+      clearInterval(IntervalId);
+      Unsubscribe();
+    };
+  }, [IsLoading]);
 
   return (
     <div className="w-full h-full rounded-[7px] flex items-center">
@@ -142,12 +100,12 @@ export default function LessonWidget() {
                 />
               </svg>
             </div>
-            <div className="text-white text-lg font-medium flex-1 text-center ml-3">{TimeDisplay}</div>
+            <div className="text-white text-lg font-medium flex-1 text-center ml-3">{PeriodInfo.RemainingTime}</div>
           </div>
         </div>
         <div className="w-1/2 h-full bg-[#1C1919]/50 border border-[#2B2828] rounded-r-[7px] flex items-center justify-center">
           <span className="text-white text-lg font-medium">
-            {IsLesson ? `Lekcja ${PeriodNumber}` : "Przerwa"}
+            {PeriodInfo.IsLesson ? `Lekcja ${PeriodInfo.PeriodNumber}` : PeriodInfo.PeriodNumber > 0 ? "Przerwa" : "Po lekcjach"}
           </span>
         </div>
       </div>

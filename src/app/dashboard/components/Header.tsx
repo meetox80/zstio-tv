@@ -1,9 +1,13 @@
 import { FC, useState, useEffect, useRef } from 'react'
 import { GetNowPlaying } from '@/lib/spotify.client'
+import { signOut } from 'next-auth/react'
+import { GetCurrentPeriodInfo, PeriodInfo, InitializeLessonDuration, SubscribeToLessonDuration } from '@/lib/data/LessonTimes/LessonTimesUtil'
+import { FetchWeatherData, WeatherData as WeatherDataType } from '@/lib/data/Weather/Weather'
 
 type HeaderProps = {
   activeTab: string
   hasNotifications: boolean
+  defaultLessonTime?: number
 }
 
 type SpotifyTrackData = {
@@ -14,22 +18,30 @@ type SpotifyTrackData = {
   duration?: number
 }
 
-const Header: FC<HeaderProps> = ({ activeTab, hasNotifications }) => {
-  const [IsScrolled, setIsScrolled] = useState(false)
-  const [TimeString, setTimeString] = useState('')
-  const [DateString, setDateString] = useState('')
-  const [WeatherData, setWeatherData] = useState({ temp: '24°', condition: 'hujowo' })
-  const [SpotifyTrack, setSpotifyTrack] = useState<SpotifyTrackData>({ title: 'Blinding Lights', artist: 'The Weeknd' })
-  const [LocalProgress, setLocalProgress] = useState<number | undefined>(undefined)
-  const [LessonEndMinutes, setLessonEndMinutes] = useState(25)
-  const HeaderRef = useRef<HTMLDivElement>(null)
-  const _ProgressInterval = useRef<NodeJS.Timeout | null>(null)
-  const _LastUpdateTime = useRef<number>(Date.now())
+const Header: FC<HeaderProps> = ({ activeTab, hasNotifications, defaultLessonTime = 45 }) => {
+  const [IsScrolled, setIsScrolled] = useState(false);
+  const [TimeString, setTimeString] = useState('');
+  const [DateString, setDateString] = useState('');
+  const [WeatherData, setWeatherData] = useState({ temp: 'n/a', condition: 'Jarosław' });
+  const [SpotifyTrack, setSpotifyTrack] = useState<SpotifyTrackData>({ title: 'Brak danych', artist: 'Zautoryzuj spotify' });
+  const [LocalProgress, setLocalProgress] = useState<number | undefined>(undefined);
+  const [PeriodInfo, setPeriodInfo] = useState<PeriodInfo>({
+    IsLesson: false,
+    PeriodNumber: 0,
+    RemainingTime: "00:00",
+    ProgressPercent: 0
+  });
+  
+  const HeaderRef = useRef<HTMLDivElement>(null);
+  const _ProgressInterval = useRef<NodeJS.Timeout | null>(null);
+  const _LastUpdateTime = useRef<number>(Date.now());
   
   const _GetTitle = () => {
     switch (activeTab) {
       case 'dashboard':
         return 'Strona główna'
+      case 'slajdy':
+        return 'Slajdy'
       case 'settings':
         return 'Settings'
       case 'archive':
@@ -40,6 +52,10 @@ const Header: FC<HeaderProps> = ({ activeTab, hasNotifications }) => {
         return 'Dashboard'
     }
   }
+  
+  useEffect(() => {
+    InitializeLessonDuration(defaultLessonTime)
+  }, [defaultLessonTime])
   
   useEffect(() => {
     const HandleScroll = () => {
@@ -59,26 +75,44 @@ const Header: FC<HeaderProps> = ({ activeTab, hasNotifications }) => {
     }
     
     const UpdateLessonTime = () => {
-      if (LessonEndMinutes > 0) {
-        setLessonEndMinutes(PrevMinutes => PrevMinutes - 1)
+      const CurrentInfo = GetCurrentPeriodInfo();
+      setPeriodInfo(CurrentInfo);
+    }
+    
+    const UpdateWeather = async () => {
+      const WeatherInfo = await FetchWeatherData()
+      if (WeatherInfo.Temperature !== null) {
+        setWeatherData({
+          temp: `${Math.round(WeatherInfo.Temperature)}°C`,
+          condition: 'Jarosław'
+        })
       }
     }
     
     window.addEventListener('scroll', HandleScroll, { passive: true })
     UpdateTimeDate()
+    UpdateLessonTime()
+    UpdateWeather()
     
     const _TimeInterval = setInterval(UpdateTimeDate, 30000)
-    const _LessonInterval = setInterval(UpdateLessonTime, 60000)
+    const _LessonInterval = setInterval(UpdateLessonTime, 1000)
+    const _WeatherInterval = setInterval(UpdateWeather, 30 * 60 * 1000)
+    
+    const _Unsubscribe = SubscribeToLessonDuration(() => {
+      UpdateLessonTime();
+    });
     
     return () => {
       window.removeEventListener('scroll', HandleScroll)
       clearInterval(_TimeInterval)
       clearInterval(_LessonInterval)
+      clearInterval(_WeatherInterval)
       if (_ProgressInterval.current) {
         clearInterval(_ProgressInterval.current)
       }
+      _Unsubscribe();
     }
-  }, [IsScrolled, LessonEndMinutes])
+  }, [IsScrolled])
   
   useEffect(() => {
     const FetchSpotifyTrack = async () => {
@@ -143,6 +177,7 @@ const Header: FC<HeaderProps> = ({ activeTab, hasNotifications }) => {
   
   const _IconMap = {
     dashboard: 'chart-bar',
+    slajdy: 'images',
     settings: 'cog',
     archive: 'archive',
     substitutions: 'exchange-alt',
@@ -150,6 +185,26 @@ const Header: FC<HeaderProps> = ({ activeTab, hasNotifications }) => {
   }
   
   const _CurrentIcon = _IconMap[activeTab as keyof typeof _IconMap] || _IconMap.default
+  
+  const _GetLessonStatusLabel = (): string => {
+    if (PeriodInfo.IsLesson) {
+      return 'Koniec lekcji za:'
+    } else if (PeriodInfo.PeriodNumber > 0) {
+      return 'Koniec przerwy za:'
+    } else {
+      return 'Lekcje zakończone'
+    }
+  }
+  
+  const _GetLessonTimeColor = (): string => {
+    if (PeriodInfo.IsLesson) {
+      return 'text-amber-400 group-hover:text-amber-300'
+    } else if (PeriodInfo.PeriodNumber > 0) {
+      return 'text-green-400 group-hover:text-green-300'
+    } else {
+      return 'text-gray-400 group-hover:text-gray-300'
+    }
+  }
   
   return (
     <>
@@ -265,8 +320,10 @@ const Header: FC<HeaderProps> = ({ activeTab, hasNotifications }) => {
                   <div className="flex items-center bg-rose-500/10 hover:bg-rose-500/15 rounded-xl px-5 py-2.5 border border-rose-500/20 hover:border-rose-500/30 transition-all group select-none">
                     <i className="fas fa-hourglass-half text-white/80 group-hover:text-white mr-3"></i>
                     <div className="flex flex-col">
-                      <span className="text-white/90 text-sm font-medium group-hover:text-white">Koniec lekcji</span>
-                      <span className="text-amber-400 text-xs group-hover:text-amber-300">{LessonEndMinutes} minut</span>
+                      <span className="text-white/90 text-sm font-medium group-hover:text-white">{_GetLessonStatusLabel()}</span>
+                      <span className={`${_GetLessonTimeColor()} text-xs`}>
+                        {PeriodInfo.PeriodNumber === 0 ? 'Na dziś' : PeriodInfo.RemainingTime}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -302,10 +359,11 @@ const Header: FC<HeaderProps> = ({ activeTab, hasNotifications }) => {
                 style={{ transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}
                 aria-label="Logout"
                 title="Logout"
+                onClick={() => signOut({ callbackUrl: '/login' })}
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-rose-500/0 to-rose-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative flex items-center">
-                  <i className="fas fa-sign-out-alt mr-2 transform group-hover:translate-x-0.5 transition-transform"></i>
+                  <i className="fas fa-sign-out-alt mr-2"></i>
                   <span className="text-sm font-medium tracking-wider">Wyloguj</span>
                 </div>
               </button>

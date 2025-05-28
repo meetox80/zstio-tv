@@ -17,6 +17,11 @@ model User {
   password String
 }
 
+model GlobalSettings {
+  id         Int @id @default(1)
+  lessonTime Int @default(45)
+}
+
 model Spotify {
   id           Int   @id @default(1)
   accessToken  String
@@ -27,4 +32,67 @@ model Spotify {
 model widgetsdata {
   id          Int    @id @default(1)
   widget_text String @default("Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych.")
+}
+
+model Slide {
+  Id        String   @id @default(cuid())
+  Name      String
+  ImageData String
+  Duration  Int      @default(5)
+  CreatedAt DateTime @default(now())
+  UpdatedAt DateTime @updatedAt
+}
+
+model SongProposal {
+  Id          String   @id @default(cuid())
+  TrackId     String
+  Title       String
+  Artist      String
+  Album       String
+  AlbumArt    String
+  Duration    Int
+  Uri         String
+  Fingerprint String?
+  CreatedAt   DateTime @default(now())
+  UpdatedAt   DateTime @updatedAt
+  Votes       Vote[]   @relation("ProposalVotes")
+}
+
+model ApprovedSong {
+  Id        String   @id @default(cuid())
+  TrackId   String
+  Title     String
+  Artist    String
+  Album     String
+  AlbumArt  String
+  Duration  Int
+  Uri       String
+  Upvotes   Int      @default(0)
+  Downvotes Int      @default(0)
+  CreatedAt DateTime @default(now())
+  UpdatedAt DateTime @updatedAt
+  Votes     Vote[]   @relation("ApprovedVotes")
+}
+
+model Vote {
+  Id             String        @id @default(cuid())
+  SongProposalId String?
+  SongProposal   SongProposal? @relation("ProposalVotes", fields: [SongProposalId], references: [Id])
+  ApprovedSongId String?
+  ApprovedSong   ApprovedSong? @relation("ApprovedVotes", fields: [ApprovedSongId], references: [Id])
+  Fingerprint    String
+  IsUpvote       Boolean
+  CreatedAt      DateTime      @default(now())
+
+  @@unique([SongProposalId, Fingerprint])
+  @@unique([ApprovedSongId, Fingerprint])
+}
+
+model Statistics {
+  Id           String   @id @default(cuid())
+  Date         String   @unique
+  SpotifyPlays Int      @default(0)
+  SongRequests Int      @default(0)
+  CreatedAt    DateTime @default(now())
+  UpdatedAt    DateTime @updatedAt
 }

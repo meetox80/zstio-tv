@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react'
 import SubstitutionsPage from '../pages/SubstitutionsPage'
-import WeatherPage from '../pages/WeatherPage'
 import VotePage from '../pages/VotePage'
+import SlidesPage from '../pages/SlidesPage'
 
 const Pages = [
   { Component: SubstitutionsPage, Key: 'substitutions' },
   { Component: VotePage, Key: 'vote' },
-  { Component: WeatherPage, Key: 'weather' }
+  { Component: SlidesPage, Key: 'slides' }
 ]
 
 export default function PageSwitcher() {

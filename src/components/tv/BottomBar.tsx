@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import TimeDisplay from "./addons/TimeDisplay"
 import SpotifyPlayer from "./addons/SpotifyPlayer"
 import { TrackData } from "@/types/spotify"
 import { GetNowPlaying } from "@/lib/spotify.client"
+import { motion } from "framer-motion"
 
 type BottomBarProps = {
   TrackData: TrackData
@@ -12,44 +13,62 @@ type BottomBarProps = {
 }
 
 export default function BottomBar({ TrackData: initialTrackData, IsAuthenticated: initialIsAuthenticated }: BottomBarProps) {
-  const [TrackData, SetTrackData] = useState<TrackData>(initialTrackData)
-  const [IsAuthenticated, SetIsAuthenticated] = useState(initialIsAuthenticated)
+  const [_TrackData, SetTrackData] = useState<TrackData>(initialTrackData);
+  const [_IsAuthenticated, SetIsAuthenticated] = useState(initialIsAuthenticated);
+  const _RetryCount = useRef(0);
+  const _MaxRetries = 3;
+  const _RetryDelay = 5000;
+  const _IsMounted = useRef(true);
+  
+  useEffect(() => {
+    _IsMounted.current = true
+    return () => { _IsMounted.current = false }
+  }, [])
   
   useEffect(() => {
     const FetchCurrentTrack = async () => {
-      if (!IsAuthenticated) return
+      if (!_IsAuthenticated || !_IsMounted.current) return
       
       try {
         const Data = await GetNowPlaying()
+        
         if (Data) {
-          const MappedData: TrackData = {
-            IsPlaying: Data.isPlaying || false,
-            Title: Data.title,
-            Artist: Data.artist,
-            AlbumArt: Data.albumArt,
-            AlbumName: Data.albumName,
-            Duration: Data.duration,
-            Progress: Data.progress,
-            IsAuthenticated: Data.isAuthenticated
-          }
+          _RetryCount.current = 0
           
-          SetTrackData(MappedData)
-          
-          if (Data.isAuthenticated === false) {
-            SetIsAuthenticated(false)
+          if (_IsMounted.current) {
+            const MappedData: TrackData = {
+              IsPlaying: Data.isPlaying || false,
+              Title: Data.title,
+              Artist: Data.artist,
+              AlbumArt: Data.albumArt,
+              AlbumName: Data.albumName,
+              Duration: Data.duration,
+              Progress: Data.progress,
+              IsAuthenticated: Data.isAuthenticated
+            }
+            
+            SetTrackData(MappedData)
+            
+            if (Data.isAuthenticated === false) {
+              SetIsAuthenticated(false)
+            }
           }
+        } else if (_RetryCount.current < _MaxRetries) {
+          _RetryCount.current++
         }
       } catch (Error) {
-        console.error("Error fetching track:", Error)
+        if (_IsMounted.current && _RetryCount.current < _MaxRetries) {
+          _RetryCount.current++
+        }
       }
     }
     
     FetchCurrentTrack()
     
-    const _UpdateInterval = setInterval(FetchCurrentTrack, 5000)
+    const _UpdateInterval = setInterval(FetchCurrentTrack, _RetryDelay)
     
     return () => clearInterval(_UpdateInterval)
-  }, [IsAuthenticated])
+  }, [_IsAuthenticated])
   
   useEffect(() => {
     SetTrackData(initialTrackData)
@@ -62,15 +81,25 @@ export default function BottomBar({ TrackData: initialTrackData, IsAuthenticated
   return (
     <>
       <SpotifyPlayer 
-        TrackData={TrackData}
-        IsAuthenticated={IsAuthenticated}
+        TrackData={_TrackData}
+        IsAuthenticated={_IsAuthenticated}
       />
       
-      <div className="absolute bottom-0 left-0 h-[200px] flex items-center px-12 z-10">
-        <div className="flex flex-col">
+      <motion.div 
+        className="absolute bottom-0 left-0 h-[200px] flex items-center px-12 z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
+      >
+        <motion.div 
+          className="flex flex-col"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.4 }}
+        >
           <TimeDisplay />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </>
   )
 } 

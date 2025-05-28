@@ -270,7 +270,7 @@ const DashboardStats: FC<DashboardStatsProps> = ({ spotifyData, apiData, songReq
     error: 'błąd',
     operational: 'działa',
     degraded: 'obniżona wydajność',
-    down: 'niedostępne'
+    down: 'brak połączenia'
   }
 
   return (
@@ -383,8 +383,8 @@ const DashboardStats: FC<DashboardStatsProps> = ({ spotifyData, apiData, songReq
             </div>
           </div>
           <div className="flex items-center mt-2">
-            <div className={`w-4 h-4 rounded-full ${_StatusColors[apiData.substitutionsStatus]} shadow-lg ring-2 ring-white/10 mr-3`}></div>
-            <span className="text-xl font-bold text-white capitalize tracking-tight">{_StatusTranslations[apiData.substitutionsStatus]}</span>
+            <div className={`w-4 h-4 rounded-full ${_StatusColors.down} shadow-lg ring-2 ring-white/10 mr-3`}></div>
+            <span className="text-xl font-bold text-white capitalize tracking-tight">{_StatusTranslations.down}</span>
           </div>
           <div className="mt-5 p-5 rounded-xl bg-white/5 backdrop-blur-lg border border-white/5 shadow-inner">
             <div className="flex items-center justify-between mb-3">
@@ -396,8 +396,8 @@ const DashboardStats: FC<DashboardStatsProps> = ({ spotifyData, apiData, songReq
               <span className="text-white font-medium">api.ox80.me/nullptr</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-400 font-medium text-sm">Średni czas odpowiedzi</span>
-              <span className="text-white font-medium">124ms</span>
+              <span className="text-gray-400 font-medium text-sm">Status połączenia</span>
+              <span className="text-rose-400 font-semibold">Brak Implementacji</span>
             </div>
           </div>
         </div>
@@ -406,4 +406,4 @@ const DashboardStats: FC<DashboardStatsProps> = ({ spotifyData, apiData, songReq
   )
 }
 
-export default DashboardStats 
+export default DashboardStats;
