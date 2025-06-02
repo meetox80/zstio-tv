@@ -34,4 +34,4 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
       
-    - run: pnpm run build --if-present
+    - run: pnpm run build
