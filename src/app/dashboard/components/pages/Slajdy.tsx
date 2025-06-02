@@ -4,6 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
 import { ConvertToBase64, OptimizeBase64Image } from '@/lib/imageUtils'
 import ConfirmationModal from '../modals/ConfirmationModal'
+import { useSession } from 'next-auth/react'
+import { Permission } from '@/app/dashboard/components/UsersTab'
+import { HasPermission } from '@/lib/permissions'
+import { useToast } from '@/app/context/ToastContext'
 
 type Slide = {
   Id: string
@@ -18,6 +22,7 @@ type SlajdyProps = {
 }
 
 const Slajdy: FC<SlajdyProps> = () => {
+  const { data: _Session } = useSession()
   const [_Slides, SetSlides] = useState<Slide[]>([])
   const [SelectedSlide, SetSelectedSlide] = useState<Slide | null>(null)
   const FileInputRef = useRef<HTMLInputElement>(null)
@@ -33,22 +38,48 @@ const Slajdy: FC<SlajdyProps> = () => {
   const [IsEditingName, SetIsEditingName] = useState(false)
   const [EditedName, SetEditedName] = useState("")
   const NameInputRef = useRef<HTMLInputElement>(null)
+  const { ShowToast } = useToast()
+  
+  const UserPermissions = _Session?.user?.permissions || 0
+  const CanViewSlides = HasPermission(UserPermissions, 1 << 1)  // SLIDES_VIEW
+  const CanEditSlides = HasPermission(UserPermissions, 1 << 2)  // SLIDES_EDIT
 
   useEffect(() => {
     FetchSlides()
-  }, [])
+  }, [_Session])
 
   const FetchSlides = async () => {
     try {
       SetIsLoading(true)
-      const Response = await axios.get('/api/slides')
-      const SlideData = Response.data.Slides
-      SetSlides(SlideData)
-      if (SlideData.length > 0 && !SelectedSlide) {
-        SetSelectedSlide(SlideData[0])
+      
+      const Response = await fetch('/api/slides')
+      
+      if (!Response.ok) {
+        if (Response.status === 403) {
+          ShowToast("Nie masz uprawnień do przeglądania slajdów", "error")
+        } else {
+          ShowToast(`Błąd podczas wczytywania slajdów: ${Response.status}`, "error")
+        }
+        SetSlides([])
+        return
       }
-    } catch (Error) {
+      
+      const Data = await Response.json()
+      
+      if (Data && Array.isArray(Data.Slides)) {
+        SetSlides(Data.Slides)
+        if (Data.Slides.length > 0 && !SelectedSlide) {
+          SetSelectedSlide(Data.Slides[0])
+        }
+      } else {
+        console.error('Unexpected data format:', Data)
+        ShowToast("Otrzymano nieprawidłowy format danych", "error")
+        SetSlides([])
+      }
+    } catch (Error: any) {
       console.error('Failed to fetch slides:', Error)
+      ShowToast("Błąd podczas wczytywania slajdów", "error")
+      SetSlides([])
     } finally {
       SetIsLoading(false)
     }
@@ -56,6 +87,10 @@ const Slajdy: FC<SlajdyProps> = () => {
 
   const HandleFileUpload = async (Files: FileList | null) => {
     if (!Files || Files.length === 0) return
+    if (!CanEditSlides) {
+      ShowToast("Nie masz uprawnień do edycji slajdów", "error")
+      return
+    }
     
     SetIsLoading(true)
     
@@ -64,19 +99,32 @@ const Slajdy: FC<SlajdyProps> = () => {
         const Base64Data = await ConvertToBase64(File)
         const OptimizedImage = await OptimizeBase64Image(Base64Data)
         
-        const Response = await axios.post('/api/slides', {
+        const Response = await fetch('/api/slides', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
           Name: File.name,
           ImageData: OptimizedImage,
           Duration: 5
         })
+        })
         
-        return Response.data.Slide
+        if (!Response.ok) {
+          if (Response.status === 403) {
+            throw new Error("Nie masz uprawnień do dodawania slajdów")
+          }
+          throw new Error(`Błąd podczas dodawania slajdu: ${Response.status}`)
+        }
+        
+        return await Response.json()
       })
       
       await Promise.all(UploadPromises)
       await FetchSlides()
-    } catch (Error) {
+      ShowToast("Slajdy zostały dodane pomyślnie", "success")
+    } catch (Error: any) {
       console.error('Error uploading slides:', Error)
+      ShowToast(Error.message || "Błąd podczas dodawania slajdów", "error")
     } finally {
       SetIsLoading(false)
     }
@@ -100,12 +148,20 @@ const Slajdy: FC<SlajdyProps> = () => {
 
   const RequestRemoveSlide = (Id: string) => {
     if (!Id) return
+    if (!CanEditSlides) {
+      ShowToast("Nie masz uprawnień do usuwania slajdów", "error")
+      return
+    }
     SetSlideToDelete(Id)
     SetIsConfirmModalOpen(true)
   }
 
   const HandleRemoveSlide = async () => {
     if (!SlideToDelete) return
+    if (!CanEditSlides) {
+      ShowToast("Nie masz uprawnień do usuwania slajdów", "error")
+      return
+    }
     
     SetIsConfirmModalOpen(false)
     
@@ -117,7 +173,6 @@ const Slajdy: FC<SlajdyProps> = () => {
         let Success = true
         
         SetSelectedSlide(null)
-        
         SetDeletingSlideId("all")
         
         const RemainingSlides = [...SlidesToDelete]
@@ -134,39 +189,43 @@ const Slajdy: FC<SlajdyProps> = () => {
               await new Promise(resolve => setTimeout(resolve, 50))
             }
             
-            await axios.delete(`/api/slides/${CurrentSlide.Id}`)
-          } catch (Error) {
+            const DeleteResponse = await fetch(`/api/slides/${CurrentSlide.Id}`, {
+              method: 'DELETE'
+            })
+            
+            if (!DeleteResponse.ok) {
+              if (DeleteResponse.status === 403) {
+                throw new Error("Nie masz uprawnień do usuwania slajdów")
+              }
+              throw new Error(`Błąd podczas usuwania slajdu: ${DeleteResponse.status}`)
+            }
+          } catch (Error: any) {
             console.error(`Failed to delete slide ${CurrentSlide.Id}:`, Error)
+            ShowToast(Error.message || "Błąd podczas usuwania slajdów", "error")
             Success = false
+            break
           }
         }
         
         if (Success) {
           SetSlides([])
+          ShowToast("Wszystkie slajdy zostały usunięte", "success")
         }
       } else {
         SetDeletingSlideId(SlideToDelete)
         
-        let Success = false
-        let Attempts = 0
-        
-        while (!Success && Attempts < 3) {
           try {
-            const Response = await axios.delete(`/api/slides/${SlideToDelete}`)
-            if (Response.status === 200) {
-              Success = true
-            } else {
-              await new Promise(resolve => setTimeout(resolve, 300))
-              Attempts++
+          const DeleteResponse = await fetch(`/api/slides/${SlideToDelete}`, {
+            method: 'DELETE'
+          })
+          
+          if (!DeleteResponse.ok) {
+            if (DeleteResponse.status === 403) {
+              throw new Error("Nie masz uprawnień do usuwania slajdów")
             }
-          } catch (Error) {
-            await new Promise(resolve => setTimeout(resolve, 300))
-            Attempts++
-            console.error(`Attempt ${Attempts} failed:`, Error)
+            throw new Error(`Błąd podczas usuwania slajdu: ${DeleteResponse.status}`)
           }
-        }
-        
-        if (Success) {
+          
           const NewSlides = _Slides.filter(Slide => Slide.Id !== SlideToDelete)
           SetSlides(NewSlides)
           
@@ -179,12 +238,16 @@ const Slajdy: FC<SlajdyProps> = () => {
               SlideContainerRef.current.focus()
             }
           }, 50)
-        } else {
-          console.error('Failed to delete slide after multiple attempts')
+          
+          ShowToast("Slajd został usunięty", "success")
+        } catch (Error: any) {
+          console.error('Error removing slide:', Error)
+          ShowToast(Error.message || "Błąd podczas usuwania slajdu", "error")
         }
       }
-    } catch (Error) {
+    } catch (Error: any) {
       console.error('Error removing slide:', Error)
+      ShowToast(Error.message || "Błąd podczas usuwania slajdów", "error")
     } finally {
       SetIsLoading(false)
       SetDeletingSlideId(null)
@@ -193,17 +256,33 @@ const Slajdy: FC<SlajdyProps> = () => {
   }
 
   const HandleDurationChange = async (Id: string, Duration: number) => {
+    if (!CanEditSlides) {
+      ShowToast("Nie masz uprawnień do edycji slajdów", "error")
+      return
+    }
+    
     try {
       const SlideToUpdate = _Slides.find(Slide => Slide.Id === Id)
       if (!SlideToUpdate) return
       
       const UpdatedSlide = { ...SlideToUpdate, Duration }
       
-      await axios.put(`/api/slides/${Id}`, {
+      const UpdateResponse = await fetch(`/api/slides/${Id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
         Name: UpdatedSlide.Name,
         ImageData: UpdatedSlide.ImageData,
         Duration: UpdatedSlide.Duration
       })
+      })
+      
+      if (!UpdateResponse.ok) {
+        if (UpdateResponse.status === 403) {
+          throw new Error("Nie masz uprawnień do edycji slajdów")
+        }
+        throw new Error(`Błąd podczas aktualizacji: ${UpdateResponse.status}`)
+      }
       
       const NewSlides = _Slides.map(Slide => 
         Slide.Id === Id ? UpdatedSlide : Slide
@@ -214,8 +293,11 @@ const Slajdy: FC<SlajdyProps> = () => {
       if (SelectedSlide && SelectedSlide.Id === Id) {
         SetSelectedSlide(UpdatedSlide)
       }
-    } catch (Error) {
+      
+      ShowToast("Czas wyświetlania został zaktualizowany", "success")
+    } catch (Error: any) {
       console.error('Error updating slide duration:', Error)
+      ShowToast(Error.message || "Błąd podczas aktualizacji czasu wyświetlania", "error")
     }
   }
 
@@ -229,6 +311,7 @@ const Slajdy: FC<SlajdyProps> = () => {
   }
   
   const HandleDragStart = (Id: string) => {
+    if (!CanEditSlides) return
     SetDraggedSlide(Id)
   }
   
@@ -256,6 +339,14 @@ const Slajdy: FC<SlajdyProps> = () => {
   
   const HandleDropOnSlide = async () => {
     if (!DraggedSlide || !DragOverSlide || DraggedSlide === DragOverSlide || DeletingSlideId) {
+      SetDraggedSlide(null)
+      SetDragOverSlide(null)
+      SetDragPosition(null)
+      return
+    }
+    
+    if (!CanEditSlides) {
+      ShowToast("Nie masz uprawnień do edycji slajdów", "error")
       SetDraggedSlide(null)
       SetDragOverSlide(null)
       SetDragPosition(null)
@@ -323,6 +414,11 @@ const Slajdy: FC<SlajdyProps> = () => {
   }
   
   const HandleNameEdit = (Id: string) => {
+    if (!CanEditSlides) {
+      ShowToast("Nie masz uprawnień do edycji slajdów", "error")
+      return
+    }
+    
     const SlideToEdit = _Slides.find(Slide => Slide.Id === Id)
     if (!SlideToEdit) return
     
@@ -343,6 +439,11 @@ const Slajdy: FC<SlajdyProps> = () => {
   
   const HandleNameSave = async () => {
     if (!SelectedSlide) return
+    if (!CanEditSlides) {
+      ShowToast("Nie masz uprawnień do edycji slajdów", "error")
+      SetIsEditingName(false)
+      return
+    }
     
     SetIsEditingName(false)
     
@@ -356,11 +457,22 @@ const Slajdy: FC<SlajdyProps> = () => {
       
       const UpdatedSlide = { ...SelectedSlide, Name: NewName }
       
-      await axios.put(`/api/slides/${SelectedSlide.Id}`, {
+      const UpdateResponse = await fetch(`/api/slides/${SelectedSlide.Id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
         Name: UpdatedSlide.Name,
         ImageData: UpdatedSlide.ImageData,
         Duration: UpdatedSlide.Duration
       })
+      })
+      
+      if (!UpdateResponse.ok) {
+        if (UpdateResponse.status === 403) {
+          throw new Error("Nie masz uprawnień do edycji slajdów")
+        }
+        throw new Error(`Błąd podczas aktualizacji: ${UpdateResponse.status}`)
+      }
       
       const NewSlides = _Slides.map(Slide => 
         Slide.Id === SelectedSlide.Id ? UpdatedSlide : Slide
@@ -368,8 +480,10 @@ const Slajdy: FC<SlajdyProps> = () => {
       
       SetSlides(NewSlides)
       SetSelectedSlide(UpdatedSlide)
-    } catch (Error) {
+      ShowToast("Nazwa slajdu została zaktualizowana", "success")
+    } catch (Error: any) {
       console.error('Error updating slide name:', Error)
+      ShowToast(Error.message || "Błąd podczas aktualizacji nazwy slajdu", "error")
     }
   }
   
@@ -418,8 +532,12 @@ const Slajdy: FC<SlajdyProps> = () => {
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="px-4 py-2.5 rounded-full bg-rose-500/20 backdrop-blur-sm border border-rose-500/30 text-white font-medium flex items-center gap-2 hover:bg-rose-500/30 transition-colors"
-              onClick={() => FileInputRef.current?.click()}
+              className={`px-4 py-2.5 rounded-full ${CanEditSlides 
+                ? 'bg-rose-500/20 backdrop-blur-sm border border-rose-500/30 text-white font-medium hover:bg-rose-500/30' 
+                : 'bg-gray-700/20 border border-gray-700/30 text-gray-400 cursor-not-allowed'} flex items-center gap-2 transition-colors`}
+              onClick={() => CanEditSlides && FileInputRef.current?.click()}
+              disabled={!CanEditSlides}
+              title={CanEditSlides ? "Dodaj slajdy" : "Brak uprawnień do dodawania slajdów"}
             >
               <i className="fas fa-cloud-upload-alt"></i>
               <span>Dodaj slajdy</span>
@@ -489,11 +607,13 @@ const Slajdy: FC<SlajdyProps> = () => {
                     ) : (
                       <div 
                         onClick={() => HandleNameEdit(SelectedSlide.Id)}
-                        className="flex items-center cursor-pointer group-hover:text-rose-300 transition-colors"
+                        className={`flex items-center ${CanEditSlides ? 'cursor-pointer group-hover:text-rose-300' : ''} transition-colors`}
                       >
                         <p className="text-white text-sm font-medium truncate group-hover:text-rose-100">{GetFileNameWithoutExtension(SelectedSlide.Name)}</p>
                         <span className="text-gray-400 text-sm">{GetFileExtension(SelectedSlide.Name)}</span>
-                        <i className="fas fa-pencil-alt text-gray-400 ml-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        {CanEditSlides && (
+                          <i className="fas fa-pencil-alt text-gray-400 ml-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        )}
                       </div>
                     )}
                   </div>
@@ -542,13 +662,17 @@ const Slajdy: FC<SlajdyProps> = () => {
                   <div className="flex items-center gap-2">
                     <motion.button
                       onClick={() => {
-                        if (_Slides.length > 0) {
+                        if (_Slides.length > 0 && CanEditSlides) {
                           SetSlideToDelete("all")
                           SetIsConfirmModalOpen(true)
+                        } else if (!CanEditSlides) {
+                          ShowToast("Nie masz uprawnień do usuwania slajdów", "error")
                         }
                       }}
-                      className="text-xs text-white bg-rose-600/20 hover:bg-rose-600/40 px-2 py-1 rounded-full border border-rose-600/30 flex items-center gap-1 transition-colors"
-                      title="Usuń wszystkie slajdy"
+                      className={`text-xs text-white ${CanEditSlides 
+                        ? 'bg-rose-600/20 hover:bg-rose-600/40 border border-rose-600/30' 
+                        : 'bg-gray-700/20 border border-gray-700/30 text-gray-400 cursor-not-allowed'} px-2 py-1 rounded-full flex items-center gap-1 transition-colors`}
+                      title={CanEditSlides ? "Usuń wszystkie slajdy" : "Brak uprawnień do usuwania slajdów"}
                     >
                       <i className="fas fa-trash-alt text-xs"></i>
                       <span>Usuń wszystkie</span>
@@ -594,7 +718,7 @@ const Slajdy: FC<SlajdyProps> = () => {
                               ${(DeletingSlideId === Slide.Id || DeletingSlideId === "all") ? 'opacity-40 bg-rose-900/20' : ''}
                               focus:outline-none focus:ring-2 focus:ring-rose-500/50`}
                             onClick={() => SetSelectedSlide(Slide)}
-                            draggable
+                            draggable={CanEditSlides}
                             onDragStart={() => HandleDragStart(Slide.Id)}
                             onDragEnd={HandleDragEnd}
                             onDragOver={(e) => { e.preventDefault(); HandleDragOverSlide(Slide.Id, e); }}
@@ -620,9 +744,11 @@ const Slajdy: FC<SlajdyProps> = () => {
                             <div className="flex-1 p-2 flex flex-col justify-between">
                               <div className="flex justify-between items-start">
                                 <p className="text-white text-sm truncate font-medium pr-2">{Slide.Name}</p>
-                                <div className="cursor-grab active:cursor-grabbing opacity-50 group-hover:opacity-100 transition-opacity">
-                                  <i className="fas fa-grip-lines text-gray-500 text-xs"></i>
-                                </div>
+                                {CanEditSlides && (
+                                  <div className="cursor-grab active:cursor-grabbing opacity-50 group-hover:opacity-100 transition-opacity">
+                                    <i className="fas fa-grip-lines text-gray-500 text-xs"></i>
+                                  </div>
+                                )}
                               </div>
                               
                               <div className="flex items-center justify-between mt-1 select-none">
@@ -654,14 +780,16 @@ const Slajdy: FC<SlajdyProps> = () => {
                                   >
                                     <i className="fas fa-download text-xs"></i>
                                   </button>
-                                  <button 
-                                    onClick={(e) => { e.stopPropagation(); RequestRemoveSlide(Slide.Id); }}
-                                    className="text-gray-400 hover:text-rose-400 bg-black/20 hover:bg-black/40 p-1 rounded transition-colors"
-                                    aria-label="Usuń slajd"
-                                    title="Usuń slajd"
-                                  >
-                                    <i className="fas fa-trash-alt text-xs"></i>
-                                  </button>
+                                  {CanEditSlides && (
+                                    <button 
+                                      onClick={(e) => { e.stopPropagation(); RequestRemoveSlide(Slide.Id); }}
+                                      className="text-gray-400 hover:text-rose-400 bg-black/20 hover:bg-black/40 p-1 rounded transition-colors"
+                                      aria-label="Usuń slajd"
+                                      title="Usuń slajd"
+                                    >
+                                      <i className="fas fa-trash-alt text-xs"></i>
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -687,8 +815,12 @@ const Slajdy: FC<SlajdyProps> = () => {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="mt-4 px-4 py-2 rounded-full bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-white text-sm flex items-center gap-2 transition-colors"
-                      onClick={() => FileInputRef.current?.click()}
+                      className={`mt-4 px-4 py-2 rounded-full ${CanEditSlides 
+                        ? 'bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-white' 
+                        : 'bg-gray-700/20 border border-gray-700/30 text-gray-400 cursor-not-allowed'} text-sm flex items-center gap-2 transition-colors`}
+                      onClick={() => CanEditSlides && FileInputRef.current?.click()}
+                      disabled={!CanEditSlides}
+                      title={CanEditSlides ? "Dodaj slajdy" : "Brak uprawnień do dodawania slajdów"}
                     >
                       <i className="fas fa-plus"></i>
                       <span>Dodaj teraz</span>
@@ -701,8 +833,12 @@ const Slajdy: FC<SlajdyProps> = () => {
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  className="w-full py-2.5 rounded-lg bg-rose-500/20 backdrop-blur-sm border border-rose-500/30 text-white font-medium flex items-center justify-center gap-2 hover:bg-rose-500/30 transition-colors"
-                  onClick={() => FileInputRef.current?.click()}
+                  className={`w-full py-2.5 rounded-lg ${CanEditSlides 
+                    ? 'bg-rose-500/20 backdrop-blur-sm border border-rose-500/30 text-white font-medium hover:bg-rose-500/30' 
+                    : 'bg-gray-700/20 border border-gray-700/30 text-gray-400 cursor-not-allowed'} flex items-center justify-center gap-2 transition-colors`}
+                  onClick={() => CanEditSlides && FileInputRef.current?.click()}
+                  disabled={!CanEditSlides}
+                  title={CanEditSlides ? "Dodaj slajdy" : "Brak uprawnień do dodawania slajdów"}
                 >
                   <i className="fas fa-cloud-upload-alt"></i>
                   <span>Dodaj slajdy</span>

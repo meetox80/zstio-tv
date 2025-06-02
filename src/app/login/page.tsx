@@ -63,16 +63,21 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
 
-    const Result = await signIn('credentials', {
-      username: Email,
-      password: Password,
-      redirect: false
-    })
+    try {
+      const Result = await signIn('credentials', {
+        username: Email,
+        password: Password,
+        redirect: false
+      })
 
-    if (Result?.error) {
-      setError('Nieprawidłowe dane logowania')
-    } else {
-      _Router.push('/dashboard')
+      if (Result?.error) {
+        setError('Nieprawidłowe dane logowania')
+      } else {
+        _Router.push('/dashboard')
+      }
+    } catch (Error) {
+      console.error('Login error:', Error)
+      setError('Wystąpił błąd podczas logowania')
     }
   }
 

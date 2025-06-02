@@ -48,16 +48,15 @@ export const SetLessonDuration = async (Duration: 30 | 45): Promise<void> => {
       body: JSON.stringify({ lessonTime: Duration })
     });
 
-    if (Response.status === 401) {
-      throw new Error('Unauthorized - You must be logged in to change settings');
+    if (!Response.ok) {
+      const ErrorData = await Response.json().catch(() => ({}));
+      throw new Error(ErrorData.error || 'Failed to save lesson time');
     }
     
-    if (!Response.ok) throw new Error('Failed to save lesson time');
     _CurrentLessonDuration = Duration;
     _NotifySubscribers();
-  } catch (error) {
-    console.error('Failed to save lesson time:', error);
-    throw error;
+  } catch (Error) {
+    throw Error;
   }
 };
 

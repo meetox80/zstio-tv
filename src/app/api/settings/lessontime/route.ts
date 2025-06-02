@@ -9,14 +9,37 @@ export async function POST(request: Request) {
       return AuthCheck.response;
     }
     
+    if (!AuthCheck.session?.user) {
+      return NextResponse.json({ error: 'User not found in session' }, { status: 401 });
+    }
+    
+    let CurrentUser;
+    if (AuthCheck.session.user.id) {
+      CurrentUser = await Prisma.user.findUnique({
+        where: { id: AuthCheck.session.user.id }
+      });
+    } else if (AuthCheck.session.user.name) {
+      CurrentUser = await Prisma.user.findUnique({
+        where: { name: AuthCheck.session.user.name }
+      });
+    }
+    
+    if (!CurrentUser) {
+      return NextResponse.json({ error: 'User not found in database' }, { status: 404 });
+    }
+
+    const UserPermissions = CurrentUser.name === 'admin' ? 0x7FFFFFFF : CurrentUser.permissions;
+    const CanEditClassTimes = CurrentUser.name === 'admin' || ((UserPermissions & 64) === 64);
+    
+    if (!CanEditClassTimes) {
+      return NextResponse.json({ error: 'Insufficient permissions to edit lesson times' }, { status: 403 });
+    }
+    
     const Body = await request.json();
     const { lessonTime } = Body;
     
     if (![30, 45].includes(lessonTime)) {
-      return NextResponse.json(
-        { error: 'Invalid lesson time provided' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid lesson time provided' }, { status: 400 });
     }
     
     try {
@@ -29,8 +52,8 @@ export async function POST(request: Request) {
         success: true, 
         lessonTime: UpdatedSettings.lessonTime 
       });
-    } catch (Error) {
-      if ((Error as any).code === 'P2025') {
+    } catch (UpdateError: any) {
+      if (UpdateError.code === 'P2025') {
         const NewSettings = await Prisma.globalSettings.create({
           data: {
             id: 1,
@@ -43,13 +66,10 @@ export async function POST(request: Request) {
           lessonTime: NewSettings.lessonTime 
         });
       }
-      throw Error;
+      
+      return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });
     }
   } catch (Error) {
-    console.error('Error saving lesson time:', Error);
-    return NextResponse.json(
-      { error: 'Failed to save lesson time' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to save lesson time' }, { status: 500 });
   }
 }

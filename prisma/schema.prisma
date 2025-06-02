@@ -12,9 +12,11 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  username String @unique
-  password String
+  id          String   @id @default(cuid())
+  name        String   @unique
+  password    String?
+  permissions Int      @default(0)
+  createdAt   DateTime @default(now())
 }
 
 model GlobalSettings {

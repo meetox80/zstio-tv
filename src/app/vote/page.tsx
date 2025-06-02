@@ -8,6 +8,7 @@ import { SearchSpotifyTracks } from "@/lib/spotify.client";
 import { SpotifyTrack } from "@/types/spotify";
 import { GenerateFingerprint } from "@/lib/client-fingerprint";
 import { debounce } from "lodash";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 const _Inter = Inter({ subsets: ["latin"] });
 const _JetBrainsMono = JetBrains_Mono({ subsets: ["latin"] });
@@ -16,7 +17,6 @@ const _SpaceGrotesk = Space_Grotesk({ subsets: ["latin"] });
 const Vote: NextPage = () => {
   const [CurrentTime, setCurrentTime] = useState("");
   const [SearchTerm, setSearchTerm] = useState("");
-  const [IsHovering, setIsHovering] = useState(false);
   const [ActiveTab, setActiveTab] = useState("submit");
   const [SearchResults, setSearchResults] = useState<SpotifyTrack[]>([]);
   const [IsLoading, setIsLoading] = useState(false);
@@ -31,6 +31,9 @@ const Vote: NextPage = () => {
   const [IsPendingExpanded, setIsPendingExpanded] = useState(false);
   const [PendingProposals, setPendingProposals] = useState<any[]>([]);
   const [IsLoadingPendingProposals, setIsLoadingPendingProposals] = useState(false);
+  const [TurnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [IsTurnstileVerified, setIsTurnstileVerified] = useState(false);
+  const [IsTurnstileLoading, setIsTurnstileLoading] = useState(false);
 
   const ShowNotification = (Message: string, Type: 'success' | 'error') => {
     setNotification({ message: Message, type: Type });
@@ -84,6 +87,10 @@ const Vote: NextPage = () => {
 
   const HandleSubmit = async () => {
     if (!SelectedTrack) return;
+    if (!TurnstileToken || !IsTurnstileVerified) {
+      ShowNotification('Proszę zweryfikować CAPTCHA przed wysłaniem', 'error');
+      return;
+    }
     
     try {
       setIsSubmitting(true);
@@ -95,7 +102,8 @@ const Vote: NextPage = () => {
         },
         body: JSON.stringify({
           Track: SelectedTrack,
-          ClientId: ClientFingerprint
+          ClientId: ClientFingerprint,
+          Token: TurnstileToken
         }),
       });
       
@@ -103,6 +111,8 @@ const Vote: NextPage = () => {
       
       if (Response.ok) {
         setSelectedTrack(null);
+        setTurnstileToken(null);
+        setIsTurnstileVerified(false);
         FetchRecentProposals();
         ShowNotification('Propozycja piosenki została wysłana!', 'success');
       } else {
@@ -112,6 +122,9 @@ const Vote: NextPage = () => {
           ShowNotification('Ta piosenka została już zaproponowana przez innego użytkownika', 'error');
         } else if (Data.alreadyApproved) {
           ShowNotification('Ta piosenka została już zatwierdzona przez administratora i będzie odtworzona', 'error');
+        } else if (Data.captchaFailed) {
+          ShowNotification('Weryfikacja CAPTCHA nie powiodła się. Spróbuj ponownie.', 'error');
+          setIsTurnstileVerified(false);
         } else {
           ShowNotification(Data.error || 'Nie udało się wysłać propozycji piosenki', 'error');
         }
@@ -155,6 +168,49 @@ const Vote: NextPage = () => {
       setIsLoadingPendingProposals(false);
     }
   }, [ClientFingerprint]);
+
+  const HandleTurnstileVerify = async (Token: string) => {
+    console.log('Turnstile token received:', Token ? Token.substring(0, 20) + '...' : null);
+    setTurnstileToken(Token);
+    setIsTurnstileLoading(true);
+    
+    // For local development, let's auto-verify
+    const IsDevelopment = process.env.NODE_ENV === 'development';
+    if (IsDevelopment) {
+      console.log('Development mode: Auto-verifying Turnstile');
+      setIsTurnstileVerified(true);
+      setIsTurnstileLoading(false);
+      return;
+    }
+    
+    try {
+      console.log('Verifying Turnstile token...');
+      const Response = await fetch('/api/verify-turnstile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Token }),
+      });
+      
+      const Result = await Response.json();
+      console.log('Turnstile verification result:', Result);
+      
+      if (Result.Success) {
+        setIsTurnstileVerified(true);
+        ShowNotification('Weryfikacja CAPTCHA zakończona pomyślnie', 'success');
+      } else {
+        setIsTurnstileVerified(false);
+        ShowNotification('Weryfikacja CAPTCHA nie powiodła się. Spróbuj ponownie.', 'error');
+      }
+    } catch (Error) {
+      console.error('Error verifying Turnstile token:', Error);
+      setIsTurnstileVerified(false);
+      ShowNotification('Wystąpił błąd podczas weryfikacji CAPTCHA', 'error');
+    } finally {
+      setIsTurnstileLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -494,20 +550,45 @@ const Vote: NextPage = () => {
                         </svg>
                         Weryfikacja CAPTCHA
                       </span>
-                      <div className="w-full max-w-xs h-24 border border-white/10 bg-black/30 flex items-center justify-center relative overflow-hidden group-hover:border-white/20 transition-all duration-300 rounded-lg">
-                        <svg className="w-6 h-6 text-white/60" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
-                        </svg>
+                      <div className="w-full flex justify-center">
+                        <Turnstile
+                          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''}
+                          onSuccess={HandleTurnstileVerify}
+                          onError={() => {
+                            setIsTurnstileVerified(false);
+                            ShowNotification('Wystąpił błąd podczas ładowania CAPTCHA', 'error');
+                          }}
+                          onExpire={() => {
+                            setIsTurnstileVerified(false);
+                            setTurnstileToken(null);
+                          }}
+                          options={{
+                            theme: 'dark',
+                            size: 'normal',
+                          }}
+                          className="mx-auto"
+                        />
                       </div>
-                      <span className={`text-xs text-white/60 mt-2 ${_JetBrainsMono.className} tracking-wider`}>Cloudflare Protected</span>
+                      <span className={`text-xs text-white/60 mt-2 ${_JetBrainsMono.className} tracking-wider`}>
+                        {IsTurnstileVerified ? (
+                          <span className="text-green-400 flex items-center">
+                            <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Zweryfikowano
+                          </span>
+                        ) : (
+                          "Cloudflare Protected"
+                        )}
+                      </span>
                     </div>
                   </div>
                   
                   <button 
-                    className={`w-full mt-6 py-4 bg-white text-black rounded-xl transition-all duration-500 font-medium group relative overflow-hidden ${!SelectedTrack || IsSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:scale-[1.02]'}`}
+                    className={`w-full mt-6 py-4 bg-white text-black rounded-xl transition-all duration-500 font-medium group relative overflow-hidden ${(!SelectedTrack || IsSubmitting || !IsTurnstileVerified) ? 'opacity-70 cursor-not-allowed' : 'hover:scale-[1.02]'}`}
                     type="button"
                     onClick={HandleSubmit}
-                    disabled={!SelectedTrack || IsSubmitting}
+                    disabled={!SelectedTrack || IsSubmitting || !IsTurnstileVerified}
                   >
                     <span className="relative z-10 group-hover:tracking-[0.15em] transition-all duration-500">
                       {IsSubmitting ? 'WYSYŁANIE...' : 'WYŚLIJ'}
@@ -612,16 +693,6 @@ const Vote: NextPage = () => {
                             </span>
                           </div>
                         </div>
-
-                        <button 
-                          className="w-8 h-8 shrink-0 flex items-center justify-center text-white/60 hover:text-white transition-colors duration-300 ml-2 rounded-full hover:bg-white/10" 
-                          title="Więcej"
-                          aria-label="Więcej opcji"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
-                          </svg>
-                        </button>
                       </div>
                     </div>
                   ))
@@ -719,7 +790,7 @@ const Vote: NextPage = () => {
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="flex gap-8">
             <a 
-              href="/gdpr" 
+              href="/vote/gdpr" 
               className="text-sm text-white/60 hover:text-white transition-all duration-300 font-mono flex items-center group"
             >
               <span>GDPR</span>

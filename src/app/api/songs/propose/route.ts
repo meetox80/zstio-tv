@@ -5,11 +5,13 @@ import { RateLimit } from '@/lib/rate-limit'
 import { ValidateInput, TrackSchema } from '@/lib/validation'
 
 const _RATE_LIMIT_WINDOW = 60 * 1000
+const _TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
+const _TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY
 
 export async function POST(Request: NextRequest) {
   try {
     const Body = await Request.json()
-    const { Track, ClientId } = Body
+    const { Track, ClientId, Token } = Body
     
     const Validation = ValidateInput(Track || {}, TrackSchema)
     if (!Validation.Valid) {
@@ -19,11 +21,66 @@ export async function POST(Request: NextRequest) {
       }, { status: 400 })
     }
     
+    if (!Token) {
+      return NextResponse.json({ 
+        error: 'CAPTCHA verification required', 
+        captchaFailed: true 
+      }, { status: 400 })
+    }
+    
     const ForwardedFor = Request.headers.get('x-forwarded-for') || 'unknown'
     const IpAddress = ForwardedFor.split(',')[0].trim()
     const UserAgent = Request.headers.get('user-agent') || 'unknown'
     
     const Fingerprint = ClientId || GenerateFingerprint(IpAddress, UserAgent)
+    
+    // Add a development mode check to bypass Turnstile verification
+    const IsDevelopment = process.env.NODE_ENV === 'development'
+    
+    if (_TURNSTILE_SECRET_KEY) {
+      const FormData = new URLSearchParams()
+      FormData.append('secret', _TURNSTILE_SECRET_KEY)
+      FormData.append('response', Token)
+      FormData.append('remoteip', IpAddress)
+      
+      try {
+        const TurnstileResponse = await fetch(_TURNSTILE_VERIFY_URL, {
+          method: 'POST',
+          body: FormData,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        })
+        
+        const TurnstileResult = await TurnstileResponse.json()
+        console.log('Turnstile verification result:', TurnstileResult)
+        
+        if (!TurnstileResult.success && !IsDevelopment) {
+          console.error('CAPTCHA verification failed:', TurnstileResult['error-codes'])
+          return NextResponse.json({ 
+            error: 'CAPTCHA verification failed', 
+            captchaFailed: true,
+            details: TurnstileResult['error-codes'] 
+          }, { status: 400 })
+        }
+      } catch (Error) {
+        console.error('Error during Turnstile verification:', Error)
+        if (!IsDevelopment) {
+          return NextResponse.json({ 
+            error: 'Error during CAPTCHA verification', 
+            captchaFailed: true 
+          }, { status: 500 })
+        }
+      }
+    } else if (!IsDevelopment) {
+      console.error('TURNSTILE_SECRET_KEY is not defined in environment variables')
+      return NextResponse.json({
+        error: 'Server configuration error',
+        captchaFailed: true
+      }, { status: 500 })
+    } else {
+      console.log('WARNING: Bypassing CAPTCHA verification in development')
+    }
     
     const RateLimitResult = await RateLimit(`song-propose:${Fingerprint}`, _RATE_LIMIT_WINDOW)
     

@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt')
 const { PrismaClient } = require('../../src/generated/prisma')
-const crypto = require('crypto')
 
 const InitAdmin = async () => {
   const Prisma = new PrismaClient()
@@ -8,28 +7,23 @@ const InitAdmin = async () => {
   try {
     const AdminExists = await Prisma.user.findUnique({
       where: {
-        username: 'admin'
+        name: 'admin'
       }
     })
     
     if (AdminExists) {
       console.log('Admin user already exists')
     } else {
-      const _SecurePassword = crypto.randomBytes(12).toString('hex')
-      const _HashedPassword = await bcrypt.hash(_SecurePassword, 12)
+      const _Password = 'admin'
+      const _HashedPassword = await bcrypt.hash(_Password, 12)
       await Prisma.user.create({
         data: {
-          username: 'admin',
-          password: _HashedPassword
+          name: 'admin',
+          password: _HashedPassword,
+          permissions: 0x7FFFFFFF // Administrator (all permissions)
         }
       })
-      
-      console.log('==============================================')
       console.log('Admin user created successfully')
-      console.log('Username: admin')
-      console.log(`Password: ${_SecurePassword}`)
-      console.log('SAVE THIS PASSWORD IMMEDIATELY - IT WILL ONLY BE SHOWN ONCE')
-      console.log('==============================================')
     }
     
     const GlobalSettingsExist = await Prisma.globalSettings.findUnique({

@@ -1,7 +1,13 @@
+'use client'
+
 import { FC, useEffect, useState } from 'react'
 import { Space_Grotesk } from 'next/font/google'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { useSession } from 'next-auth/react'
+import { Permission } from '@/types/permissions'
+import { HasPermission } from '@/lib/permissions'
+import { useToast } from '@/app/context/ToastContext'
 
 const _SpaceGrotesk = Space_Grotesk({ subsets: ["latin"] })
 
@@ -25,55 +31,60 @@ type SongProposal = {
 }
 
 const SongRequests: FC<SongRequestsProps> = ({ username }) => {
-  const [PendingProposals, setPendingProposals] = useState<SongProposal[]>([])
-  const [ApprovedSongs, setApprovedSongs] = useState<any[]>([])
-  const [ActiveTab, setActiveTab] = useState('pending')
-  const [IsLoading, setIsLoading] = useState(false)
-  const [Notification, setNotification] = useState<{message: string; type: 'success' | 'error'} | null>(null)
+  const [PendingProposals, SetPendingProposals] = useState<SongProposal[]>([])
+  const [ApprovedSongs, SetApprovedSongs] = useState<any[]>([])
+  const [ActiveTab, SetActiveTab] = useState('pending')
+  const [IsLoading, SetIsLoading] = useState(false)
+  const { data: _Session } = useSession()
+  const { ShowToast } = useToast()
+
+  const UserPermissions = _Session?.user?.permissions || 0
+  const CanManageSongRequests = HasPermission(UserPermissions, Permission.SONG_REQUESTS_MANAGE)
 
   const FetchPendingProposals = async () => {
     try {
-      setIsLoading(true)
+      SetIsLoading(true)
       const Response = await fetch('/api/songs/proposals?limit=50&pending=true')
       
       if (Response.ok) {
         const Data = await Response.json()
-        setPendingProposals(Data.proposals)
+        SetPendingProposals(Data.proposals)
       } else {
         const ErrorData = await Response.json()
-        console.error('Error response from API:', ErrorData)
-        ShowNotification(ErrorData.error || 'Nie udało się pobrać propozycji piosenek', 'error')
+        ShowToast(ErrorData.error || 'Nie udało się pobrać propozycji piosenek', 'error')
       }
     } catch (Error) {
-      console.error('Error fetching proposals:', Error)
-      ShowNotification('Nie udało się pobrać propozycji piosenek', 'error')
+      ShowToast('Nie udało się pobrać propozycji piosenek', 'error')
     } finally {
-      setIsLoading(false)
+      SetIsLoading(false)
     }
   }
 
   const FetchApprovedSongs = async () => {
     try {
-      setIsLoading(true)
+      SetIsLoading(true)
       const Response = await fetch('/api/songs/proposals?limit=50&pending=false')
       
       if (Response.ok) {
         const Data = await Response.json()
-        setApprovedSongs(Data.proposals)
+        SetApprovedSongs(Data.proposals)
       } else {
         const ErrorData = await Response.json()
-        console.error('Error response from API:', ErrorData)
-        ShowNotification(ErrorData.error || 'Nie udało się pobrać zatwierdzonych piosenek', 'error')
+        ShowToast(ErrorData.error || 'Nie udało się pobrać zatwierdzonych piosenek', 'error')
       }
     } catch (Error) {
-      console.error('Error fetching approved songs:', Error)
-      ShowNotification('Nie udało się pobrać zatwierdzonych piosenek', 'error')
+      ShowToast('Nie udało się pobrać zatwierdzonych piosenek', 'error')
     } finally {
-      setIsLoading(false)
+      SetIsLoading(false)
     }
   }
 
   const HandleApprove = async (SongId: string) => {
+    if (!CanManageSongRequests) {
+      ShowToast('Nie masz uprawnień do zarządzania propozycjami piosenek.', 'error')
+      return
+    }
+
     try {
       const Response = await fetch('/api/songs/approve', {
         method: 'POST',
@@ -86,20 +97,23 @@ const SongRequests: FC<SongRequestsProps> = ({ username }) => {
       const Data = await Response.json()
       
       if (Response.ok) {
-        ShowNotification('Piosenka została zatwierdzona pomyślnie', 'success')
+        ShowToast('Piosenka została zatwierdzona pomyślnie', 'success')
         FetchPendingProposals()
         FetchApprovedSongs()
       } else {
-        console.error('Error response from API:', Data)
-        ShowNotification(Data.error || 'Nie udało się zatwierdzić piosenki', 'error')
+        ShowToast(Data.error || 'Nie udało się zatwierdzić piosenki', 'error')
       }
     } catch (Error: any) {
-      console.error('Error approving song:', Error)
-      ShowNotification(`Wystąpił błąd: ${Error.message || 'Unknown error'}`, 'error')
+      ShowToast(`Wystąpił błąd: ${Error.message || 'Unknown error'}`, 'error')
     }
   }
 
   const HandleReject = async (SongId: string) => {
+    if (!CanManageSongRequests) {
+      ShowToast('Nie masz uprawnień do zarządzania propozycjami piosenek.', 'error')
+      return
+    }
+
     try {
       const Response = await fetch('/api/songs/reject', {
         method: 'POST',
@@ -110,21 +124,16 @@ const SongRequests: FC<SongRequestsProps> = ({ username }) => {
       })
       
       if (Response.ok) {
-        ShowNotification('Piosenka została odrzucona', 'success')
+        ShowToast('Piosenka została odrzucona/usunięta', 'success')
         FetchPendingProposals()
+        FetchApprovedSongs()
       } else {
         const Data = await Response.json()
-        ShowNotification(Data.error || 'Nie udało się odrzucić piosenki', 'error')
+        ShowToast(Data.error || 'Nie udało się odrzucić/usunąć piosenki', 'error')
       }
-    } catch (Error) {
-      console.error('Error rejecting song:', Error)
-      ShowNotification('Wystąpił błąd podczas odrzucania piosenki', 'error')
+    } catch (Error: any) {
+      ShowToast(`Wystąpił błąd: ${Error.message || 'Unknown error'}`, 'error')
     }
-  }
-
-  const ShowNotification = (Message: string, Type: 'success' | 'error') => {
-    setNotification({ message: Message, type: Type })
-    setTimeout(() => setNotification(null), 4000)
   }
 
   const FormatDuration = (Ms: number) => {
@@ -143,39 +152,6 @@ const SongRequests: FC<SongRequestsProps> = ({ username }) => {
 
   return (
     <div className="relative max-w-7xl mx-auto">
-      {Notification && (
-        <div className={`fixed top-6 right-6 z-[100] max-w-md p-4 rounded-lg shadow-lg transition-all duration-500 transform translate-y-0 opacity-100 ${
-          Notification.type === 'success' 
-            ? 'bg-green-500/80 backdrop-blur-sm border border-green-400' 
-            : 'bg-red-500/80 backdrop-blur-sm border border-red-400'
-        }`}>
-          <div className="flex items-center">
-            <div className="shrink-0 mr-3">
-              {Notification.type === 'success' ? (
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              )}
-            </div>
-            <div className="text-white text-sm">{Notification.message}</div>
-            <button 
-              onClick={() => setNotification(null)}
-              className="ml-auto text-white hover:text-white/80"
-              aria-label="Zamknij powiadomienie"
-              title="Zamknij powiadomienie"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="mb-8 p-6">
         <motion.h1 
           initial={{ opacity: 0 }}
@@ -195,7 +171,7 @@ const SongRequests: FC<SongRequestsProps> = ({ username }) => {
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          onClick={() => setActiveTab('pending')}
+          onClick={() => SetActiveTab('pending')}
           className={`px-4 py-2 relative mr-4 rounded-full transition-all duration-300 ${ActiveTab === 'pending' 
             ? 'text-white font-medium bg-rose-500/20 backdrop-blur-sm border border-rose-500/30' 
             : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -210,7 +186,7 @@ const SongRequests: FC<SongRequestsProps> = ({ username }) => {
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          onClick={() => setActiveTab('approved')}
+          onClick={() => SetActiveTab('approved')}
           className={`px-4 py-2 relative rounded-full transition-all duration-300 ${ActiveTab === 'approved' 
             ? 'text-white font-medium bg-rose-500/20 backdrop-blur-sm border border-rose-500/30' 
             : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -275,27 +251,30 @@ const SongRequests: FC<SongRequestsProps> = ({ username }) => {
                     </div>
                   </div>
 
-                  <div className="flex space-x-3">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => HandleApprove(Proposal.Id)}
-                      className="bg-gradient-to-r from-green-600/80 to-green-500/80 hover:from-green-500/90 hover:to-green-400/90 text-white py-2 px-4 rounded-full border border-green-500/30 backdrop-blur-sm shadow-lg shadow-green-900/20 transition-all duration-300 flex items-center"
-                    >
-                      <i className="fas fa-check mr-2"></i>
-                      Zatwierdź
-                    </motion.button>
-                    
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => HandleReject(Proposal.Id)}
-                      className="bg-gradient-to-r from-rose-600/80 to-rose-500/80 hover:from-rose-500/90 hover:to-rose-400/90 text-white py-2 px-4 rounded-full border border-rose-500/30 backdrop-blur-sm shadow-lg shadow-rose-900/20 transition-all duration-300 flex items-center"
-                    >
-                      <i className="fas fa-times mr-2"></i>
-                      Odrzuć
-                    </motion.button>
-                  </div>
+                  {CanManageSongRequests && (
+                    <div className="flex items-center space-x-2">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => HandleApprove(Proposal.Id)}
+                        className="px-4 py-2 text-sm font-medium text-white bg-green-500/20 backdrop-blur-sm border border-green-500/30 rounded-lg hover:bg-green-500/30 transition-colors"
+                        title="Zatwierdź piosenkę"
+                      >
+                        <i className="fas fa-check mr-1.5"></i>
+                        Zatwierdź
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => HandleReject(Proposal.Id)}
+                        className="px-4 py-2 text-sm font-medium text-white bg-red-500/20 backdrop-blur-sm border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-colors"
+                        title="Odrzuć piosenkę"
+                      >
+                        <i className="fas fa-times mr-1.5"></i>
+                        Odrzuć
+                      </motion.button>
+                    </div>
+                  )}
                 </div>
               ))
             )}
@@ -343,13 +322,20 @@ const SongRequests: FC<SongRequestsProps> = ({ username }) => {
                     </div>
                   </div>
                   
-                  <motion.div 
-                    whileHover={{ scale: 1.05 }}
-                    className="px-3 py-1.5 rounded-full bg-gradient-to-r from-green-600/20 to-green-500/20 border border-green-500/30 flex items-center shadow-lg"
-                  >
-                    <i className="fas fa-check text-green-400 mr-2"></i>
-                    <span className="text-sm text-white">Zatwierdzona</span>
-                  </motion.div>
+                  {CanManageSongRequests && (
+                    <div className="flex items-center">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => HandleReject(Song.Id)}
+                        className="px-3 py-1.5 text-xs font-medium text-white bg-red-500/20 backdrop-blur-sm border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-colors"
+                        title="Usuń z zatwierdzonych (odrzuć)"
+                      >
+                        <i className="fas fa-trash-alt mr-1"></i>
+                        Usuń
+                      </motion.button>
+                    </div>
+                  )}
                 </div>
               ))
             )}
