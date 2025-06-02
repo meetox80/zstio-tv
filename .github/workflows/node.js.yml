@@ -1,0 +1,27 @@
+name: Production
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [22.16.0]
+    env:
+      SPOTIFY_ID: ${{secrets.SPOTIFY_ID}}
+      SPOTIFY_SECRET: ${{secrets.SPOTIFY_SECRET}}
+      TURNSTILE_SECRET_KEY: ${{secrets.TURNSTILE_SECRET_KEY}}
+      TURNSTILE_SITE_KEY: ${{secrets.TURNSTILE_SITE_KEY}}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: pnpm ci
+    - run: pnpm run build --if-present
