@@ -7,7 +7,6 @@ on:
 jobs:
   build:
     runs-on: self-hosted
-
     strategy:
       matrix:
         node-version: [22.16.0]
@@ -16,6 +15,7 @@ jobs:
       SPOTIFY_SECRET: ${{secrets.SPOTIFY_SECRET}}
       TURNSTILE_SECRET_KEY: ${{secrets.TURNSTILE_SECRET_KEY}}
       TURNSTILE_SITE_KEY: ${{secrets.TURNSTILE_SITE_KEY}}
+      DATABASE_URL: ${{secrets.DATABASE_URL}}  # Make sure this is set in secrets
     steps:
     - uses: actions/checkout@v4
     
@@ -35,3 +35,23 @@ jobs:
       run: pnpm install --frozen-lockfile
       
     - run: pnpm run build
+
+    - name: Setup Prisma and Database
+      run: |
+        npx prisma generate
+        npx prisma db push --accept-data-loss
+        
+    - name: Initialize Admin
+      run: pnpm run init-admin
+      
+    - name: Install PM2 globally
+      run: npm install -g pm2
+      
+    - name: Deploy with PM2
+      run: |
+        pm2 delete tv || true
+        
+        pm2 start pnpm --name "tv" -- start
+        pm2 save
+        
+        pm2 startup | tail -n 1 | sudo sh
