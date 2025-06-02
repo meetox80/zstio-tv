@@ -34,9 +34,6 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
       
-    - name: Generate Prisma Client
-      run: npx prisma generate
-      
     - name: Setup Database
       run: |
         if ! npx prisma db execute --url "$DATABASE_URL" --stdin < <(echo "SELECT 1"); then
