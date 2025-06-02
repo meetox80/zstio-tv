@@ -15,7 +15,7 @@ jobs:
       SPOTIFY_SECRET: ${{secrets.SPOTIFY_SECRET}}
       TURNSTILE_SECRET_KEY: ${{secrets.TURNSTILE_SECRET_KEY}}
       TURNSTILE_SITE_KEY: ${{secrets.TURNSTILE_SITE_KEY}}
-      DATABASE_URL: "file:./prisma.db"
+      DATABASE_URL: "file:/home/tv/prisma.db"
     steps:
     - uses: actions/checkout@v4
     
@@ -35,22 +35,13 @@ jobs:
       run: pnpm install --frozen-lockfile
       
     - name: Setup Database
-      run: |
-        if ! npx prisma db execute --url "$DATABASE_URL" --stdin < <(echo "SELECT 1"); then
-          echo "Database doesn't exist - creating new database"
-          npx prisma db push --accept-data-loss
-        else
-          echo "Database already exists - skipping creation"
-        fi
+      run: pnpm prisma db push
         
     - name: Initialize Admin
       run: pnpm run init-admin
       
     - name: Build project
       run: pnpm run build
-      
-    - name: Install PM2 globally
-      run: npm install -g pm2
       
     - name: Deploy with PM2
       run: |
