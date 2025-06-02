@@ -18,11 +18,17 @@ jobs:
       TURNSTILE_SITE_KEY: ${{secrets.TURNSTILE_SITE_KEY}}
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Install pnpm
+      run: npm install -g pnpm
+      
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: pnpm i
-    - run: pnpm ci
+        cache: pnpm
+        
+    - name: Install dependencies
+      run: pnpm install
+      
     - run: pnpm run build --if-present
