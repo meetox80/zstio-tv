@@ -11,11 +11,17 @@ jobs:
       matrix:
         node-version: [22.16.0]
     env:
+      DATABASE_URL: "file:/home/tv/database.db"
+      
+      NEXTAUTH_URL: "https://tv.ox80.me/"
+      NEXTAUTH_SECRET: $(openssl rand -hex 128)
+      
       SPOTIFY_ID: ${{secrets.SPOTIFY_ID}}
       SPOTIFY_SECRET: ${{secrets.SPOTIFY_SECRET}}
+      SPOTIFY_REDIRECT: "https://tv.ox80.me/api/spotify/auth"
+      
       TURNSTILE_SECRET_KEY: ${{secrets.TURNSTILE_SECRET_KEY}}
       TURNSTILE_SITE_KEY: ${{secrets.TURNSTILE_SITE_KEY}}
-      DATABASE_URL: "file:/home/tv/prisma.db"
     steps:
     - uses: actions/checkout@v4
     
