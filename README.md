@@ -1,5 +1,5 @@
 > [!CAUTION]
-> Under heavy development. Do not submit Issues/Pull Requests
+> Under heavy development. Do not submit Pull Requests
 
 ```bash
 pnpm install
