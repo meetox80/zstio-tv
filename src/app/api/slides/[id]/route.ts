@@ -3,154 +3,111 @@ import { Prisma } from "@/lib/prisma"
 import { RequireAuth } from "@/lib/auth"
 import { HasPermission } from "@/lib/permissions"
 
-export async function GET(Request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const AuthCheck = await RequireAuth()
-    if (!AuthCheck.authenticated) {
-      return AuthCheck.response
-    }
-    
-    const Session = AuthCheck.session
-    if (!Session?.user?.name) {
-      return NextResponse.json({ error: 'User information not available' }, { status: 401 })
-    }
-    
-    const User = await Prisma.user.findUnique({
-      where: { name: Session.user.name as string }
-    })
-    
-    if (!User) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
-    
-    const SlideViewPermission = 1 << 1  // SLIDES_VIEW permission value
-    
-    if (!HasPermission(User.permissions, SlideViewPermission)) {
-      return NextResponse.json({ error: 'Insufficient permissions to view slides' }, { status: 403 })
-    }
-    
-    const ParamsObject = await Promise.resolve(params)
-    
-    if (!ParamsObject || typeof ParamsObject.id !== 'string') {
-      return NextResponse.json({ error: "Invalid slide ID" }, { status: 400 })
-    }
-    
-    const Id = ParamsObject.id
-    const Slide = await Prisma.slide.findUnique({
-      where: { Id }
-    })
+const _PERMISSION_SLIDE_VIEW = 1 << 1
+const _PERMISSION_SLIDE_EDIT = 1 << 2
 
-    if (!Slide) {
-      return NextResponse.json({ error: "Slide not found" }, { status: 404 })
-    }
-
-    return NextResponse.json({ Slide })
-  } catch (Error) {
-    console.error("Error fetching slide:", Error)
-    return NextResponse.json({ error: "Failed to fetch slide" }, { status: 500 })
-  }
-}
-
-export async function PUT(Request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const AuthCheck = await RequireAuth()
-    if (!AuthCheck.authenticated) {
-      return AuthCheck.response
-    }
-    
-    const Session = AuthCheck.session
-    if (!Session?.user?.name) {
-      return NextResponse.json({ error: 'User information not available' }, { status: 401 })
-    }
-    
-    const User = await Prisma.user.findUnique({
-      where: { name: Session.user.name as string }
-    })
-    
-    if (!User) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
-    
-    const SlideEditPermission = 1 << 2  // SLIDES_EDIT permission value
-    
-    if (!HasPermission(User.permissions, SlideEditPermission)) {
-      return NextResponse.json({ error: 'Insufficient permissions to edit slides' }, { status: 403 })
-    }
-    
-    const ParamsObject = await Promise.resolve(params)
-    
-    if (!ParamsObject || typeof ParamsObject.id !== 'string') {
-      return NextResponse.json({ error: "Invalid slide ID" }, { status: 400 })
-    }
-    
-    const Id = ParamsObject.id
-    const Data = await Request.json()
-    const { Name, ImageData, Duration } = Data
-
-    const UpdatedSlide = await Prisma.slide.update({
-      where: { Id },
-      data: {
-        Name: Name,
-        ImageData: ImageData,
-        Duration: Duration
-      }
-    })
-
-    return NextResponse.json({ Slide: UpdatedSlide })
-  } catch (Error) {
-    console.error("Error updating slide:", Error)
-    return NextResponse.json({ error: "Failed to update slide" }, { status: 500 })
-  }
-}
-
-export async function DELETE(Request: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const AuthCheck = await RequireAuth()
-    if (!AuthCheck.authenticated) {
-      return AuthCheck.response
-    }
-    
-    const Session = AuthCheck.session
-    if (!Session?.user?.name) {
-      return NextResponse.json({ error: 'User information not available' }, { status: 401 })
-    }
-    
-    const User = await Prisma.user.findUnique({
-      where: { name: Session.user.name as string }
-    })
-    
-    if (!User) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
-    
-    const SlideEditPermission = 1 << 2  // SLIDES_EDIT permission value
-    
-    if (!HasPermission(User.permissions, SlideEditPermission)) {
-      return NextResponse.json({ error: 'Insufficient permissions to edit slides' }, { status: 403 })
-    }
-    
-    const ParamsObject = await Promise.resolve(params)
-    
-    if (!ParamsObject || typeof ParamsObject.id !== 'string') {
-      return NextResponse.json({ error: "Invalid slide ID" }, { status: 400 })
-    }
-    
-    const Id = ParamsObject.id
-    
+export async function GET(
+  Request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
     try {
-      await Prisma.slide.delete({
-        where: { Id }
-      })
-      
-      return NextResponse.json({ success: true })
-    } catch (DeleteError: any) {
-      if (DeleteError.code === 'P2025') {
-        return NextResponse.json({ error: "Slide not found" }, { status: 404 })
-      }
-      throw DeleteError
+        const { id } = await params
+        
+        const _AuthResult = await RequireAuth()
+        if (!_AuthResult.authenticated) {
+            if (!_AuthResult.response) return NextResponse.json({ Error: "Authentication failed" }, { status: 500 })
+            return _AuthResult.response
+        }
+        
+        const _Session = _AuthResult.session
+        if (!_Session?.user?.name) return NextResponse.json({ Error: "User data unavailable" }, { status: 401 })
+        
+        const _User = await Prisma.user.findUnique({ where: { name: _Session.user.name } })
+        if (!_User) return NextResponse.json({ Error: "User not found" }, { status: 404 })
+        
+        if (!HasPermission(_User.permissions, _PERMISSION_SLIDE_VIEW)) return NextResponse.json({ Error: "Insufficient permissions" }, { status: 403 })
+        
+        const _Slide = await Prisma.slide.findUnique({ where: { Id: id } })
+        if (!_Slide) return NextResponse.json({ Error: "Slide not found" }, { status: 404 })
+        
+        return NextResponse.json({ Slide: _Slide })
+    } catch (Error) {
+        console.error("Fetch error:", Error)
+        return NextResponse.json({ Error: "Slide retrieval failed" }, { status: 500 })
     }
-  } catch (Error) {
-    console.error("Error deleting slide:", Error)
-    return NextResponse.json({ error: "Failed to delete slide" }, { status: 500 })
-  }
-} 
+}
+
+export async function PUT(
+  Request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await params
+        
+        const _AuthResult = await RequireAuth()
+        if (!_AuthResult.authenticated) {
+            if (!_AuthResult.response) return NextResponse.json({ Error: "Authentication failed" }, { status: 500 })
+            return _AuthResult.response
+        }
+        
+        const _Session = _AuthResult.session
+        if (!_Session?.user?.name) return NextResponse.json({ Error: "User data unavailable" }, { status: 401 })
+        
+        const _User = await Prisma.user.findUnique({ where: { name: _Session.user.name } })
+        if (!_User) return NextResponse.json({ Error: "User not found" }, { status: 404 })
+        
+        if (!HasPermission(_User.permissions, _PERMISSION_SLIDE_EDIT)) return NextResponse.json({ Error: "Insufficient permissions" }, { status: 403 })
+        
+        const _UpdateData = await Request.json()
+        
+        const _UpdatedSlide = await Prisma.slide.update({
+            where: { Id: id },
+            data: {
+                Name: _UpdateData.Name,
+                ImageData: _UpdateData.ImageData,
+                Duration: _UpdateData.Duration
+            }
+        })
+        
+        return NextResponse.json({ Slide: _UpdatedSlide })
+    } catch (Error) {
+        console.error("Update error:", Error)
+        return NextResponse.json({ Error: "Slide update failed" }, { status: 500 })
+    }
+}
+
+export async function DELETE(
+  Request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await params
+        
+        const _AuthResult = await RequireAuth()
+        if (!_AuthResult.authenticated) {
+            if (!_AuthResult.response) return NextResponse.json({ Error: "Authentication failed" }, { status: 500 })
+            return _AuthResult.response
+        }
+        
+        const _Session = _AuthResult.session
+        if (!_Session?.user?.name) return NextResponse.json({ Error: "User data unavailable" }, { status: 401 })
+        
+        const _User = await Prisma.user.findUnique({ where: { name: _Session.user.name } })
+        if (!_User) return NextResponse.json({ Error: "User not found" }, { status: 404 })
+        
+        if (!HasPermission(_User.permissions, _PERMISSION_SLIDE_EDIT)) return NextResponse.json({ Error: "Insufficient permissions" }, { status: 403 })
+        
+        try {
+            await Prisma.slide.delete({ where: { Id: id } })
+            return NextResponse.json({ Success: true })
+        } catch (DeleteError) {
+            if ((DeleteError as any).code === "P2025") {
+                return NextResponse.json({ Error: "Slide not found" }, { status: 404 })
+            }
+            throw DeleteError
+        }
+    } catch (Error) {
+        console.error("Deletion error:", Error)
+        return NextResponse.json({ Error: "Slide deletion failed" }, { status: 500 })
+    }
+}

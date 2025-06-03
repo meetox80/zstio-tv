@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { Prisma } from "@/lib/prisma"
 import { RequireAuth } from "@/lib/auth"
-import { Permission } from "@/app/dashboard/components/UsersTab"
+import { Permission } from "@/types/permissions"
 import { HasPermission } from "@/lib/permissions"
 
 export async function GET() {

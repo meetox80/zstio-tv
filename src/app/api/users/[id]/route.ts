@@ -7,10 +7,10 @@ import { HasPermission } from '@/lib/permissions'
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const _ParamsId = params.id
+    const { id: _ParamsId } = await params
     const _Session = await getServerSession(authOptions)
     
     if (!_Session?.user) {
@@ -48,10 +48,10 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const _ParamsId = params.id
+    const { id: _ParamsId } = await params
     const _Session = await getServerSession(authOptions)
     
     if (!_Session?.user) {
@@ -135,10 +135,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const _ParamsId = params.id
+    const { id: _ParamsId } = await params
     const _Session = await getServerSession(authOptions)
     
     if (!_Session?.user) {

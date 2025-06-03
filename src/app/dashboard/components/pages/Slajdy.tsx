@@ -5,7 +5,7 @@ import axios from 'axios'
 import { ConvertToBase64, OptimizeBase64Image } from '@/lib/imageUtils'
 import ConfirmationModal from '../modals/ConfirmationModal'
 import { useSession } from 'next-auth/react'
-import { Permission } from '@/app/dashboard/components/UsersTab'
+import { Permission } from '@/types/permissions'
 import { HasPermission } from '@/lib/permissions'
 import { useToast } from '@/app/context/ToastContext'
 

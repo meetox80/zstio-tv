@@ -13,7 +13,7 @@ import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 import Background from './components/Background'
 import { GetStatisticsHistory } from '@/lib/statistics.client'
-import { Permission } from './components/UsersTab'
+import { Permission } from '@/types/permissions'
 import { HasPermission } from '@/lib/permissions'
 import { useToast } from '../context/ToastContext'
 

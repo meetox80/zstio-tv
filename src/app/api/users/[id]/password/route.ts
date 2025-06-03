@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Permission } from '@/app/dashboard/components/UsersTab'
+import { Permission } from '@/types/permissions'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { Prisma } from '@/lib/prisma'
@@ -8,10 +8,10 @@ import bcrypt from 'bcrypt'
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const _ParamsId = params.id
+    const { id: _ParamsId } = await params
     const _Session = await getServerSession(authOptions)
     
     if (!_Session?.user) {

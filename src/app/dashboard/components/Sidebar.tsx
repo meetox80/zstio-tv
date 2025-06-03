@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Permission } from '@/app/dashboard/components/UsersTab'
+import { Permission } from '@/types/permissions'
 import { HasPermission } from '@/lib/permissions'
 
 type SidebarProps = {

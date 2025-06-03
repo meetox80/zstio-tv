@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 import type { NextAuthOptions } from 'next-auth'
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { Permission } from '@/app/dashboard/components/UsersTab'
+import { Permission } from '@/types/permissions'
 
 export const authOptions: NextAuthOptions = {
   providers: [
