@@ -51,7 +51,7 @@ jobs:
       
     - name: Deploy with PM2
       run: |
-        pm2 delete tv || true
+        pm2 delete tv || echo "No existing PM2 process to delete"
         
         pm2 start pnpm --name "tv" -- start
         pm2 save
