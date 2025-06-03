@@ -9,8 +9,8 @@ export async function GET() {
     const TrackData = await GetCurrentTrack()
     
     if (!TrackData) {
-      return NextResponse.json({ isAuthenticated: false }, { 
-        status: 401,
+      return NextResponse.json({ isPlaying: false }, { 
+        status: 200,
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'Pragma': 'no-cache',
@@ -28,7 +28,7 @@ export async function GET() {
     })
   } catch (error) {
     console.error('Error fetching current track:', error)
-    return NextResponse.json({ error: 'Internal Server Error', isAuthenticated: true }, { 
+    return NextResponse.json({ isPlaying: false, error: 'Internal Server Error' }, { 
       status: 500,
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',

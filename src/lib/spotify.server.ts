@@ -122,7 +122,7 @@ export const GetCurrentTrack = cache(async (): Promise<TrackData> => {
   const AccessToken = await GetValidAccessToken()
   
   if (!AccessToken) {
-    return null
+    return { isPlaying: false }
   }
   
   const Response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
@@ -143,7 +143,7 @@ export const GetCurrentTrack = cache(async (): Promise<TrackData> => {
         return GetCurrentTrack()
       }
     }
-    return null
+    return { isPlaying: false }
   }
   
   const Data = await Response.json()
