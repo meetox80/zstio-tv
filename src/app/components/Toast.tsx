@@ -42,7 +42,7 @@ const Toast: FC<ToastProps> = ({
       case 'success':
         return <i className="fas fa-check-circle text-green-400"></i>
       case 'info':
-        return <i className="fas fa-info-circle text-blue-400"></i>
+        return <i className="fas fa-info-circle text-rose-400"></i>
       case 'warning':
         return <i className="fas fa-exclamation-circle text-amber-400"></i>
     }
@@ -55,7 +55,7 @@ const Toast: FC<ToastProps> = ({
       case 'success':
         return 'bg-green-500/20 border-green-500/30'
       case 'info':
-        return 'bg-blue-500/20 border-blue-500/30'
+        return 'bg-rose-500/20 border-rose-500/30'
       case 'warning':
         return 'bg-amber-500/20 border-amber-500/30'
     }
