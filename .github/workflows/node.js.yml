@@ -20,7 +20,7 @@ jobs:
       SPOTIFY_SECRET: ${{secrets.SPOTIFY_SECRET}}
       SPOTIFY_REDIRECT: "https://tv.ox80.me/api/spotify/auth"
       
-      TURNSTILE_SECRET_KEY: ${{secrets.TURNSTILE_SECRET_KEY}}
+      NEXT_PUBLIC_TURNSTILE_SECRET_KEY: ${{secrets.TURNSTILE_SECRET_KEY}}
       TURNSTILE_SITE_KEY: ${{secrets.TURNSTILE_SITE_KEY}}
     steps:
     - uses: actions/checkout@v4
