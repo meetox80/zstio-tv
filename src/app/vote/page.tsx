@@ -144,7 +144,8 @@ const Vote: NextPage = () => {
       
       if (Response.ok) {
         const Data = await Response.json();
-        setRecentProposals(Data.proposals);
+        const SortedProposals = [...Data.proposals].sort((a, b) => (b.Upvotes || 0) - (a.Upvotes || 0));
+        setRecentProposals(SortedProposals);
       }
     } catch (Error) {
       console.error('Error fetching recent proposals:', Error);
@@ -160,7 +161,8 @@ const Vote: NextPage = () => {
       
       if (Response.ok) {
         const Data = await Response.json();
-        setPendingProposals(Data.proposals);
+        const SortedProposals = [...Data.proposals].sort((a, b) => (b.Upvotes || 0) - (a.Upvotes || 0));
+        setPendingProposals(SortedProposals);
       }
     } catch (Error) {
       console.error('Error fetching pending proposals:', Error);
@@ -174,7 +176,6 @@ const Vote: NextPage = () => {
     setTurnstileToken(Token);
     setIsTurnstileLoading(true);
     
-    // For local development, let's auto-verify
     const IsDevelopment = process.env.NODE_ENV === 'development';
     if (IsDevelopment) {
       console.log('Development mode: Auto-verifying Turnstile');
