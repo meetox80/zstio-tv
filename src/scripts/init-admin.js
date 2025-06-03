@@ -1,5 +1,5 @@
-const bcrypt = require('bcrypt')
-const { PrismaClient } = require('../../src/generated/prisma')
+import bcrypt from 'bcrypt'
+import { PrismaClient } from '../../src/generated/prisma/index.js'
 
 const InitAdmin = async () => {
   const Prisma = new PrismaClient()
