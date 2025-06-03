@@ -4,8 +4,9 @@ import { useState, useEffect, useRef } from 'react'
 import SubstitutionsPage from '../pages/SubstitutionsPage'
 import VotePage from '../pages/VotePage'
 import SlidesPage from '../pages/SlidesPage'
+import axios from 'axios'
 
-const Pages = [
+const DefaultPages = [
   { Component: SubstitutionsPage, Key: 'substitutions' },
   { Component: VotePage, Key: 'vote' },
   { Component: SlidesPage, Key: 'slides' }
@@ -15,10 +16,46 @@ export default function PageSwitcher() {
   const [_CurrentPageIndex, SetCurrentPageIndex] = useState(0)
   const _TotalSeconds = 30
   const _IsChangingPage = useRef(false)
+  const [_ActivePages, SetActivePages] = useState(DefaultPages)
+  
+  useEffect(() => {
+    const CheckSlidesAvailability = async () => {
+      try {
+        const Response = await axios.get('/api/slides')
+        const SlideData = Response.data.Slides || []
+        
+        if (SlideData.length === 0) {
+          const FilteredPages = DefaultPages.filter(page => page.Key !== 'slides')
+          SetActivePages(FilteredPages)
+        } else {
+          SetActivePages(DefaultPages)
+        }
+      } catch (Error) {
+        const FilteredPages = DefaultPages.filter(page => page.Key !== 'slides')
+        SetActivePages(FilteredPages)
+      }
+    }
+    
+    CheckSlidesAvailability()
+    
+    const RefreshInterval = setInterval(() => {
+      CheckSlidesAvailability()
+    }, 60000)
+    
+    return () => clearInterval(RefreshInterval)
+  }, [])
+  
+  useEffect(() => {
+    if (_CurrentPageIndex >= _ActivePages.length && _ActivePages.length > 0) {
+      SetCurrentPageIndex(0)
+    }
+  }, [_ActivePages, _CurrentPageIndex])
   
   useEffect(() => {
     const _Interval = setInterval(() => {
-      const NewIndex = (_CurrentPageIndex + 1) % Pages.length
+      if (_ActivePages.length === 0) return
+      
+      const NewIndex = (_CurrentPageIndex + 1) % _ActivePages.length
       SetCurrentPageIndex(NewIndex)
       
       _IsChangingPage.current = true
@@ -30,11 +67,11 @@ export default function PageSwitcher() {
     }, _TotalSeconds * 1000)
     
     return () => clearInterval(_Interval)
-  }, [_CurrentPageIndex])
+  }, [_CurrentPageIndex, _ActivePages])
   
   useEffect(() => {
     const HandlePageChangeEvent = (Event: CustomEvent<{ pageIndex: number }>) => {
-      if (!_IsChangingPage.current && Event.detail.pageIndex !== _CurrentPageIndex) {
+      if (!_IsChangingPage.current && Event.detail.pageIndex !== _CurrentPageIndex && Event.detail.pageIndex < _ActivePages.length) {
         setTimeout(() => {
           SetCurrentPageIndex(Event.detail.pageIndex)
         }, 0)
@@ -46,9 +83,11 @@ export default function PageSwitcher() {
     return () => {
       window.removeEventListener('pageChange', HandlePageChangeEvent as EventListener)
     }
-  }, [_CurrentPageIndex])
+  }, [_CurrentPageIndex, _ActivePages])
   
-  const _CurrentPage = Pages[_CurrentPageIndex]
+  if (_ActivePages.length === 0) return null
+  
+  const _CurrentPage = _ActivePages[_CurrentPageIndex]
   const CurrentPageComponent = _CurrentPage.Component
   
   return (

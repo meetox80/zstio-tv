@@ -19,6 +19,7 @@ export default function SlidesPage() {
   const [Slides, SetSlides] = useState<Slide[]>([])
   const [IsLoading, SetIsLoading] = useState(true)
   const [CurrentSlideIndex, SetCurrentSlideIndex] = useState(0)
+  const [ImagesPreloaded, SetImagesPreloaded] = useState(false)
   const TimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const FetchSlides = async () => {
@@ -61,6 +62,27 @@ export default function SlidesPage() {
   useEffect(() => {
     if (Slides.length === 0) return
 
+    const PreloadImages = async () => {
+      SetImagesPreloaded(false)
+      const ImagePromises = Slides.map(slide => {
+        return new Promise<void>((resolve) => {
+          const Img = new window.Image()
+          Img.onload = () => resolve()
+          Img.onerror = () => resolve()
+          Img.src = slide.ImageData
+        })
+      })
+      
+      await Promise.all(ImagePromises)
+      SetImagesPreloaded(true)
+    }
+    
+    PreloadImages()
+  }, [Slides])
+
+  useEffect(() => {
+    if (Slides.length === 0) return
+
     const GoToNextSlide = () => {
       SetCurrentSlideIndex((PrevIndex) => 
         PrevIndex === Slides.length - 1 ? 0 : PrevIndex + 1
@@ -88,28 +110,37 @@ export default function SlidesPage() {
 
   const CurrentSlide = Slides.length > 0 ? Slides[CurrentSlideIndex] : null
   const ShowEmptyState = !IsLoading && Slides.length === 0
+  
+  if (ShowEmptyState) {
+    return null
+  }
 
   return (
     <div ref={_ContainerRef} className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden mt-12">
       <div className="absolute inset-0"></div>
       
       <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-7xl">
+        {CurrentSlide && (
+          <div className="hidden">
+            {Slides.map(slide => (
+              <Image 
+                key={`preload-${slide.Id}`}
+                src={slide.ImageData}
+                alt=""
+                width={1}
+                height={1}
+              />
+            ))}
+          </div>
+        )}
+        
         <motion.div 
           className="relative rounded-3xl border border-[#2F2F2F] overflow-hidden mb-12 w-full max-w-7xl aspect-video bg-black"
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={{ opacity: ImagesPreloaded ? 1 : 0, y: ImagesPreloaded ? 0 : 20 }}
           transition={{ duration: 0.9, ease: "easeOut" }}
         >
-          {ShowEmptyState ? (
-            <div className="w-full h-full flex items-center justify-center bg-black">
-              <div className="text-center">
-                <div className="w-24 h-24 rounded-full bg-[#1A1A1A] flex items-center justify-center mb-4 mx-auto">
-                  <span className="text-4xl text-gray-500">📸</span>
-                </div>
-                <p className="text-gray-400 text-xl">Brak slajdów do wyświetlenia</p>
-              </div>
-            </div>
-          ) : CurrentSlide ? (
+          {CurrentSlide ? (
             <Image
               key={CurrentSlide.Id}
               src={CurrentSlide.ImageData}
