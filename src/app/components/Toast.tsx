@@ -1,66 +1,66 @@
-import { FC, useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { FC, useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-export type ToastType = 'error' | 'success' | 'info' | 'warning'
+export type ToastType = "error" | "success" | "info" | "warning";
 
 type ToastProps = {
-  Message: string | null
-  Type?: ToastType
-  Duration?: number
-  OnClose?: () => void
-}
+  Message: string | null;
+  Type?: ToastType;
+  Duration?: number;
+  OnClose?: () => void;
+};
 
 const Toast: FC<ToastProps> = ({
   Message,
-  Type = 'error',
+  Type = "error",
   Duration = 5000,
-  OnClose
+  OnClose,
 }) => {
-  const [IsVisible, SetIsVisible] = useState(!!Message)
-  
+  const [IsVisible, SetIsVisible] = useState(!!Message);
+
   useEffect(() => {
-    SetIsVisible(!!Message)
-    
+    SetIsVisible(!!Message);
+
     if (Message) {
       const Timer = setTimeout(() => {
-        SetIsVisible(false)
+        SetIsVisible(false);
         setTimeout(() => {
-          OnClose && OnClose()
-        }, 300)
-      }, Duration)
-      
-      return () => clearTimeout(Timer)
+          OnClose && OnClose();
+        }, 300);
+      }, Duration);
+
+      return () => clearTimeout(Timer);
     }
-  }, [Message, Duration, OnClose])
-  
-  if (!Message) return null
-  
+  }, [Message, Duration, OnClose]);
+
+  if (!Message) return null;
+
   const GetIcon = () => {
     switch (Type) {
-      case 'error':
-        return <i className="fas fa-exclamation-triangle text-red-400"></i>
-      case 'success':
-        return <i className="fas fa-check-circle text-green-400"></i>
-      case 'info':
-        return <i className="fas fa-info-circle text-rose-400"></i>
-      case 'warning':
-        return <i className="fas fa-exclamation-circle text-amber-400"></i>
+      case "error":
+        return <i className="fas fa-exclamation-triangle text-red-400"></i>;
+      case "success":
+        return <i className="fas fa-check-circle text-green-400"></i>;
+      case "info":
+        return <i className="fas fa-info-circle text-rose-400"></i>;
+      case "warning":
+        return <i className="fas fa-exclamation-circle text-amber-400"></i>;
     }
-  }
-  
+  };
+
   const GetBgColor = () => {
     switch (Type) {
-      case 'error':
-        return 'bg-red-500/20 border-red-500/30'
-      case 'success':
-        return 'bg-green-500/20 border-green-500/30'
-      case 'info':
-        return 'bg-rose-500/20 border-rose-500/30'
-      case 'warning':
-        return 'bg-amber-500/20 border-amber-500/30'
+      case "error":
+        return "bg-red-500/20 border-red-500/30";
+      case "success":
+        return "bg-green-500/20 border-green-500/30";
+      case "info":
+        return "bg-rose-500/20 border-rose-500/30";
+      case "warning":
+        return "bg-amber-500/20 border-amber-500/30";
     }
-  }
-  
+  };
+
   return (
     <AnimatePresence>
       {IsVisible && (
@@ -71,17 +71,15 @@ const Toast: FC<ToastProps> = ({
           transition={{ duration: 0.3 }}
           className={`fixed bottom-6 right-6 z-50 p-4 rounded-lg ${GetBgColor()} backdrop-blur-md shadow-lg max-w-md flex items-center`}
         >
-          <div className="mr-3">
-            {GetIcon()}
-          </div>
+          <div className="mr-3">{GetIcon()}</div>
           <span className="text-white">{Message}</span>
-          <button 
+          <button
             onClick={() => {
-              SetIsVisible(false)
+              SetIsVisible(false);
               setTimeout(() => {
-                OnClose && OnClose()
-              }, 300)
-            }} 
+                OnClose && OnClose();
+              }, 300);
+            }}
             className="ml-4 text-white/70 hover:text-white"
             aria-label="Zamknij komunikat"
             title="Zamknij"
@@ -91,7 +89,7 @@ const Toast: FC<ToastProps> = ({
         </motion.div>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default Toast 
+export default Toast;

@@ -1,45 +1,51 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 
 export default function FullscreenHandler() {
-  const [_IsFullscreen, SetIsFullscreen] = useState<boolean>(false)
+  const [_IsFullscreen, SetIsFullscreen] = useState<boolean>(false);
 
   const HandleFullscreenToggle = () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen()
+      document.documentElement
+        .requestFullscreen()
         .then(() => {
-          SetIsFullscreen(true)
+          SetIsFullscreen(true);
         })
         .catch((error) => {
-          console.error(`Error attempting to enable fullscreen: ${error.message}`)
-        })
+          console.error(
+            `Error attempting to enable fullscreen: ${error.message}`,
+          );
+        });
     } else {
       if (document.exitFullscreen) {
-        document.exitFullscreen()
+        document
+          .exitFullscreen()
           .then(() => {
-            SetIsFullscreen(false)
+            SetIsFullscreen(false);
           })
           .catch((error) => {
-            console.error(`Error attempting to exit fullscreen: ${error.message}`)
-          })
+            console.error(
+              `Error attempting to exit fullscreen: ${error.message}`,
+            );
+          });
       }
     }
-  }
+  };
 
   useEffect(() => {
     const HandleKeyDown = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() === 'f') {
-        HandleFullscreenToggle()
+      if (event.key.toLowerCase() === "f") {
+        HandleFullscreenToggle();
       }
-    }
+    };
 
-    window.addEventListener('keydown', HandleKeyDown)
-    
+    window.addEventListener("keydown", HandleKeyDown);
+
     return () => {
-      window.removeEventListener('keydown', HandleKeyDown)
-    }
-  }, [])
+      window.removeEventListener("keydown", HandleKeyDown);
+    };
+  }, []);
 
-  return null
-} 
+  return null;
+}
