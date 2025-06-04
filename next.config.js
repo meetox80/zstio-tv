@@ -7,12 +7,12 @@ const NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'i.scdn.co',
-        pathname: '**',
+        protocol: "https",
+        hostname: "i.scdn.co",
+        pathname: "**",
       },
     ],
   },
-}
+};
 
-export default NextConfig 
+export default NextConfig;

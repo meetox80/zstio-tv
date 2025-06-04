@@ -1,6 +1,3 @@
-> [!CAUTION]
-> Under heavy development. Do not submit Pull Requests
-
 ```bash
 pnpm install
 ```

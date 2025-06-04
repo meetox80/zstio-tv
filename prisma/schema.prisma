@@ -25,13 +25,13 @@ model GlobalSettings {
 }
 
 model Spotify {
-  id           Int   @id @default(1)
+  id           Int    @id @default(1)
   accessToken  String
   refreshToken String
   expiresAt    BigInt
 }
 
-model widgetsdata {
+model WidgetsData {
   id          Int    @id @default(1)
   widget_text String @default("Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych.")
 }

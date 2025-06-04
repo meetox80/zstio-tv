@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC } from "react";
 
 const Background: FC = () => {
   return (
@@ -10,7 +10,7 @@ const Background: FC = () => {
         <span className="absolute w-[1px] h-24 bg-gradient-to-b from-red-800/20 to-transparent top-0 left-[66%] animate-[glow_6s_ease-in-out_infinite_1.5s]"></span>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Background 
+export default Background;
