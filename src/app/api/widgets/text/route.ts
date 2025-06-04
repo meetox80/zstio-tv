@@ -5,14 +5,14 @@ export async function GET() {
   const Prisma = new PrismaClient();
 
   try {
-    const WidgetData = await Prisma.widgetsdata.findUnique({
+    const WidgetData = await Prisma.widgetsData.findUnique({
       where: {
         id: 1,
       },
     });
 
     if (!WidgetData) {
-      await Prisma.widgetsdata.create({
+      await Prisma.widgetsData.create({
         data: {
           id: 1,
           widget_text:
@@ -54,7 +54,7 @@ export async function POST(Request: NextRequest) {
       );
     }
 
-    await Prisma.widgetsdata.upsert({
+    await Prisma.widgetsData.upsert({
       where: { id: 1 },
       update: { widget_text },
       create: {
