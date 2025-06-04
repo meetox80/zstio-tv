@@ -313,6 +313,14 @@ const Vote: NextPage = () => {
 
   return (
     <main className="flex min-h-screen relative overflow-hidden bg-black text-white">
+      {/* Add custom scrollbar styles to match the rest of the site */}
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {width: 4px}
+        .custom-scrollbar::-webkit-scrollbar-track {background: rgba(0, 0, 0, 0.2); border-radius: 4px}
+        .custom-scrollbar::-webkit-scrollbar-thumb {background: rgba(244, 63, 94, 0.2); border-radius: 4px}
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {background: rgba(244, 63, 94, 0.3)}
+      `}</style>
+      
       {Notification && (
         <div className={`fixed top-6 right-6 z-[100] max-w-md p-4 rounded-lg shadow-xl transition-all duration-500 transform translate-y-0 opacity-100 ${
           Notification.type === 'success' 
