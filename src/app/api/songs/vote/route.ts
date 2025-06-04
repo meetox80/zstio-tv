@@ -51,25 +51,48 @@ export async function POST(Request: NextRequest) {
       
       try {
         await Prisma.$transaction(async (Tx) => {
+          const WasUpvote = ExistingVote.IsUpvote
+          
           await Tx.vote.update({
             where: { Id: ExistingVote.Id },
             data: { IsUpvote }
           })
           
-          await Tx.approvedSong.update({
+          const FetchedSongData = await Tx.approvedSong.findUnique({
             where: { Id: ProposalId },
-            data: {
-              Upvotes: { [IsUpvote ? 'increment' : 'decrement']: 1 },
-              Downvotes: { [!IsUpvote ? 'increment' : 'decrement']: 1 }
-            }
+            select: { Upvotes: true, Downvotes: true }
           })
+          
+          if (!FetchedSongData) {
+            throw new Error(`ApprovedSong with ID ${ProposalId} not found during vote update.`)
+          }
+          
+          if (WasUpvote && !IsUpvote) {
+            await Tx.approvedSong.update({
+              where: { Id: ProposalId },
+              data: {
+                Upvotes: FetchedSongData.Upvotes > 0 ? { decrement: 1 } : { set: 0 },
+                Downvotes: { increment: 1 }
+              }
+            })
+          } else if (!WasUpvote && IsUpvote) {
+            await Tx.approvedSong.update({
+              where: { Id: ProposalId },
+              data: {
+                Upvotes: { increment: 1 },
+                Downvotes: FetchedSongData.Downvotes > 0 ? { decrement: 1 } : { set: 0 }
+              }
+            })
+          }
         })
         
-        return NextResponse.json({ 
-          success: true, 
+        const UpdatedSongAfterVoteChange = await Prisma.approvedSong.findUnique({ where: { Id: ProposalId } })
+        
+        return NextResponse.json({
+          success: true,
           changed: true,
           song: {
-            ...SongData,
+            ...(UpdatedSongAfterVoteChange || SongData),
             UserVote: IsUpvote ? 'up' : 'down'
           }
         })
@@ -104,12 +127,17 @@ export async function POST(Request: NextRequest) {
           }
         })
         
-        await Tx.approvedSong.update({
-          where: { Id: ProposalId },
-          data: IsUpvote 
-            ? { Upvotes: { increment: 1 } }
-            : { Downvotes: { increment: 1 } }
-        })
+        if (IsUpvote) {
+          await Tx.approvedSong.update({
+            where: { Id: ProposalId },
+            data: { Upvotes: { increment: 1 } }
+          })
+        } else {
+          await Tx.approvedSong.update({
+            where: { Id: ProposalId },
+            data: { Downvotes: { increment: 1 } }
+          })
+        }
       })
       
       _VoteRateLimitMap.set(Fingerprint, CurrentTime)

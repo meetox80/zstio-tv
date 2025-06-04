@@ -313,7 +313,6 @@ const Vote: NextPage = () => {
 
   return (
     <main className="flex min-h-screen relative overflow-hidden bg-black text-white">
-      {/* Updated scrollbar styles to match the site's design */}
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 8px;
@@ -662,7 +661,7 @@ const Vote: NextPage = () => {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                             </svg>
                           </button>
-                          <span className="text-sm font-medium my-1 text-white/70">{Proposal.Upvotes || 0}</span>
+                          <span className="text-sm font-medium my-1 text-white/70">{(Proposal.Upvotes || 0) - (Proposal.Downvotes || 0)}</span>
                           <button 
                             className={`w-8 h-8 flex items-center justify-center rounded-full ${
                               Proposal.UserVote === 'down'
