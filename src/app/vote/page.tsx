@@ -171,7 +171,10 @@ const Vote: NextPage = () => {
       if (Response.ok) {
         const Data = await Response.json();
         const SortedProposals = [...Data.proposals].sort(
-          (a, b) => (b.Upvotes || 0) - (a.Upvotes || 0),
+          (a, b) =>
+            (b.Upvotes || 0) -
+            (b.Downvotes || 0) -
+            ((a.Upvotes || 0) - (a.Downvotes || 0)),
         );
         setRecentProposals(SortedProposals);
       }
@@ -192,7 +195,10 @@ const Vote: NextPage = () => {
       if (Response.ok) {
         const Data = await Response.json();
         const SortedProposals = [...Data.proposals].sort(
-          (a, b) => (b.Upvotes || 0) - (a.Upvotes || 0),
+          (a, b) =>
+            (b.Upvotes || 0) -
+            (b.Downvotes || 0) -
+            ((a.Upvotes || 0) - (a.Downvotes || 0)),
         );
         setPendingProposals(SortedProposals);
       }
