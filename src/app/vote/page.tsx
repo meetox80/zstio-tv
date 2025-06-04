@@ -484,7 +484,7 @@ const Vote: NextPage = () => {
                       </div>
                       
                       {SearchTerm && SearchResults.length > 0 && (
-                        <div className="absolute z-50 mt-1 w-full bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden max-h-[320px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                        <div className="absolute z-50 mt-1 w-full bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden max-h-[320px] overflow-y-auto custom-scrollbar">
                           <div className="divide-y divide-white/10">
                             {SearchResults.map((Track) => (
                               <div 
@@ -621,7 +621,7 @@ const Vote: NextPage = () => {
                     <p className="text-white/70">Brak zatwierdzonych piosenek</p>
                   </div>
                 ) : (
-                  <div className="space-y-3 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                  <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
                     {RecentProposals.map((Proposal) => (
                       <div 
                         key={Proposal.Id} 
@@ -743,7 +743,7 @@ const Vote: NextPage = () => {
                         <p className="text-white/60">Brak oczekujących propozycji</p>
                       </div>
                     ) : (
-                      <div className="space-y-3 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                      <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
                         {PendingProposals.map((Proposal) => (
                           <div 
                             key={Proposal.Id} 
