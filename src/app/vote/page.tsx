@@ -140,7 +140,7 @@ const Vote: NextPage = () => {
   const FetchRecentProposals = useCallback(async () => {
     try {
       setIsLoadingProposals(true);
-      const Response = await fetch(`/api/songs/proposals?limit=5${ClientFingerprint ? `&clientId=${ClientFingerprint}` : ''}&pending=false`);
+      const Response = await fetch(`/api/songs/proposals?limit=20${ClientFingerprint ? `&clientId=${ClientFingerprint}` : ''}&pending=false`);
       
       if (Response.ok) {
         const Data = await Response.json();
@@ -621,82 +621,84 @@ const Vote: NextPage = () => {
                     <p className="text-white/70">Brak zatwierdzonych piosenek</p>
                   </div>
                 ) : (
-                  RecentProposals.map((Proposal) => (
-                    <div 
-                      key={Proposal.Id} 
-                      className="flex border border-white/10 rounded-xl bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group relative overflow-hidden"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      
-                      <div className="flex flex-col items-center justify-center py-2 px-2 border-r border-white/10 relative z-10">
-                        <button 
-                          className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                            Proposal.UserVote === 'up'
-                              ? 'text-green-400 bg-green-400/10'
-                              : 'text-white/50 hover:text-white/80 hover:bg-white/10'
-                          } transition-colors duration-300`}
-                          title="Głosuj za"
-                          onClick={() => HandleVote(Proposal.Id, true)}
-                          disabled={IsSubmitting}
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                          </svg>
-                        </button>
-                        <span className="text-sm font-medium my-1 text-white/70">{Proposal.Upvotes || 0}</span>
-                        <button 
-                          className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                            Proposal.UserVote === 'down'
-                              ? 'text-red-400 bg-red-400/10'
-                              : 'text-white/50 hover:text-white/80 hover:bg-white/10'
-                          } transition-colors duration-300`}
-                          title="Głosuj przeciw"
-                          onClick={() => HandleVote(Proposal.Id, false)}
-                          disabled={IsSubmitting}
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </button>
-                      </div>
-                      
-                      <div className="flex-grow p-4 pl-4 relative z-10 flex items-center">
-                        <div className="h-16 w-16 rounded-lg overflow-hidden mr-4 shrink-0 group-hover:scale-105 transition-all duration-500 border border-white/10">
-                          {Proposal.AlbumArt ? (
-                            <Image 
-                              src={Proposal.AlbumArt} 
-                              alt={Proposal.Album} 
-                              width={64} 
-                              height={64}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-white/10 flex items-center justify-center">
-                              <svg className="w-8 h-8 text-white/60" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/>
-                              </svg>
-                            </div>
-                          )}
+                  <div className="space-y-3 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                    {RecentProposals.map((Proposal) => (
+                      <div 
+                        key={Proposal.Id} 
+                        className="flex border border-white/10 rounded-xl bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group relative overflow-hidden"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <div className="flex flex-col items-center justify-center py-2 px-2 border-r border-white/10 relative z-10">
+                          <button 
+                            className={`w-8 h-8 flex items-center justify-center rounded-full ${
+                              Proposal.UserVote === 'up'
+                                ? 'text-green-400 bg-green-400/10'
+                                : 'text-white/50 hover:text-white/80 hover:bg-white/10'
+                            } transition-colors duration-300`}
+                            title="Głosuj za"
+                            onClick={() => HandleVote(Proposal.Id, true)}
+                            disabled={IsSubmitting}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                            </svg>
+                          </button>
+                          <span className="text-sm font-medium my-1 text-white/70">{Proposal.Upvotes || 0}</span>
+                          <button 
+                            className={`w-8 h-8 flex items-center justify-center rounded-full ${
+                              Proposal.UserVote === 'down'
+                                ? 'text-red-400 bg-red-400/10'
+                                : 'text-white/50 hover:text-white/80 hover:bg-white/10'
+                            } transition-colors duration-300`}
+                            title="Głosuj przeciw"
+                            onClick={() => HandleVote(Proposal.Id, false)}
+                            disabled={IsSubmitting}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
                         </div>
                         
-                        <div className="min-w-0 flex-1 flex flex-col justify-center">
-                          <h3 className={`font-medium text-white line-clamp-1 ${_SpaceGrotesk.className}`}>{Proposal.Title}</h3>
-                          <p className="text-sm text-white/70">{Proposal.Artist}</p>
-                          <div className="flex items-center justify-between mt-1">
-                            <span className={`text-xs text-white/60 ${_JetBrainsMono.className} tracking-wider`}>
-                              {new Date(Proposal.CreatedAt).toLocaleDateString('pl-PL', {
-                                day: 'numeric',
-                                month: 'short'
-                              })}
-                            </span>
-                            <span className={`text-xs text-white/60 ${_JetBrainsMono.className} tracking-wider`}>
-                              {Proposal.Fingerprint && Proposal.Fingerprint.substring(0, 8)}
-                            </span>
+                        <div className="flex-grow p-4 pl-4 relative z-10 flex items-center">
+                          <div className="h-16 w-16 rounded-lg overflow-hidden mr-4 shrink-0 group-hover:scale-105 transition-all duration-500 border border-white/10">
+                            {Proposal.AlbumArt ? (
+                              <Image 
+                                src={Proposal.AlbumArt} 
+                                alt={Proposal.Album} 
+                                width={64} 
+                                height={64}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-white/10 flex items-center justify-center">
+                                <svg className="w-8 h-8 text-white/60" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/>
+                                </svg>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="min-w-0 flex-1 flex flex-col justify-center">
+                            <h3 className={`font-medium text-white line-clamp-1 ${_SpaceGrotesk.className}`}>{Proposal.Title}</h3>
+                            <p className="text-sm text-white/70">{Proposal.Artist}</p>
+                            <div className="flex items-center justify-between mt-1">
+                              <span className={`text-xs text-white/60 ${_JetBrainsMono.className} tracking-wider`}>
+                                {new Date(Proposal.CreatedAt).toLocaleDateString('pl-PL', {
+                                  day: 'numeric',
+                                  month: 'short'
+                                })}
+                              </span>
+                              <span className={`text-xs text-white/60 ${_JetBrainsMono.className} tracking-wider`}>
+                                {Proposal.Fingerprint && Proposal.Fingerprint.substring(0, 8)}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))
+                    ))}
+                  </div>
                 )}
               </div>
               
