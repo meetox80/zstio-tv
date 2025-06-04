@@ -1,55 +1,57 @@
-import { PrismaClient } from "@/generated/prisma"
-import { NextRequest, NextResponse } from "next/server"
+import { PrismaClient } from "@/generated/prisma";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
-  const Prisma = new PrismaClient()
-  
+  const Prisma = new PrismaClient();
+
   try {
     const WidgetData = await Prisma.widgetsdata.findUnique({
       where: {
-        id: 1
-      }
-    })
+        id: 1,
+      },
+    });
 
     if (!WidgetData) {
       await Prisma.widgetsdata.create({
         data: {
           id: 1,
-          widget_text: "Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych."
-        }
-      })
-      
+          widget_text:
+            "Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych.",
+        },
+      });
+
       return NextResponse.json({
-        widget_text: "Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych."
-      })
+        widget_text:
+          "Przypominamy, że obowiązuje całkowity zakaz opuszczania terenu szkoły podczas zajęć i przerw międzylekcyjnych.",
+      });
     }
 
     return NextResponse.json({
-      widget_text: WidgetData.widget_text
-    })
+      widget_text: WidgetData.widget_text,
+    });
   } catch (Error) {
-    console.error("Error fetching widget text:", Error)
+    console.error("Error fetching widget text:", Error);
     return NextResponse.json(
       { error: "Failed to fetch widget text" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   } finally {
-    await Prisma.$disconnect()
+    await Prisma.$disconnect();
   }
 }
 
 export async function POST(Request: NextRequest) {
-  const Prisma = new PrismaClient()
-  
+  const Prisma = new PrismaClient();
+
   try {
-    const Data = await Request.json()
-    const { widget_text } = Data
+    const Data = await Request.json();
+    const { widget_text } = Data;
 
     if (!widget_text) {
       return NextResponse.json(
         { error: "Missing widget_text parameter" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     await Prisma.widgetsdata.upsert({
@@ -57,18 +59,18 @@ export async function POST(Request: NextRequest) {
       update: { widget_text },
       create: {
         id: 1,
-        widget_text
-      }
-    })
+        widget_text,
+      },
+    });
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true });
   } catch (Error) {
-    console.error("Error updating widget text:", Error)
+    console.error("Error updating widget text:", Error);
     return NextResponse.json(
       { error: "Failed to fetch widget text" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   } finally {
-    await Prisma.$disconnect()
+    await Prisma.$disconnect();
   }
-} 
+}

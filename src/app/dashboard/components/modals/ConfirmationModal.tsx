@@ -1,17 +1,17 @@
-import { FC, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { FC, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 type ConfirmationModalProps = {
-  IsOpen: boolean
-  OnClose: () => void
-  OnConfirm: () => void
-  Title: string
-  Message: string
-  ConfirmText?: string
-  CancelText?: string
-  IsLoading?: boolean
-  IconClassName?: string
-}
+  IsOpen: boolean;
+  OnClose: () => void;
+  OnConfirm: () => void;
+  Title: string;
+  Message: string;
+  ConfirmText?: string;
+  CancelText?: string;
+  IsLoading?: boolean;
+  IconClassName?: string;
+};
 
 const ConfirmationModal: FC<ConfirmationModalProps> = ({
   IsOpen,
@@ -19,32 +19,32 @@ const ConfirmationModal: FC<ConfirmationModalProps> = ({
   OnConfirm,
   Title,
   Message,
-  ConfirmText = 'Potwierdź',
-  CancelText = 'Anuluj',
+  ConfirmText = "Potwierdź",
+  CancelText = "Anuluj",
   IsLoading = false,
-  IconClassName = 'fas fa-exclamation-triangle text-yellow-400'
+  IconClassName = "fas fa-exclamation-triangle text-yellow-400",
 }) => {
-  const CancelButtonRef = useRef<HTMLButtonElement>(null)
-  const ConfirmButtonRef = useRef<HTMLButtonElement>(null)
+  const CancelButtonRef = useRef<HTMLButtonElement>(null);
+  const ConfirmButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (IsOpen) {
-      setTimeout(() => CancelButtonRef.current?.focus(), 0)
+      setTimeout(() => CancelButtonRef.current?.focus(), 0);
     }
-  }, [IsOpen])
+  }, [IsOpen]);
 
   const HandleKeyDown = (Event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (Event.key === 'Escape') {
-      OnClose()
+    if (Event.key === "Escape") {
+      OnClose();
     }
-    if (Event.key === 'ArrowLeft' || Event.key === 'ArrowRight') {
+    if (Event.key === "ArrowLeft" || Event.key === "ArrowRight") {
       if (document.activeElement === ConfirmButtonRef.current) {
-        CancelButtonRef.current?.focus()
+        CancelButtonRef.current?.focus();
       } else {
-        ConfirmButtonRef.current?.focus()
+        ConfirmButtonRef.current?.focus();
       }
     }
-  }
+  };
 
   return (
     <AnimatePresence>
@@ -77,10 +77,15 @@ const ConfirmationModal: FC<ConfirmationModalProps> = ({
                 {Title}
               </h3>
             </div>
-            
+
             <div className="p-6">
-              <p id="modal-message" className="text-gray-300 mb-8 text-sm leading-relaxed">{Message}</p>
-              
+              <p
+                id="modal-message"
+                className="text-gray-300 mb-8 text-sm leading-relaxed"
+              >
+                {Message}
+              </p>
+
               <div className="flex justify-end gap-3">
                 <motion.button
                   ref={CancelButtonRef}
@@ -99,7 +104,9 @@ const ConfirmationModal: FC<ConfirmationModalProps> = ({
                   {IsLoading ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                   ) : (
-                    IconClassName.includes('trash') && <i className="fas fa-trash-alt mr-2 text-sm"></i>
+                    IconClassName.includes("trash") && (
+                      <i className="fas fa-trash-alt mr-2 text-sm"></i>
+                    )
                   )}
                   {ConfirmText}
                 </motion.button>
@@ -109,7 +116,7 @@ const ConfirmationModal: FC<ConfirmationModalProps> = ({
         </motion.div>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default ConfirmationModal 
+export default ConfirmationModal;

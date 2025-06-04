@@ -2,7 +2,7 @@ name: Production
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -12,40 +12,40 @@ jobs:
         node-version: [22.16.0]
     env:
       DATABASE_URL: "file:/home/tv/database.db"
-      
+
       NEXTAUTH_URL: "https://tv.ox80.me/"
       NEXTAUTH_SECRET: $(openssl rand -hex 128)
-      
+
       SPOTIFY_ID: ${{secrets.SPOTIFY_ID}}
       SPOTIFY_SECRET: ${{secrets.SPOTIFY_SECRET}}
       SPOTIFY_REDIRECT: "https://tv.ox80.me/api/spotify/auth"
-      
+
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{secrets.TURNSTILE_SITE_KEY}}
       TURNSTILE_SECRET_KEY: ${{secrets.TURNSTILE_SECRET_KEY}}
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Install pnpm
-      run: npm install -g pnpm
-      
-    - name: Update lockfile
-      run: pnpm install --lockfile-only
-      
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
-      
-    - name: Setup Database
-      run: pnpm prisma db push
-        
-    - name: Initialize Admin
-      run: pnpm run init-admin
-      
-    - name: Build project
-      run: pnpm run build
-      
-    - name: Deploy with PM2
-      run: |
-        pm2 delete tv || echo "No existing PM2 process to delete"
-        
-        pm2 start pnpm --name "tv" -- start
-        pm2 save
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Update lockfile
+        run: pnpm install --lockfile-only
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Database
+        run: pnpm prisma db push
+
+      - name: Initialize Admin
+        run: pnpm run init-admin
+
+      - name: Build project
+        run: pnpm run build
+
+      - name: Deploy with PM2
+        run: |
+          pm2 delete tv || echo "No existing PM2 process to delete"
+
+          pm2 start pnpm --name "tv" -- start
+          pm2 save

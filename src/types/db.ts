@@ -1,5 +1,5 @@
 export interface _Users {
-  id: number
-  username: string
-  password: string
-} 
+  id: number;
+  username: string;
+  password: string;
+}

@@ -1,53 +1,53 @@
-import bcrypt from 'bcrypt'
-import { PrismaClient } from '../../src/generated/prisma/index.js'
+import bcrypt from "bcrypt";
+import { PrismaClient } from "../../src/generated/prisma/index.js";
 
 const InitAdmin = async () => {
-  const Prisma = new PrismaClient()
-  
+  const Prisma = new PrismaClient();
+
   try {
     const AdminExists = await Prisma.user.findUnique({
       where: {
-        name: 'admin'
-      }
-    })
-    
+        name: "admin",
+      },
+    });
+
     if (AdminExists) {
-      console.log('Admin user already exists')
+      console.log("Admin user already exists");
     } else {
-      const _Password = 'admin'
-      const _HashedPassword = await bcrypt.hash(_Password, 12)
+      const _Password = "admin";
+      const _HashedPassword = await bcrypt.hash(_Password, 12);
       await Prisma.user.create({
         data: {
-          name: 'admin',
+          name: "admin",
           password: _HashedPassword,
-          permissions: 0x7FFFFFFF // Administrator (all permissions)
-        }
-      })
-      console.log('Admin user created successfully')
+          permissions: 0x7fffffff, // Administrator (all permissions)
+        },
+      });
+      console.log("Admin user created successfully");
     }
-    
+
     const GlobalSettingsExist = await Prisma.globalSettings.findUnique({
-      where: { id: 1 }
-    })
-    
+      where: { id: 1 },
+    });
+
     if (GlobalSettingsExist) {
-      console.log('Global settings already initialized')
+      console.log("Global settings already initialized");
     } else {
       await Prisma.globalSettings.create({
         data: {
           id: 1,
-          lessonTime: 45
-        }
-      })
-      
-      console.log('Global settings initialized successfully')
+          lessonTime: 45,
+        },
+      });
+
+      console.log("Global settings initialized successfully");
     }
   } catch (Error) {
-    console.error('Error during initialization:', Error)
-    process.exit(1)
+    console.error("Error during initialization:", Error);
+    process.exit(1);
   } finally {
-    await Prisma.$disconnect()
+    await Prisma.$disconnect();
   }
-}
+};
 
-InitAdmin() 
+InitAdmin();

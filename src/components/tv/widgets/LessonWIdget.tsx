@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { 
-  GetCurrentPeriodInfo, 
+import {
+  GetCurrentPeriodInfo,
   PeriodInfo,
   SubscribeToLessonDuration,
-  InitializeLessonDuration
+  InitializeLessonDuration,
 } from "@/lib/data/LessonTimes/LessonTimesUtil";
 
 export default function LessonWidget() {
@@ -15,7 +15,7 @@ export default function LessonWidget() {
     IsLesson: false,
     PeriodNumber: 0,
     RemainingTime: "00:00",
-    ProgressPercent: 0
+    ProgressPercent: 0,
   });
 
   const CalculateStrokeDashoffset = (Progress: number) => {
@@ -31,7 +31,7 @@ export default function LessonWidget() {
   useEffect(() => {
     const FetchLessonDuration = async () => {
       try {
-        const Response = await fetch('/api/settings');
+        const Response = await fetch("/api/settings");
         if (Response.ok) {
           const Settings = await Response.json();
           if (Settings.lessonTime) {
@@ -39,7 +39,7 @@ export default function LessonWidget() {
           }
         }
       } catch (Error) {
-        console.error('Failed to fetch lesson duration:', Error);
+        console.error("Failed to fetch lesson duration:", Error);
       } finally {
         setIsLoading(false);
       }
@@ -76,7 +76,11 @@ export default function LessonWidget() {
         <div className="w-1/2 h-full bg-[#1C1919]/50 border border-[#282626] rounded-l-[7px] flex items-center">
           <div className="flex items-center justify-between w-full px-4">
             <div className="relative flex items-center">
-              <svg width={_CircleSize} height={_CircleSize} viewBox={`0 0 ${_CircleSize} ${_CircleSize}`}>
+              <svg
+                width={_CircleSize}
+                height={_CircleSize}
+                viewBox={`0 0 ${_CircleSize} ${_CircleSize}`}
+              >
                 <circle
                   cx={_CircleSize / 2}
                   cy={_CircleSize / 2}
@@ -100,15 +104,21 @@ export default function LessonWidget() {
                 />
               </svg>
             </div>
-            <div className="text-white text-lg font-medium flex-1 text-center ml-3">{PeriodInfo.RemainingTime}</div>
+            <div className="text-white text-lg font-medium flex-1 text-center ml-3">
+              {PeriodInfo.RemainingTime}
+            </div>
           </div>
         </div>
         <div className="w-1/2 h-full bg-[#1C1919]/50 border border-[#2B2828] rounded-r-[7px] flex items-center justify-center">
           <span className="text-white text-lg font-medium">
-            {PeriodInfo.IsLesson ? `Lekcja ${PeriodInfo.PeriodNumber}` : PeriodInfo.PeriodNumber > 0 ? "Przerwa" : "Po lekcjach"}
+            {PeriodInfo.IsLesson
+              ? `Lekcja ${PeriodInfo.PeriodNumber}`
+              : PeriodInfo.PeriodNumber > 0
+                ? "Przerwa"
+                : "Po lekcjach"}
           </span>
         </div>
       </div>
     </div>
   );
-} 
+}
