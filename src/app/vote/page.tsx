@@ -313,12 +313,22 @@ const Vote: NextPage = () => {
 
   return (
     <main className="flex min-h-screen relative overflow-hidden bg-black text-white">
-      {/* Add custom scrollbar styles to match the rest of the site */}
+      {/* Updated scrollbar styles to match the site's design */}
       <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {width: 4px}
-        .custom-scrollbar::-webkit-scrollbar-track {background: rgba(0, 0, 0, 0.2); border-radius: 4px}
-        .custom-scrollbar::-webkit-scrollbar-thumb {background: rgba(244, 63, 94, 0.2); border-radius: 4px}
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {background: rgba(244, 63, 94, 0.3)}
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
       `}</style>
       
       {Notification && (
@@ -629,7 +639,7 @@ const Vote: NextPage = () => {
                     <p className="text-white/70">Brak zatwierdzonych piosenek</p>
                   </div>
                 ) : (
-                  <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
+                  <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
                     {RecentProposals.map((Proposal) => (
                       <div 
                         key={Proposal.Id} 
@@ -751,7 +761,7 @@ const Vote: NextPage = () => {
                         <p className="text-white/60">Brak oczekujących propozycji</p>
                       </div>
                     ) : (
-                      <div className="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar">
+                      <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
                         {PendingProposals.map((Proposal) => (
                           <div 
                             key={Proposal.Id} 
