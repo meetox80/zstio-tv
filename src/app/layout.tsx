@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../css/globals.css";
 import "../css/fa/css/all.css";
@@ -17,10 +18,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "zstio-tv@v2",
-  description: "Your app description",
-};
+export async function GenerateMetadata(): Promise<Metadata> {
+  const NextUrl = (await headers()).get("next-url") || "";
+
+  let Description = "zstio-tv: Platforma multimedialna radiowęzła ZSTiO.";
+
+  if (NextUrl.includes("vote")) {
+    Description = "Zagłosuj na swoją ulubioną piosenkę i wpłyń na playlistę radiowęzła ZSTiO!";
+  }
+
+  return {
+    title: "zstio-tv@v2",
+    description: Description,
+    openGraph: {
+      images: ["/metadata.jpg"],
+    },
+  };
+}
 
 export default function RootLayout({
   children,
