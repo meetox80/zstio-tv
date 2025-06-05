@@ -414,7 +414,7 @@ const Vote = () => {
             Zaproponuj piosenke
           </h1>
           <p className="text-lg text-white/70 max-w-xl mb-16">
-            Pomóż nam tworzyć wyjątkową atmosferę w szkole
+            Pomóż nam tworzyć wyjątkową atmosferę w szkole. Piosenki z największą ilością głosów trafiają do playlisty.
           </p>
 
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
@@ -645,8 +645,12 @@ const Vote = () => {
                     </div>
                   </div>
 
+                  <div className="text-center -mt-4">
+                    <p className="text-sm text-white/40 italic">*Nie akceptujemy propozycji z wulgaryzmami w języku polskim</p>
+                  </div>
+
                   <button
-                    className={`w-full mt-6 py-4 bg-white text-black rounded-xl transition-all duration-500 font-medium group relative overflow-hidden ${!SelectedTrack || IsSubmitting || !IsTurnstileVerified ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02]"}`}
+                    className={`w-full -mt-6 py-4 bg-white text-black rounded-xl transition-all duration-500 font-medium group relative overflow-hidden ${!SelectedTrack || IsSubmitting || !IsTurnstileVerified ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02]"}`}
                     type="button"
                     onClick={HandleSubmit}
                     disabled={
