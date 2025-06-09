@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export async function GenerateMetadata(): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const NextUrl = (await headers()).get("next-url") || "";
 
   let Description = "zstio-tv: Platforma multimedialna radiowęzła ZSTiO.";
