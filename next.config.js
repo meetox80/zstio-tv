@@ -12,7 +12,7 @@ const NextConfig = {
         pathname: "**",
       },
     ],
-  },
+  }
 };
 
 export default NextConfig;

@@ -10,6 +10,20 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  return handlePasswordUpdate(req, params);
+}
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  return handlePasswordUpdate(req, params);
+}
+
+async function handlePasswordUpdate(
+  req: NextRequest,
+  params: Promise<{ id: string }>,
+) {
   try {
     const { id: _ParamsId } = await params;
     const _Session = await getServerSession(authOptions);
@@ -22,16 +36,6 @@ export async function POST(
       where: { name: _Session.user.name as string },
     });
 
-    if (
-      !_CurrentUser ||
-      !HasPermission(_CurrentUser.permissions, Permission.USERS_MANAGE)
-    ) {
-      return NextResponse.json(
-        { error: "Insufficient permissions" },
-        { status: 403 },
-      );
-    }
-
     const _TargetUser = await Prisma.user.findUnique({
       where: { id: _ParamsId },
     });
@@ -40,8 +44,18 @@ export async function POST(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Protect the admin user from being modified
-    if (_TargetUser.name === "admin" && _CurrentUser.name !== "admin") {
+    const _IsSelfUpdate = _CurrentUser?.id === _TargetUser.id;
+    const _HasAdminPermission = _CurrentUser && HasPermission(_CurrentUser.permissions, Permission.USERS_MANAGE);
+    
+    if (!_IsSelfUpdate && !_HasAdminPermission) {
+      return NextResponse.json(
+        { error: "Insufficient permissions" },
+        { status: 403 },
+      );
+    }
+
+
+    if (_TargetUser.name === "admin" && _CurrentUser?.name !== "admin") {
       return NextResponse.json(
         { error: "Cannot modify system admin user" },
         { status: 403 },

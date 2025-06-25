@@ -16,6 +16,7 @@ import { GetStatisticsHistory } from "@/lib/statistics.client";
 import { Permission } from "@/types/permissions";
 import { HasPermission } from "@/lib/permissions";
 import { useToast } from "../context/ToastContext";
+import AdminPasswordModal from "./components/modals/AdminPasswordModal";
 
 export default function DashboardPage() {
   const { data: _Session, status } = useSession();
@@ -26,6 +27,7 @@ export default function DashboardPage() {
   const [_GlobalSettings, setGlobalSettings] = useState({
     lessonTime: 45,
   });
+  const [_ShowAdminPasswordModal, setShowAdminPasswordModal] = useState(false);
 
   const { ShowToast } = useToast();
 
@@ -46,19 +48,22 @@ export default function DashboardPage() {
     values: [0, 0, 0, 0, 0],
   });
 
-  // Get user permissions
   const UserPermissions = _Session?.user?.permissions || 0;
 
-  // Check permissions for different sections
-  const CanAccessDashboard = HasPermission(UserPermissions, 1 << 0); // DASHBOARD_ACCESS
-  const CanViewSlides = HasPermission(UserPermissions, 1 << 1); // SLIDES_VIEW
-  const CanViewSongRequests = HasPermission(UserPermissions, 1 << 3); // SONG_REQUESTS_VIEW
-  const CanViewUsers = HasPermission(UserPermissions, 1 << 7); // USERS_VIEW
-  const CanViewSettings = HasPermission(UserPermissions, 1 << 9); // SETTINGS_VIEW
-  const CanViewClassTimes = HasPermission(UserPermissions, 1 << 5); // CLASS_TIMES_VIEW
+  const CanAccessDashboard = HasPermission(UserPermissions, 1 << 0);
+  const CanViewSlides = HasPermission(UserPermissions, 1 << 1);
+  const CanViewSongRequests = HasPermission(UserPermissions, 1 << 3);
+  const CanViewUsers = HasPermission(UserPermissions, 1 << 7);
+  const CanViewSettings = HasPermission(UserPermissions, 1 << 9);
+  const CanViewClassTimes = HasPermission(UserPermissions, 1 << 5);
 
-  // Allow settings access if user has either SETTINGS_VIEW or CLASS_TIMES_VIEW permission
   const CanAccessSettings = CanViewSettings || CanViewClassTimes;
+  
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      _Router.push("/login");
+    }
+  }, [status, _Router]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -66,14 +71,36 @@ export default function DashboardPage() {
     }
   }, [status, _Router]);
 
-  // Redirect to login if not authenticated
   useEffect(() => {
-    if (status === "unauthenticated") {
-      _Router.push("/login");
-    }
-  }, [status, _Router]);
+    const CheckAdminDefaultPassword = async () => {
+      if (_Session?.user?.name === "admin") {
+        try {
+          const Response = await fetch("/api/users/admin", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              checkPassword: true,
+              password: "admin",
+            }),
+          });
+          
+          const Data = await Response.json();
+          if (Response.ok && Data.isMatch) {
+            setShowAdminPasswordModal(true);
+          }
+        } catch (Error) {
+          console.error("Error checking admin password:", Error);
+        }
+      }
+    };
 
-  // Fetch global settings
+    if (status === "authenticated" && _Session?.user?.name === "admin") {
+      CheckAdminDefaultPassword();
+    }
+  }, [_Session, status]);
+
   useEffect(() => {
     const FetchGlobalSettings = async () => {
       try {
@@ -92,7 +119,6 @@ export default function DashboardPage() {
     }
   }, [status]);
 
-  // Fetch statistics data
   useEffect(() => {
     const FetchStatisticsData = async () => {
       try {
@@ -131,7 +157,6 @@ export default function DashboardPage() {
     }
   }, [status, CanAccessDashboard]);
 
-  // Set a default tab if user doesn't have permission for current tab
   useEffect(() => {
     if (!_Session?.user) return;
 
@@ -167,7 +192,6 @@ export default function DashboardPage() {
   }
 
   const ToggleTab = (tab: string): void => {
-    // Check if user has permission to access the tab
     if (
       (tab === "dashboard" && !CanAccessDashboard) ||
       (tab === "slajdy" && !CanViewSlides) ||
@@ -175,16 +199,14 @@ export default function DashboardPage() {
       (tab === "users" && !CanViewUsers) ||
       (tab === "settings" && !CanAccessSettings)
     ) {
-      // Show toast notification for permission error
       ShowToast("Nie masz uprawnień do wyświetlenia tej sekcji", "error");
 
-      // Find first tab user has access to
       if (CanAccessDashboard) tab = "dashboard";
       else if (CanViewSlides) tab = "slajdy";
       else if (CanViewSongRequests) tab = "songrequests";
       else if (CanViewUsers) tab = "users";
       else if (CanAccessSettings) tab = "settings";
-      else return; // No permissions at all
+      else return;
     }
 
     setActiveTab(tab);
@@ -243,6 +265,14 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+      
+      {_Session?.user?.name && (
+        <AdminPasswordModal 
+          IsOpen={_ShowAdminPasswordModal} 
+          OnClose={() => setShowAdminPasswordModal(false)} 
+          Username={_Session.user.name}
+        />
+      )}
     </div>
   );
 }
