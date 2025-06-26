@@ -42,12 +42,12 @@ export default function VotePage() {
   const FetchTopSongs = async () => {
     try {
       const Response = await fetch(
-        "/api/songs/proposals?pending=false&limit=7",
+        "/api/songs/approved?limit=7",
       );
       if (Response.ok) {
         const Data = await Response.json();
-        if (Data.proposals) {
-          const MappedSongs: Song[] = Data.proposals.map((proposal: any) => ({
+        if (Data.songs) {
+          const MappedSongs: Song[] = Data.songs.map((proposal: any) => ({
             Id: proposal.Id,
             Title: proposal.Title,
             Artist: proposal.Artist,
