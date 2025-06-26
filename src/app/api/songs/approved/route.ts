@@ -18,18 +18,21 @@ export async function GET(Request: NextRequest) {
     const Limit = LimitParam ? parseInt(LimitParam, 10) : 10;
     const Skip = (Page - 1) * Limit;
 
-    const ApprovedSongs = await Prisma.approvedSong.findMany({
-      take: Limit,
-      skip: Skip,
-      orderBy: {
-        CreatedAt: "desc",
-      },
-    });
+    const AllApprovedSongs = await Prisma.approvedSong.findMany({});
 
-    const Total = await Prisma.approvedSong.count();
+    const SongsWithVoteCount = AllApprovedSongs.map((Song) => ({
+      ...Song,
+      VoteCount: Song.Upvotes - Song.Downvotes,
+    }));
+
+    SongsWithVoteCount.sort((a, b) => b.VoteCount - a.VoteCount);
+
+    const PaginatedSongs = SongsWithVoteCount.slice(Skip, Skip + Limit);
+
+    const Total = AllApprovedSongs.length;
 
     return NextResponse.json({
-      songs: ApprovedSongs,
+      songs: PaginatedSongs,
       pagination: {
         total: Total,
         page: Page,
