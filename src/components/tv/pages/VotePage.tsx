@@ -51,7 +51,7 @@ export default function VotePage() {
             Id: proposal.Id,
             Title: proposal.Title,
             Artist: proposal.Artist,
-            Votes: proposal.Upvotes || 0,
+            Votes: (proposal.Upvotes || 0) - (proposal.Downvotes || 0),
           }));
           SetFetchedSongs(MappedSongs);
         } else {
