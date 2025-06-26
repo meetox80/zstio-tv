@@ -4,11 +4,6 @@ import { RequireAuth } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const AuthCheck = await RequireAuth();
-    if (!AuthCheck.authenticated) {
-      return AuthCheck.response;
-    }
-
     let GlobalSettings;
 
     try {

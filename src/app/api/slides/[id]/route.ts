@@ -13,35 +13,6 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const _AuthResult = await RequireAuth();
-    if (!_AuthResult.authenticated) {
-      if (!_AuthResult.response)
-        return NextResponse.json(
-          { Error: "Authentication failed" },
-          { status: 500 },
-        );
-      return _AuthResult.response;
-    }
-
-    const _Session = _AuthResult.session;
-    if (!_Session?.user?.name)
-      return NextResponse.json(
-        { Error: "User data unavailable" },
-        { status: 401 },
-      );
-
-    const _User = await Prisma.user.findUnique({
-      where: { name: _Session.user.name },
-    });
-    if (!_User)
-      return NextResponse.json({ Error: "User not found" }, { status: 404 });
-
-    if (!HasPermission(_User.permissions, _PERMISSION_SLIDE_VIEW))
-      return NextResponse.json(
-        { Error: "Insufficient permissions" },
-        { status: 403 },
-      );
-
     const _Slide = await Prisma.slide.findUnique({ where: { Id: id } });
     if (!_Slide)
       return NextResponse.json({ Error: "Slide not found" }, { status: 404 });

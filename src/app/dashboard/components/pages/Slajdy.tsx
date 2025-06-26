@@ -554,7 +554,6 @@ const Slajdy: FC<SlajdyProps> = () => {
   return (
     <div className="relative p-0 rounded-2xl overflow-hidden h-[calc(100vh-10rem)] max-w-full">
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-rose-950/40 z-0"></div>
-      <div className="absolute inset-0 bg-[url('/grid-pattern.png')] bg-repeat opacity-10 z-0"></div>
 
       <div className="relative z-10 h-full flex flex-col">
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-rose-500/20">

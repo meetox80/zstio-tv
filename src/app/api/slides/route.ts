@@ -6,36 +6,6 @@ import { HasPermission } from "@/lib/permissions";
 
 export async function GET() {
   try {
-    const AuthCheck = await RequireAuth();
-    if (!AuthCheck.authenticated) {
-      return AuthCheck.response;
-    }
-
-    const Session = AuthCheck.session;
-    if (!Session?.user?.name) {
-      return NextResponse.json(
-        { error: "User information not available" },
-        { status: 401 },
-      );
-    }
-
-    const User = await Prisma.user.findUnique({
-      where: { name: Session.user.name as string },
-    });
-
-    if (!User) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    const SlideViewPermission = 1 << 1; // SLIDES_VIEW permission value
-
-    if (!HasPermission(User.permissions, SlideViewPermission)) {
-      return NextResponse.json(
-        { error: "Insufficient permissions to view slides" },
-        { status: 403 },
-      );
-    }
-
     const Slides = await Prisma.slide.findMany({
       orderBy: {
         CreatedAt: "asc",
