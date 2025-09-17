@@ -165,7 +165,7 @@ const Vote = () => {
     try {
       setIsLoadingProposals(true);
       const Response = await fetch(
-        `/api/songs/proposals?limit=20${ClientFingerprint ? `&clientId=${ClientFingerprint}` : ""}&pending=false`,
+        `/api/songs/proposals?limit=200${ClientFingerprint ? `&clientId=${ClientFingerprint}` : ""}&pending=false`,
       );
 
       if (Response.ok) {
