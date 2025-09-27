@@ -131,7 +131,7 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 border-b border-rose-500/20 flex items-center">
-              <div className="bg-rose-500/20 p-3 rounded-lg mr-3">
+              <div className="bg-rose-500/20 p-3 rounded-lg mr-3 w-12 h-12 flex items-center justify-center">
                 <i className="fas fa-lock text-rose-300 text-lg"></i>
               </div>
               <div>
@@ -146,16 +146,16 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
 
             <div className="p-6">
               <div className="bg-rose-500/20 rounded-lg p-4 mb-6 border border-rose-500/30">
-                <p className="text-rose-100 text-sm flex items-start">
-                  <i className="fas fa-triangle-exclamation mr-2 mt-0.5"></i>
+                <p className="text-rose-100 text-sm flex items-center">
+                  <i className="fas fa-triangle-exclamation mr-3 flex-shrink-0"></i>
                   <span>Wykryto użycie domyślnego hasła administratora. Zalecana jest natychmiastowa zmiana hasła.</span>
                 </p>
               </div>
 
               {_Success ? (
                 <div className="bg-emerald-500/20 rounded-lg p-4 mb-6 border border-emerald-500/30">
-                  <p className="text-emerald-100 text-sm flex items-start">
-                    <i className="fas fa-circle-check mr-2 mt-0.5"></i>
+                  <p className="text-emerald-100 text-sm flex items-center">
+                    <i className="fas fa-circle-check mr-3 flex-shrink-0"></i>
                     <span>Hasło zostało zmienione pomyślnie!</span>
                   </p>
                 </div>
@@ -163,8 +163,8 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
                 <>
                   {_Error && (
                     <div className="bg-rose-500/20 rounded-lg p-4 mb-6 border border-rose-500/30">
-                      <p className="text-rose-100 text-sm flex items-start">
-                        <i className="fas fa-circle-exclamation mr-2 mt-0.5"></i>
+                      <p className="text-rose-100 text-sm flex items-center">
+                        <i className="fas fa-circle-exclamation mr-3 flex-shrink-0"></i>
                         <span>{_Error}</span>
                       </p>
                     </div>
@@ -173,7 +173,7 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
                   <div className="space-y-4 mb-6">
                     <div className="space-y-1">
                       <label htmlFor="new-password" className="text-sm text-gray-300 block flex items-center">
-                        <i className="fas fa-key mr-2 text-rose-300/70"></i>
+                        <i className="fas fa-key mr-2 text-rose-300/70 flex-shrink-0"></i>
                         Nowe hasło
                       </label>
                       <div className="relative">
@@ -186,7 +186,7 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
                           placeholder="Minimum 8 znaków"
                           disabled={_IsLoading}
                         />
-                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-rose-400/50">
+                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-rose-400/50">
                           <i className="fas fa-lock text-sm"></i>
                         </div>
                       </div>
@@ -194,7 +194,7 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
                     
                     <div className="space-y-1">
                       <label htmlFor="confirm-password" className="text-sm text-gray-300 block flex items-center">
-                        <i className="fas fa-check-double mr-2 text-rose-300/70"></i>
+                        <i className="fas fa-check-double mr-2 text-rose-300/70 flex-shrink-0"></i>
                         Potwierdź nowe hasło
                       </label>
                       <div className="relative">
@@ -207,7 +207,7 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
                           placeholder="Potwierdź nowe hasło"
                           disabled={_IsLoading}
                         />
-                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-rose-400/50">
+                        <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-rose-400/50">
                           <i className="fas fa-shield text-sm"></i>
                         </div>
                       </div>
@@ -216,7 +216,7 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
                 </>
               )}
 
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-between gap-3 mt-6">
                 <motion.button
                   ref={_CloseButtonRef}
                   onClick={OnClose}
@@ -225,17 +225,10 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
                   whileTap={{ scale: 0.95 }}
                   className="px-5 py-2.5 rounded-lg bg-gray-700/50 hover:bg-gray-700/80 text-white font-medium transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-rose-500/50 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {_Success ? (
-                    <>
-                      <i className="fas fa-check mr-2"></i>
-                      Zamknij
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-xmark mr-2"></i>
-                      Anuluj
-                    </>
-                  )}
+                  <>
+                    <i className="fas fa-xmark mr-2"></i>
+                    Zamknij
+                  </>
                 </motion.button>
                 
                 {!_Success && (
@@ -251,7 +244,7 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                         Zapisywanie...
                       </>
-                    ) : (
+                ) : (
                       <>
                         <i className="fas fa-shield mr-2"></i>
                         Zmień hasło

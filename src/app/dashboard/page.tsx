@@ -36,12 +36,8 @@ export default function DashboardPage() {
       labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
       values: [0, 0, 0, 0, 0],
     },
-    integrationStatus: "connected" as const,
   });
 
-  const [_ApiData, setApiData] = useState({
-    substitutionsStatus: "operational" as const,
-  });
 
   const [_SongRequestData, setSongRequestData] = useState({
     labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
@@ -229,6 +225,7 @@ export default function DashboardPage() {
         toggleMobileMenu={ToggleMobileMenu}
         toggleTab={ToggleTab}
         session={_Session}
+        hasNotifications={_HasNotifications}
       />
 
       <div className="md:ml-72 p-4 md:p-8 pt-20 -mt-10 md:pt-8 relative z-10 flex-1">
@@ -236,6 +233,8 @@ export default function DashboardPage() {
           activeTab={_ActiveTab}
           hasNotifications={_HasNotifications}
           defaultLessonTime={_GlobalSettings.lessonTime}
+          isMobileMenuOpen={_IsMobileMenuOpen}
+          toggleMobileMenu={ToggleMobileMenu}
         />
 
         {_ActiveTab === "settings" && CanAccessSettings ? (
@@ -252,7 +251,6 @@ export default function DashboardPage() {
         ) : _ActiveTab === "dashboard" && CanAccessDashboard ? (
           <DashboardStats
             spotifyData={_SpotifyData}
-            apiData={_ApiData}
             songRequestData={_SongRequestData}
           />
         ) : (

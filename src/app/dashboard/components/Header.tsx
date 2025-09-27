@@ -16,6 +16,8 @@ type HeaderProps = {
   activeTab: string;
   hasNotifications: boolean;
   defaultLessonTime?: number;
+  isMobileMenuOpen: boolean;
+  toggleMobileMenu: () => void;
 };
 
 type SpotifyTrackData = {
@@ -30,6 +32,8 @@ const Header: FC<HeaderProps> = ({
   activeTab,
   hasNotifications,
   defaultLessonTime = 45,
+  isMobileMenuOpen,
+  toggleMobileMenu,
 }) => {
   const [IsScrolled, setIsScrolled] = useState(false);
   const [TimeString, setTimeString] = useState("");
@@ -266,8 +270,8 @@ const Header: FC<HeaderProps> = ({
             }`}
             style={{ transition: "padding 0.3s cubic-bezier(0.16, 1, 0.3, 1)" }}
           >
-            <div className="flex items-center pb-[2px]">
-              <div className="ml-6">
+            <div className="flex items-center pb-[2px] pl-2 md:pl-0">
+              <div className="ml-6 hidden lg:block">
                 <div
                   className={`rounded-xl bg-gradient-to-br from-rose-500 to-rose-700 flex items-center justify-center ${
                     IsScrolled ? "w-11 h-11" : "w-14 h-14"
@@ -290,11 +294,11 @@ const Header: FC<HeaderProps> = ({
                 </div>
               </div>
 
-              <div className="ml-5">
+              <div className="md:ml-5 ml-4">
                 <div className="flex flex-col">
                   <h1
                     className={`font-bold tracking-tight ${
-                      IsScrolled ? "text-xl" : "text-2xl"
+                      IsScrolled ? "text-lg md:text-xl" : "text-xl md:text-2xl"
                     } text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]`}
                     style={{
                       transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
@@ -314,14 +318,14 @@ const Header: FC<HeaderProps> = ({
                   >
                     <div className="text-xs text-rose-200/70 font-medium tracking-wide flex items-center mt-1.5">
                       <i className="fas fa-clock text-rose-300/80 mr-1.5"></i>
-                      <span className="inline-flex items-center gap-2">
-                        <span className="backdrop-blur-sm bg-rose-500/5 px-2 py-0.5 rounded-md border border-rose-300/10">
+                      <span className="inline-flex items-center gap-1 md:gap-2">
+                        <span className="backdrop-blur-sm bg-rose-500/5 px-1.5 md:px-2 py-0.5 rounded-md border border-rose-300/10">
                           {TimeString}
                         </span>
                         <span className="text-rose-300/50 flex items-center justify-center">
                           •
                         </span>
-                        <span className="backdrop-blur-sm bg-rose-500/5 px-2 py-0.5 rounded-md border border-rose-300/10">
+                        <span className="backdrop-blur-sm bg-rose-500/5 px-1.5 md:px-2 py-0.5 rounded-md border border-rose-300/10 truncate max-w-[120px] md:max-w-none">
                           {DateString}
                         </span>
                       </span>
@@ -333,8 +337,8 @@ const Header: FC<HeaderProps> = ({
 
             <div className="hidden md:flex items-center mx-auto pb-[2px]">
               {!IsScrolled && (
-                <div className="flex items-center space-x-8">
-                  <div className="flex items-center bg-rose-500/10 hover:bg-rose-500/15 rounded-xl px-5 py-2.5 border border-rose-500/20 hover:border-rose-500/30 transition-all group select-none">
+                <div className="flex items-center space-x-3 md:space-x-4 xl:space-x-8">
+                  <div className="hidden xl:flex items-center bg-rose-500/10 hover:bg-rose-500/15 rounded-xl px-5 py-2.5 border border-rose-500/20 hover:border-rose-500/30 transition-all group select-none">
                     <i className="fas fa-temperature-high text-white/80 group-hover:text-white mr-3"></i>
                     <div className="flex flex-col">
                       <span className="text-white/90 text-sm font-medium group-hover:text-white">
@@ -346,7 +350,7 @@ const Header: FC<HeaderProps> = ({
                     </div>
                   </div>
 
-                  <div className="relative flex items-center bg-rose-500/10 hover:bg-rose-500/15 rounded-xl border border-rose-500/20 hover:border-rose-500/30 transition-all group select-none overflow-hidden">
+                  <div className="relative flex md:block hidden max-[820px]:hidden items-center bg-rose-500/10 hover:bg-rose-500/15 rounded-xl border border-rose-500/20 hover:border-rose-500/30 transition-all group select-none overflow-hidden">
                     {SpotifyTrack.isPlaying && (
                       <div
                         className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-green-500 to-green-400"
@@ -357,17 +361,17 @@ const Header: FC<HeaderProps> = ({
                         }}
                       ></div>
                     )}
-                    <div className="flex items-center px-5 py-2.5">
-                      <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center mr-3">
+                    <div className="flex items-center px-3 md:px-5 py-2.5">
+                      <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-green-500/20 flex items-center justify-center mr-2 md:mr-3">
                         <i
                           className={`fab fa-spotify text-green-500 ${SpotifyTrack.isPlaying ? "animate-pulse" : ""}`}
                         ></i>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-white/90 text-sm font-medium truncate max-w-[140px] group-hover:text-white">
+                        <span className="text-white/90 text-xs md:text-sm font-medium truncate max-w-[100px] md:max-w-[140px] group-hover:text-white">
                           {SpotifyTrack.title}
                         </span>
-                        <span className="text-rose-200/50 text-xs truncate max-w-[140px] group-hover:text-rose-200/70 flex items-center gap-1.5">
+                        <span className="text-rose-200/50 text-xs truncate max-w-[100px] md:max-w-[140px] group-hover:text-rose-200/70 flex items-center gap-1.5">
                           {SpotifyTrack.isPlaying && (
                             <span className="relative flex h-1.5 w-1.5">
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -380,10 +384,10 @@ const Header: FC<HeaderProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex items-center bg-rose-500/10 hover:bg-rose-500/15 rounded-xl px-5 py-2.5 border border-rose-500/20 hover:border-rose-500/30 transition-all group select-none">
-                    <i className="fas fa-hourglass-half text-white/80 group-hover:text-white mr-3"></i>
+                  <div className="flex min-[1201px]:flex hidden max-[1200px]:hidden max-[768px]:flex items-center bg-rose-500/10 hover:bg-rose-500/15 rounded-xl px-3 md:px-5 py-2.5 border border-rose-500/20 hover:border-rose-500/30 transition-all group select-none">
+                    <i className="fas fa-hourglass-half text-white/80 group-hover:text-white mr-2 md:mr-3"></i>
                     <div className="flex flex-col">
-                      <span className="text-white/90 text-sm font-medium group-hover:text-white">
+                      <span className="text-white/90 text-xs md:text-sm font-medium group-hover:text-white truncate max-w-[100px] md:max-w-none">
                         {_GetLessonStatusLabel()}
                       </span>
                       <span className={`${_GetLessonTimeColor()} text-xs`}>
@@ -400,7 +404,26 @@ const Header: FC<HeaderProps> = ({
             <div className="flex items-center pr-6 pb-[2px]">
               <div className="relative mr-4">
                 <button
-                  className={`relative group flex items-center justify-center will-change-transform ${
+                  onClick={toggleMobileMenu}
+                  className={`md:hidden relative group flex items-center justify-center will-change-transform ${
+                    IsScrolled ? "h-10 w-10" : "h-12 w-12"
+                  } rounded-xl backdrop-blur-xl bg-gradient-to-br from-rose-500/10 to-rose-500/20 border border-rose-500/30 text-gray-300 hover:text-white hover:bg-rose-500/30 hover:border-rose-500/50 shadow-[0_0_0.4rem_rgba(244,63,94,0.1)] overflow-hidden`}
+                  style={{
+                    transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                  }}
+                  aria-label="Toggle mobile menu"
+                  title="Toggle mobile menu"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-rose-500/0 to-rose-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  {isMobileMenuOpen ? (
+                    <i className="fas fa-times transform group-hover:scale-110 transition-transform"></i>
+                  ) : (
+                    <i className="fas fa-bars transform group-hover:scale-110 transition-transform"></i>
+                  )}
+                </button>
+                
+                <button
+                  className={`hidden md:flex relative group items-center justify-center will-change-transform ${
                     IsScrolled ? "h-10 w-10" : "h-12 w-12"
                   } rounded-xl backdrop-blur-xl bg-gradient-to-br from-rose-500/10 to-rose-500/20 border border-rose-500/30 text-gray-300 hover:text-white hover:bg-rose-500/30 hover:border-rose-500/50 shadow-[0_0_0.4rem_rgba(244,63,94,0.1)] overflow-hidden`}
                   style={{
@@ -414,7 +437,7 @@ const Header: FC<HeaderProps> = ({
                 </button>
 
                 {hasNotifications && (
-                  <span className="absolute -top-2 -right-2 z-10">
+                  <span className="absolute -top-2 -right-2 z-10 hidden md:inline-block">
                     <span className="absolute inline-flex h-5 w-5 rounded-full bg-rose-500 opacity-75 animate-ping"></span>
                     <span className="relative inline-flex rounded-full h-5 w-5 bg-rose-600 border border-rose-400/50 shadow-[0_0_0.7rem_rgba(244,63,94,0.7)]"></span>
                   </span>
@@ -422,10 +445,11 @@ const Header: FC<HeaderProps> = ({
               </div>
 
               <button
-                className={`group flex items-center will-change-transform ${
-                  IsScrolled ? "px-4 py-2.5" : "px-5 py-3"
-                } rounded-xl backdrop-blur-xl bg-gradient-to-r from-rose-500/10 to-rose-500/20 border border-rose-500/30 text-gray-300 hover:text-white hover:bg-rose-500/30 hover:border-rose-500/50 shadow-[0_0_0.4rem_rgba(244,63,94,0.1)] overflow-hidden relative`}
-                style={{ transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)" }}
+                className="hidden xl:flex group items-center will-change-transform rounded-xl backdrop-blur-xl bg-gradient-to-r from-rose-500/10 to-rose-500/20 border border-rose-500/30 text-gray-300 hover:text-white hover:bg-rose-500/30 hover:border-rose-500/50 shadow-[0_0_0.4rem_rgba(244,63,94,0.1)] overflow-hidden relative"
+                style={{ 
+                  transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                  padding: IsScrolled ? "0.625rem 1rem" : "0.75rem 1.25rem"
+                }}
                 aria-label="Logout"
                 title="Logout"
                 onClick={() => signOut({ callbackUrl: "/login" })}
@@ -438,13 +462,43 @@ const Header: FC<HeaderProps> = ({
                   </span>
                 </div>
               </button>
+              
+              <button
+                className="hidden md:flex xl:hidden relative group items-center justify-center will-change-transform rounded-xl backdrop-blur-xl bg-gradient-to-br from-rose-500/10 to-rose-500/20 border border-rose-500/30 text-gray-300 hover:text-white hover:bg-rose-500/30 hover:border-rose-500/50 shadow-[0_0_0.4rem_rgba(244,63,94,0.1)] overflow-hidden"
+                style={{
+                  transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                  height: IsScrolled ? "2.5rem" : "3rem",
+                  width: IsScrolled ? "2.5rem" : "3rem"
+                }}
+                aria-label="Logout"
+                title="Logout"
+                onClick={() => signOut({ callbackUrl: "/login" })}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-500/0 to-rose-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <i className="fas fa-sign-out-alt transform group-hover:scale-110 transition-transform"></i>
+              </button>
+              
+              <button
+                className="md:hidden relative group flex items-center justify-center will-change-transform rounded-xl backdrop-blur-xl bg-gradient-to-br from-rose-500/10 to-rose-500/20 border border-rose-500/30 text-gray-300 hover:text-white hover:bg-rose-500/30 hover:border-rose-500/50 shadow-[0_0_0.4rem_rgba(244,63,94,0.1)] overflow-hidden"
+                style={{
+                  transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                  height: IsScrolled ? "2.5rem" : "3rem",
+                  width: IsScrolled ? "2.5rem" : "3rem"
+                }}
+                aria-label="Logout"
+                title="Logout"
+                onClick={() => signOut({ callbackUrl: "/login" })}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-500/0 to-rose-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <i className="fas fa-sign-out-alt transform group-hover:scale-110 transition-transform"></i>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
       <div
-        className={`will-change-transform ${IsScrolled ? "h-24" : "h-32"} mb-4`}
+        className={`will-change-transform ${IsScrolled ? "h-24 md:h-24" : "h-16 md:h-32"} mb-4`}
         style={{ transition: "height 0.3s cubic-bezier(0.16, 1, 0.3, 1)" }}
       ></div>
 

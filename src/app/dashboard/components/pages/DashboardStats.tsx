@@ -34,10 +34,6 @@ type DashboardStatsProps = {
       labels: string[];
       values: number[];
     };
-    integrationStatus: "connected" | "disconnected" | "error";
-  };
-  apiData: {
-    substitutionsStatus: "operational" | "degraded" | "down";
   };
   songRequestData: {
     labels: string[];
@@ -47,12 +43,14 @@ type DashboardStatsProps = {
 
 const DashboardStats: FC<DashboardStatsProps> = ({
   spotifyData,
-  apiData,
   songRequestData,
 }) => {
   useEffect(() => {
     const Style = document.createElement("style");
     Style.textContent = `
+      :root {
+        --stats-margin-top: 32px;
+      }
       #chartjs-tooltip {
         position: fixed;
         pointer-events: none;
@@ -100,12 +98,23 @@ const DashboardStats: FC<DashboardStatsProps> = ({
     `;
     document.head.appendChild(Style);
 
+    const HideTooltip = () => {
+      const TooltipEl = document.getElementById("chartjs-tooltip");
+      if (TooltipEl) {
+        TooltipEl.style.opacity = "0";
+        TooltipEl.style.transform = "translateX(-50%) translateY(-5px)";
+      }
+    };
+
+    window.addEventListener("resize", HideTooltip);
+
     return () => {
       const TooltipEl = document.getElementById("chartjs-tooltip");
       if (TooltipEl) {
         TooltipEl.remove();
       }
       Style.remove();
+      window.removeEventListener("resize", HideTooltip);
     };
   }, []);
 
@@ -141,32 +150,39 @@ const DashboardStats: FC<DashboardStatsProps> = ({
           const PositionEl = context.chart.canvas.getBoundingClientRect();
           const TooltipRoot = document.getElementById("chartjs-tooltip");
 
-          if (TooltipRoot && context.tooltip.opacity !== 0) {
-            const CurrentValue = context.tooltip.dataPoints?.[0]?.raw as number;
-            const ValueFormatted = CurrentValue.toLocaleString();
+          if (!TooltipRoot) return;
 
-            TooltipRoot.innerHTML = `
-              <div id="chartjs-tooltip-value">${ValueFormatted}</div>
-            `;
+          if (context.tooltip.opacity !== 0 && context.tooltip.dataPoints?.length > 0) {
+            try {
+              const CurrentValue = context.tooltip.dataPoints[0].raw as number;
+              const ValueFormatted = CurrentValue.toLocaleString();
 
-            TooltipRoot.style.opacity = "1";
-            TooltipRoot.style.transform = "translateX(-50%) translateY(-15px)";
-            TooltipRoot.style.left =
-              PositionEl.left + window.scrollX + context.tooltip.caretX + "px";
-            TooltipRoot.style.top =
-              PositionEl.top +
-              window.scrollY +
-              context.tooltip.caretY -
-              30 +
-              "px";
+              TooltipRoot.innerHTML = `
+                <div id="chartjs-tooltip-value">${ValueFormatted}</div>
+              `;
 
-            const DatasetIndex = context.tooltip.dataPoints[0].datasetIndex;
-            const BorderColor = context.chart.data.datasets[DatasetIndex]
-              .borderColor as string;
+              TooltipRoot.style.opacity = "1";
+              TooltipRoot.style.transform = "translateX(-50%) translateY(-15px)";
+              TooltipRoot.style.left =
+                PositionEl.left + window.scrollX + context.tooltip.caretX + "px";
+              TooltipRoot.style.top =
+                PositionEl.top +
+                window.scrollY +
+                context.tooltip.caretY -
+                30 +
+                "px";
 
-            TooltipRoot.style.borderColor = borderColor(BorderColor, 0.3);
-            TooltipRoot.style.boxShadow = `0 10px 25px rgba(0, 0, 0, 0.6), 0 2px 5px rgba(0, 0, 0, 0.5), 0 0 0 1px ${borderColor(BorderColor, 0.15)}`;
-          } else if (TooltipRoot) {
+              const DatasetIndex = context.tooltip.dataPoints[0].datasetIndex;
+              const BorderColor = context.chart.data.datasets[DatasetIndex]
+                .borderColor as string;
+
+              TooltipRoot.style.borderColor = borderColor(BorderColor, 0.3);
+              TooltipRoot.style.boxShadow = `0 10px 25px rgba(0, 0, 0, 0.6), 0 2px 5px rgba(0, 0, 0, 0.5), 0 0 0 1px ${borderColor(BorderColor, 0.15)}`;
+            } catch (error) {
+              TooltipRoot.style.opacity = "0";
+              TooltipRoot.style.transform = "translateX(-50%) translateY(-5px)";
+            }
+          } else {
             TooltipRoot.style.opacity = "0";
             TooltipRoot.style.transform = "translateX(-50%) translateY(-5px)";
           }
@@ -233,6 +249,7 @@ const DashboardStats: FC<DashboardStatsProps> = ({
     return color;
   };
 
+
   const SpotifyChartData: ChartData<"line"> = {
     labels: spotifyData.playCountData.labels,
     datasets: [
@@ -296,7 +313,7 @@ const DashboardStats: FC<DashboardStatsProps> = ({
         animate="visible"
         variants={_CardVariants}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="relative p-7 rounded-2xl backdrop-blur-xl bg-black/20 border border-white/8 shadow-2xl overflow-hidden group"
+        className="relative p-7 rounded-2xl backdrop-blur-xl bg-black/20 border border-white/8 shadow-2xl overflow-hidden group mt-[calc(var(--stats-margin-top,0px)*0.25)] md:mt-0"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-green-900/10 via-emerald-800/5 to-transparent"></div>
         <div className="absolute right-0 bottom-0 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl transform translate-x-1/4 translate-y-1/4 group-hover:bg-emerald-500/10 transition-all duration-700"></div>
@@ -326,7 +343,7 @@ const DashboardStats: FC<DashboardStatsProps> = ({
         animate="visible"
         variants={_CardVariants}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="relative p-7 rounded-2xl backdrop-blur-xl bg-black/20 border border-white/8 shadow-2xl overflow-hidden group"
+        className="relative p-7 rounded-2xl backdrop-blur-xl bg-black/20 border border-white/8 shadow-2xl overflow-hidden group mt-[calc(var(--stats-margin-top,0px)*0.25)] md:mt-0"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-orange-900/10 via-rose-800/5 to-transparent"></div>
         <div className="absolute right-0 bottom-0 w-40 h-40 bg-rose-500/5 rounded-full blur-3xl transform translate-x-1/4 translate-y-1/4 group-hover:bg-rose-500/10 transition-all duration-700"></div>
@@ -347,110 +364,6 @@ const DashboardStats: FC<DashboardStatsProps> = ({
           </div>
           <div className="h-72 pt-2">
             <Line options={_ChartOptions} data={SongRequestChartData} />
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={_CardVariants}
-        transition={{ duration: 0.5, delay: 0.3 }}
-        className="relative p-7 rounded-2xl backdrop-blur-xl bg-black/20 border border-white/8 shadow-2xl overflow-hidden group"
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/10 via-teal-800/5 to-transparent"></div>
-        <div className="absolute right-0 bottom-0 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl transform translate-x-1/4 translate-y-1/4 group-hover:bg-emerald-500/10 transition-all duration-700"></div>
-        <div className="absolute left-0 bottom-0 w-60 h-60 bg-teal-400/5 rounded-full blur-3xl transform -translate-x-1/4 translate-y-1/4 group-hover:bg-teal-400/10 transition-all duration-700"></div>
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-bold text-white tracking-tight">
-              Integracja ze Spotify
-            </h3>
-            <div className="p-2.5 bg-black/30 backdrop-blur-md rounded-xl border border-white/10 flex items-center justify-center w-12 h-12 shadow-lg">
-              <i className="fab fa-spotify text-white text-2xl"></i>
-            </div>
-          </div>
-          <div className="flex items-center mt-2">
-            <div
-              className={`w-4 h-4 rounded-full ${_StatusColors[spotifyData.integrationStatus]} shadow-lg ring-2 ring-white/10 mr-3`}
-            ></div>
-            <span className="text-xl font-bold text-white capitalize tracking-tight">
-              {_StatusTranslations[spotifyData.integrationStatus]}
-            </span>
-          </div>
-          <div className="mt-5 p-5 rounded-xl bg-white/5 backdrop-blur-lg border border-white/5 shadow-inner">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-gray-400 font-medium text-sm">
-                Ostatnie sprawdzenie
-              </span>
-              <span className="text-white font-medium">Przed chwilą</span>
-            </div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-gray-400 font-medium text-sm">
-                Typ usługi
-              </span>
-              <span className="text-white font-medium">Spotify API</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400 font-medium text-sm">
-                Token odświeżania
-              </span>
-              <span className="text-white font-medium">Aktywny</span>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={_CardVariants}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="relative p-7 rounded-2xl backdrop-blur-xl bg-black/20 border border-white/8 shadow-2xl overflow-hidden group"
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/10 via-indigo-800/5 to-transparent"></div>
-        <div className="absolute right-0 bottom-0 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl transform translate-x-1/4 translate-y-1/4 group-hover:bg-blue-500/10 transition-all duration-700"></div>
-        <div className="absolute left-0 bottom-0 w-60 h-60 bg-indigo-400/5 rounded-full blur-3xl transform -translate-x-1/4 translate-y-1/4 group-hover:bg-indigo-400/10 transition-all duration-700"></div>
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-bold text-white tracking-tight">
-              API Zastępstwa
-            </h3>
-            <div className="p-2.5 bg-black/30 backdrop-blur-md rounded-xl border border-white/10 flex items-center justify-center w-12 h-12 shadow-lg">
-              <i className="fas fa-server text-indigo-400 text-2xl"></i>
-            </div>
-          </div>
-          <div className="flex items-center mt-2">
-            <div
-              className={`w-4 h-4 rounded-full ${_StatusColors.down} shadow-lg ring-2 ring-white/10 mr-3`}
-            ></div>
-            <span className="text-xl font-bold text-white capitalize tracking-tight">
-              {_StatusTranslations.down}
-            </span>
-          </div>
-          <div className="mt-5 p-5 rounded-xl bg-white/5 backdrop-blur-lg border border-white/5 shadow-inner">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-gray-400 font-medium text-sm">
-                Ostatnie sprawdzenie
-              </span>
-              <span className="text-white font-medium">Przed chwilą</span>
-            </div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-gray-400 font-medium text-sm">
-                Adres końcowy
-              </span>
-              <span className="text-white font-medium">
-                api.ox80.me/nullptr
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400 font-medium text-sm">
-                Status połączenia
-              </span>
-              <span className="text-rose-400 font-semibold">
-                Brak Implementacji
-              </span>
-            </div>
           </div>
         </div>
       </motion.div>

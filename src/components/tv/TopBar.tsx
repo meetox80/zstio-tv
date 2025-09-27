@@ -1,62 +1,28 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import LessonWidget from "./widgets/LessonWIdget";
 import TextWidget from "./widgets/TextWidget";
 import PageIndicator from "./widgets/PageIndicator";
 import { motion } from "framer-motion";
 import axios from "axios";
+import PageConfiguration, { GetEnabledPages } from "@/config/pageConfig";
+import { usePageContext } from "@/context/PageContext";
 
 export default function TopBar() {
   const _FirstSectionWidth = 300;
   const _CenterSectionWidth = 1270;
   const _ThirdSectionWidth = 300;
 
-  const _DefaultPages = [
-    { Key: "info" },
-    { Key: "schedule" },
-    { Key: "announcements" },
-  ];
+  // Use the shared page context
+  const { ActivePages: _ActivePages, SetCurrentPageIndex } = usePageContext();
 
-  const [_ActivePages, SetActivePages] = useState(_DefaultPages);
-
-  useEffect(() => {
-    const CheckSlidesAvailability = async () => {
-      try {
-        const Response = await axios.get("/api/slides");
-        const SlideData = Response.data.Slides || [];
-
-        if (SlideData.length === 0) {
-          const FilteredPages = _DefaultPages.filter(
-            (page) => page.Key !== "announcements",
-          );
-          SetActivePages(FilteredPages);
-        } else {
-          SetActivePages(_DefaultPages);
-        }
-      } catch (Error) {
-        const FilteredPages = _DefaultPages.filter(
-          (page) => page.Key !== "announcements",
-        );
-        SetActivePages(FilteredPages);
-      }
-    };
-
-    CheckSlidesAvailability();
-
-    const RefreshInterval = setInterval(() => {
-      CheckSlidesAvailability();
-    }, 60000);
-
-    return () => clearInterval(RefreshInterval);
-  }, []);
+  // We no longer need the slide availability check here as it's handled in PageSwitcher
 
   const HandlePageChange = useCallback((PageIndex: number) => {
-    const PageChangeEvent = new CustomEvent("pageChange", {
-      detail: { pageIndex: PageIndex },
-    });
-    window.dispatchEvent(PageChangeEvent);
-  }, []);
+    // Update the current page index in the shared context
+    SetCurrentPageIndex(PageIndex);
+  }, [SetCurrentPageIndex]);
 
   return (
     <motion.div
@@ -84,7 +50,7 @@ export default function TopBar() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
       >
-        <div className="w-full h-[60px] rounded-[7px] border border-[#2F2F2F] bg-[#151515]/80 backdrop-blur-md shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+        <div className="w-full h-[60px]">
           <TextWidget />
         </div>
       </motion.div>

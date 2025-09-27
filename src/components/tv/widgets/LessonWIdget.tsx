@@ -71,9 +71,9 @@ export default function LessonWidget() {
   }, [IsLoading]);
 
   return (
-    <div className="w-full h-full rounded-[7px] flex items-center">
+    <div className="w-full h-full rounded-[12px] flex items-center">
       <div className="relative w-full h-[60px] flex">
-        <div className="w-1/2 h-full bg-[#1C1919]/50 border border-[#282626] rounded-l-[7px] flex items-center">
+        <div className="w-1/2 h-full bg-[#1C1919]/80 border border-[#282626] rounded-l-[12px] flex items-center">
           <div className="flex items-center justify-between w-full px-4">
             <div className="relative flex items-center">
               <svg
@@ -109,7 +109,7 @@ export default function LessonWidget() {
             </div>
           </div>
         </div>
-        <div className="w-1/2 h-full bg-[#1C1919]/50 border border-[#2B2828] rounded-r-[7px] flex items-center justify-center">
+        <div className="w-1/2 h-full bg-[#1C1919]/80 border border-[#282626] rounded-r-[12px] flex items-center justify-center">
           <span className="text-white text-lg font-medium">
             {PeriodInfo.IsLesson
               ? `Lekcja ${PeriodInfo.PeriodNumber}`

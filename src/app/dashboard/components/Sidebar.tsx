@@ -1,7 +1,6 @@
 import { FC } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Permission } from "@/types/permissions";
 import { HasPermission } from "@/lib/permissions";
 
 type SidebarProps = {
@@ -10,6 +9,7 @@ type SidebarProps = {
   toggleMobileMenu: () => void;
   toggleTab: (tab: string) => void;
   session: any;
+  hasNotifications: boolean;
 };
 
 const Sidebar: FC<SidebarProps> = ({
@@ -18,6 +18,7 @@ const Sidebar: FC<SidebarProps> = ({
   toggleMobileMenu,
   toggleTab,
   session,
+  hasNotifications,
 }) => {
   const _ActiveTab = activeTab;
   const _IsMobileMenuOpen = isMobileMenuOpen;
@@ -41,32 +42,6 @@ const Sidebar: FC<SidebarProps> = ({
 
   return (
     <>
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 backdrop-blur-xl bg-black/40 border-b border-rose-500/30 p-4 flex justify-between items-center shadow-lg">
-        <div className="flex items-center">
-          <Image
-            src="/zstio-512-alt.png"
-            alt="zstio Logo"
-            width={32}
-            height={32}
-            className="w-8 h-8"
-          />
-          <span className="ml-2 text-xl font-bold text-white tracking-wider">
-            ZSTIO-TV
-          </span>
-        </div>
-        <button
-          onClick={_ToggleMobileMenu}
-          className="p-2 rounded-lg backdrop-blur-xl bg-rose-500/20 border border-rose-500/40 text-white hover:bg-rose-500/30 hover:border-rose-500/60 active:scale-95 transition-all duration-300"
-          aria-label="Toggle mobile menu"
-          title="Toggle mobile menu"
-        >
-          {_IsMobileMenuOpen ? (
-            <i className="fas fa-times w-5 h-5 flex items-center justify-center"></i>
-          ) : (
-            <i className="fas fa-bars w-5 h-5 flex items-center justify-center"></i>
-          )}
-        </button>
-      </div>
 
       <div className="hidden md:block fixed left-0 top-0 h-full w-72 backdrop-blur-xl bg-gradient-to-br from-black/50 via-rose-950/30 to-rose-900/20 border-r border-rose-500/30 z-40 shadow-[5px_0_25px_rgba(0,0,0,0.3)]">
         <div className="p-6 h-full flex flex-col">
@@ -230,24 +205,30 @@ const Sidebar: FC<SidebarProps> = ({
             <div className="p-6 h-full flex flex-col">
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center">
-                  <Image
-                    src="/zstio-512-alt.png"
-                    alt="zstio Logo"
-                    width={40}
-                    height={40}
-                    className="w-10 h-10"
-                  />
-                  <span className="ml-2 text-xl font-bold text-white tracking-wider">
-                    ZSTIO-TV
-                  </span>
+                  <div className="relative">
+                    <button
+                      className="w-10 h-10 rounded-lg backdrop-blur-xl bg-rose-500/20 border border-rose-500/40 text-white hover:bg-rose-500/30 hover:border-rose-500/60 active:scale-95 transition-all duration-300 flex items-center justify-center"
+                      aria-label="Notifications"
+                      title="Notifications"
+                    >
+                      <i className="fas fa-bell"></i>
+                    </button>
+                    
+                    {hasNotifications && (
+                      <span className="absolute -top-2 -right-2 z-10">
+                        <span className="absolute inline-flex h-5 w-5 rounded-full bg-rose-500 opacity-75 animate-ping"></span>
+                        <span className="relative inline-flex rounded-full h-5 w-5 bg-rose-600 border border-rose-400/50 shadow-[0_0_0.7rem_rgba(244,63,94,0.7)]"></span>
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <button
                   onClick={_ToggleMobileMenu}
-                  className="p-2 rounded-lg backdrop-blur-xl bg-rose-500/20 border border-rose-500/40 text-white hover:bg-rose-500/30 hover:border-rose-500/60 active:scale-95 transition-all duration-300"
+                  className="w-10 h-10 rounded-lg backdrop-blur-xl bg-rose-500/20 border border-rose-500/40 text-white hover:bg-rose-500/30 hover:border-rose-500/60 active:scale-95 transition-all duration-300 flex items-center justify-center"
                   aria-label="Close mobile menu"
                   title="Close mobile menu"
                 >
-                  <i className="fas fa-times w-5 h-5 flex items-center justify-center"></i>
+                  <i className="fas fa-times"></i>
                 </button>
               </div>
 

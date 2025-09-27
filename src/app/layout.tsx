@@ -7,6 +7,7 @@ import AuthProvider from "@/components/AuthProvider";
 import "aos/dist/aos.css";
 import AOSInitializer from "@/components/AOSInitializer";
 import { ToastProvider } from "./context/ToastContext";
+import { PageProvider } from "@/context/PageContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,7 +55,9 @@ export default function RootLayout({
       >
         <AOSInitializer />
         <AuthProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <PageProvider>{children}</PageProvider>
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>

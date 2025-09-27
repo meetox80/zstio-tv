@@ -25,7 +25,7 @@ export default function TextWidget() {
   }, []);
 
   return (
-    <div className="w-full h-full flex items-center justify-center">
+    <div className="w-full h-full bg-[#1C1919]/80 border border-[#282626] rounded-[12px] flex items-center justify-center px-6">
       <p className="text-white text-[20px] font-bold font-inter text-center opacity-75">
         {_WidgetText}
       </p>

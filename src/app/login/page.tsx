@@ -85,10 +85,21 @@ export default function LoginPage() {
   };
 
   return (
-    <section className="bg-gray-900 h-screen w-screen overflow-hidden">
+    <section className="bg-gray-900 h-screen w-screen overflow-hidden relative">
+      <div className="flex justify-between items-center absolute top-4 left-0 right-0 z-50 px-4">
+        <span className="px-3 py-1 bg-white/5 backdrop-blur-sm rounded-md border border-white/10 font-mono text-xs tracking-wider shadow-inner shadow-red-900/10 text-white">
+          {Version}
+        </span>
+        <a
+          className="text-white text-sm font-semibold hover:cursor-pointer"
+          href="https://github.com/meetox80/zstio-tv"
+        >
+          <i className="fab fa-github text-xl"></i>
+        </a>
+      </div>
       <div className="flex flex-wrap h-full">
         <div
-          className="w-full lg:w-1/2 relative px-5 flex items-center bg-gray-900"
+          className="w-full lg:w-1/2 relative px-4 md:px-5 flex items-center bg-gray-900"
           suppressHydrationWarning
         >
           <div className="absolute inset-0 overflow-hidden">
@@ -155,7 +166,7 @@ export default function LoginPage() {
           </div>
 
           <div
-            className="w-full pt-12 pb-12 md:pt-24 lg:pt-0 md:pb-24 xl:pb-0 md:px-8 z-10"
+            className="w-full pt-20 pb-12 md:pt-24 lg:pt-0 md:pb-24 xl:pb-0 md:px-8 z-10"
             suppressHydrationWarning
           >
             <div className="max-w-sm mx-auto">
@@ -261,21 +272,10 @@ export default function LoginPage() {
         </div>
 
         <div
-          className="w-full lg:w-1/2 bg-radial-dark-red h-full"
+          className="hidden lg:block lg:w-1/2 bg-radial-dark-red h-full"
           suppressHydrationWarning
         >
           <div className="relative flex flex-col max-w-md mx-auto lg:max-w-none h-full pt-8 pb-12 px-10 overflow-hidden">
-            <div className="relative z-10 flex items-center justify-end">
-              <a
-                className="inline-flex items-center leading-loose text-white text-sm font-semibold"
-                href="https://github.com/meetox80/zstio-tv"
-              >
-                <span className="mr-3 px-3 py-1 bg-white/5 backdrop-blur-sm rounded-md border border-white/10 font-mono text-xs tracking-wider shadow-inner shadow-red-900/10">
-                  {Version}
-                </span>
-                <i className="fab fa-github text-xl"></i>
-              </a>
-            </div>
 
             <div className="relative z-10 my-auto py-24">
               {ShowAnimations ? (

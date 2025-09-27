@@ -5,18 +5,35 @@ import SubstitutionsPage from "../pages/SubstitutionsPage";
 import VotePage from "../pages/VotePage";
 import SlidesPage from "../pages/SlidesPage";
 import axios from "axios";
+import PageConfiguration, { GetEnabledPages } from "@/config/pageConfig";
+import { usePageContext } from "@/context/PageContext";
 
-const DefaultPages = [
+const AllPages = [
   { Component: SubstitutionsPage, Key: "substitutions" },
   { Component: VotePage, Key: "vote" },
   { Component: SlidesPage, Key: "slides" },
 ];
 
+const DefaultPages = AllPages.filter(page => 
+  GetEnabledPages().includes(page.Key)
+);
+
 export default function PageSwitcher() {
-  const [_CurrentPageIndex, SetCurrentPageIndex] = useState(0);
   const _TotalSeconds = 30;
   const _IsChangingPage = useRef(false);
-  const [_ActivePages, SetActivePages] = useState(DefaultPages);
+  
+  // Use the shared page context
+  const { 
+    CurrentPageIndex: _CurrentPageIndex, 
+    SetCurrentPageIndex, 
+    ActivePages: _ActivePages, 
+    SetActivePages 
+  } = usePageContext();
+  
+  // Initialize the active pages in the context
+  useEffect(() => {
+    SetActivePages(DefaultPages);
+  }, []);
 
   useEffect(() => {
     const CheckSlidesAvailability = async () => {
@@ -40,13 +57,17 @@ export default function PageSwitcher() {
       }
     };
 
-    CheckSlidesAvailability();
-
-    const RefreshInterval = setInterval(() => {
+    if (DefaultPages.some(page => page.Key === "slides")) {
       CheckSlidesAvailability();
-    }, 60000);
-
-    return () => clearInterval(RefreshInterval);
+      
+      const RefreshInterval = setInterval(() => {
+        CheckSlidesAvailability();
+      }, 60000);
+      
+      return () => clearInterval(RefreshInterval);
+    } else {
+      SetActivePages(DefaultPages);
+    }
   }, []);
 
   useEffect(() => {
@@ -104,12 +125,12 @@ export default function PageSwitcher() {
   if (_ActivePages.length === 0) return null;
 
   const _CurrentPage = _ActivePages[_CurrentPageIndex];
-  const CurrentPageComponent = _CurrentPage.Component;
+  const CurrentPageComponent = _CurrentPage?.Component;
 
   return (
     <div className="relative w-full h-full">
       <div className="w-full h-full">
-        <CurrentPageComponent />
+        {CurrentPageComponent && <CurrentPageComponent />}
       </div>
     </div>
   );

@@ -18,5 +18,9 @@ pnpm run init-admin
 ```
 
 ```bash
+npx next telemetry disable
+```
+
+```bash
 pnpm dev
 ```
