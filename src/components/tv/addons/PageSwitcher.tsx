@@ -17,21 +17,21 @@ const AllPages = [
   { Component: SlidesPage, Key: "slides" },
 ];
 
-const DefaultPages = AllPages.filter(page => 
-  GetEnabledPages().includes(page.Key)
+const DefaultPages = AllPages.filter((page) =>
+  GetEnabledPages().includes(page.Key),
 );
 
 export default function PageSwitcher() {
   const _TotalSeconds = 30;
   const _IsChangingPage = useRef(false);
-  
-  const { 
-    CurrentPageIndex: _CurrentPageIndex, 
-    SetCurrentPageIndex, 
-    ActivePages: _ActivePages, 
-    SetActivePages 
+
+  const {
+    CurrentPageIndex: _CurrentPageIndex,
+    SetCurrentPageIndex,
+    ActivePages: _ActivePages,
+    SetActivePages,
   } = usePageContext();
-  
+
   useEffect(() => {
     SetActivePages(DefaultPages);
   }, []);
@@ -58,13 +58,13 @@ export default function PageSwitcher() {
       }
     };
 
-    if (DefaultPages.some(page => page.Key === "slides")) {
+    if (DefaultPages.some((page) => page.Key === "slides")) {
       CheckSlidesAvailability();
-      
+
       const RefreshInterval = setInterval(() => {
         CheckSlidesAvailability();
       }, 60000);
-      
+
       return () => clearInterval(RefreshInterval);
     } else {
       SetActivePages(DefaultPages);

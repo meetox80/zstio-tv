@@ -19,10 +19,13 @@ export default function TopBar() {
 
   // We no longer need the slide availability check here as it's handled in PageSwitcher
 
-  const HandlePageChange = useCallback((PageIndex: number) => {
-    // Update the current page index in the shared context
-    SetCurrentPageIndex(PageIndex);
-  }, [SetCurrentPageIndex]);
+  const HandlePageChange = useCallback(
+    (PageIndex: number) => {
+      // Update the current page index in the shared context
+      SetCurrentPageIndex(PageIndex);
+    },
+    [SetCurrentPageIndex],
+  );
 
   return (
     <motion.div

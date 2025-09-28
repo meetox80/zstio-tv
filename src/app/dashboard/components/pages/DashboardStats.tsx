@@ -152,7 +152,10 @@ const DashboardStats: FC<DashboardStatsProps> = ({
 
           if (!TooltipRoot) return;
 
-          if (context.tooltip.opacity !== 0 && context.tooltip.dataPoints?.length > 0) {
+          if (
+            context.tooltip.opacity !== 0 &&
+            context.tooltip.dataPoints?.length > 0
+          ) {
             try {
               const CurrentValue = context.tooltip.dataPoints[0].raw as number;
               const ValueFormatted = CurrentValue.toLocaleString();
@@ -162,9 +165,13 @@ const DashboardStats: FC<DashboardStatsProps> = ({
               `;
 
               TooltipRoot.style.opacity = "1";
-              TooltipRoot.style.transform = "translateX(-50%) translateY(-15px)";
+              TooltipRoot.style.transform =
+                "translateX(-50%) translateY(-15px)";
               TooltipRoot.style.left =
-                PositionEl.left + window.scrollX + context.tooltip.caretX + "px";
+                PositionEl.left +
+                window.scrollX +
+                context.tooltip.caretX +
+                "px";
               TooltipRoot.style.top =
                 PositionEl.top +
                 window.scrollY +
@@ -248,7 +255,6 @@ const DashboardStats: FC<DashboardStatsProps> = ({
     }
     return color;
   };
-
 
   const SpotifyChartData: ChartData<"line"> = {
     labels: spotifyData.playCountData.labels,

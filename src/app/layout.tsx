@@ -25,7 +25,8 @@ export async function generateMetadata(): Promise<Metadata> {
   let Description = "zstio-tv: Platforma multimedialna radiowęzła ZSTiO.";
 
   if (NextUrl.includes("vote")) {
-    Description = "Zagłosuj na swoją ulubioną piosenkę i wpłyń na playlistę radiowęzła ZSTiO!";
+    Description =
+      "Zagłosuj na swoją ulubioną piosenkę i wpłyń na playlistę radiowęzła ZSTiO!";
   }
 
   return {

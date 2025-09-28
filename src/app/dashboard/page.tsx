@@ -38,7 +38,6 @@ export default function DashboardPage() {
     },
   });
 
-
   const [_SongRequestData, setSongRequestData] = useState({
     labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
     values: [0, 0, 0, 0, 0],
@@ -54,7 +53,7 @@ export default function DashboardPage() {
   const CanViewClassTimes = HasPermission(UserPermissions, 1 << 5);
 
   const CanAccessSettings = CanViewSettings || CanViewClassTimes;
-  
+
   useEffect(() => {
     if (status === "unauthenticated") {
       _Router.push("/login");
@@ -81,7 +80,7 @@ export default function DashboardPage() {
               password: "admin",
             }),
           });
-          
+
           const Data = await Response.json();
           if (Response.ok && Data.isMatch) {
             setShowAdminPasswordModal(true);
@@ -263,11 +262,11 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
-      
+
       {_Session?.user?.name && (
-        <AdminPasswordModal 
-          IsOpen={_ShowAdminPasswordModal} 
-          OnClose={() => setShowAdminPasswordModal(false)} 
+        <AdminPasswordModal
+          IsOpen={_ShowAdminPasswordModal}
+          OnClose={() => setShowAdminPasswordModal(false)}
           Username={_Session.user.name}
         />
       )}

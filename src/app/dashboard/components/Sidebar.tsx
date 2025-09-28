@@ -42,7 +42,6 @@ const Sidebar: FC<SidebarProps> = ({
 
   return (
     <>
-
       <div className="hidden md:block fixed left-0 top-0 h-full w-72 backdrop-blur-xl bg-gradient-to-br from-black/50 via-rose-950/30 to-rose-900/20 border-r border-rose-500/30 z-40 shadow-[5px_0_25px_rgba(0,0,0,0.3)]">
         <div className="p-6 h-full flex flex-col">
           <div className="flex justify-center items-center mb-10 pt-2">
@@ -213,7 +212,7 @@ const Sidebar: FC<SidebarProps> = ({
                     >
                       <i className="fas fa-bell"></i>
                     </button>
-                    
+
                     {hasNotifications && (
                       <span className="absolute -top-2 -right-2 z-10">
                         <span className="absolute inline-flex h-5 w-5 rounded-full bg-rose-500 opacity-75 animate-ping"></span>

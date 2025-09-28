@@ -19,22 +19,39 @@ export default function PomodoroPage() {
     if (!_InitialInfo.End) return Date.now();
     const [H, M] = _InitialInfo.End.split(":").map(Number);
     const Now = new Date();
-    const End = new Date(Now.getFullYear(), Now.getMonth(), Now.getDate(), H, M, 0, 0);
+    const End = new Date(
+      Now.getFullYear(),
+      Now.getMonth(),
+      Now.getDate(),
+      H,
+      M,
+      0,
+      0,
+    );
     return End.getTime();
   })();
   const [_DisplayTime, SetDisplayTime] = useState(
-    FormatTimeDisplay(Math.max(0, Math.floor((_InitialEndMsCalc - Date.now()) / 1000)))
+    FormatTimeDisplay(
+      Math.max(0, Math.floor((_InitialEndMsCalc - Date.now()) / 1000)),
+    ),
   );
   const _ContainerRef = useRef<HTMLDivElement>(null);
   const _EndTimeMsRef = useRef<number>(Date.now());
   const _RafIdRef = useRef<number | null>(null);
-  
 
   const _ParseEndTimeMs = (Info: PeriodInfo): number => {
     if (!Info.End) return Date.now();
     const [H, M] = Info.End.split(":").map(Number);
     const Now = new Date();
-    const End = new Date(Now.getFullYear(), Now.getMonth(), Now.getDate(), H, M, 0, 0);
+    const End = new Date(
+      Now.getFullYear(),
+      Now.getMonth(),
+      Now.getDate(),
+      H,
+      M,
+      0,
+      0,
+    );
     return End.getTime();
   };
 
@@ -67,7 +84,10 @@ export default function PomodoroPage() {
 
     const Tick = () => {
       const NowMs = Date.now();
-      const RemainingSec = Math.max(0, Math.floor((_EndTimeMsRef.current - NowMs) / 1000));
+      const RemainingSec = Math.max(
+        0,
+        Math.floor((_EndTimeMsRef.current - NowMs) / 1000),
+      );
       const Display = FormatTimeDisplay(RemainingSec);
       SetDisplayTime((Prev) => (Prev !== Display ? Display : Prev));
       if (RemainingSec <= 0) {
@@ -95,19 +115,20 @@ export default function PomodoroPage() {
   const _PeriodLabel = _PeriodInfo.IsLesson
     ? `Lekcja ${_PeriodInfo.PeriodNumber}`
     : _PeriodInfo.PeriodNumber > 0
-    ? "Przerwa"
-    : "Po lekcjach";
+      ? "Przerwa"
+      : "Po lekcjach";
 
   const _SubLabel = (() => {
     if (_PeriodInfo.IsLesson) return `Lekcja ${_PeriodInfo.PeriodNumber}`;
     if (_PeriodInfo.PeriodNumber > 0) {
-      const [Min] = (_PeriodInfo.End && _PeriodInfo.Start)
-        ? (() => {
-            const [sh, sm] = _PeriodInfo.Start.split(":").map(Number);
-            const [eh, em] = _PeriodInfo.End.split(":").map(Number);
-            return [eh * 60 + em - (sh * 60 + sm)];
-          })()
-        : [0];
+      const [Min] =
+        _PeriodInfo.End && _PeriodInfo.Start
+          ? (() => {
+              const [sh, sm] = _PeriodInfo.Start.split(":").map(Number);
+              const [eh, em] = _PeriodInfo.End.split(":").map(Number);
+              return [eh * 60 + em - (sh * 60 + sm)];
+            })()
+          : [0];
       return `Przerwa ${Min} minutowa`;
     }
     return "Po lekcjach";
@@ -120,7 +141,10 @@ export default function PomodoroPage() {
     >
       <div className="absolute inset-0"></div>
 
-      <div className="relative z-10 flex flex-col items-center justify-center w-full h-full" style={{ transform: "translateY(50px)" }}>
+      <div
+        className="relative z-10 flex flex-col items-center justify-center w-full h-full"
+        style={{ transform: "translateY(50px)" }}
+      >
         <div className="relative">
           <AnimatedDigit Value={_DisplayTime} Size="xxlarge" />
         </div>

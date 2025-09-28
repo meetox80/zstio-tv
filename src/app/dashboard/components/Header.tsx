@@ -421,7 +421,7 @@ const Header: FC<HeaderProps> = ({
                     <i className="fas fa-bars transform group-hover:scale-110 transition-transform"></i>
                   )}
                 </button>
-                
+
                 <button
                   className={`hidden md:flex relative group items-center justify-center will-change-transform ${
                     IsScrolled ? "h-10 w-10" : "h-12 w-12"
@@ -446,9 +446,9 @@ const Header: FC<HeaderProps> = ({
 
               <button
                 className="hidden xl:flex group items-center will-change-transform rounded-xl backdrop-blur-xl bg-gradient-to-r from-rose-500/10 to-rose-500/20 border border-rose-500/30 text-gray-300 hover:text-white hover:bg-rose-500/30 hover:border-rose-500/50 shadow-[0_0_0.4rem_rgba(244,63,94,0.1)] overflow-hidden relative"
-                style={{ 
+                style={{
                   transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-                  padding: IsScrolled ? "0.625rem 1rem" : "0.75rem 1.25rem"
+                  padding: IsScrolled ? "0.625rem 1rem" : "0.75rem 1.25rem",
                 }}
                 aria-label="Logout"
                 title="Logout"
@@ -462,13 +462,13 @@ const Header: FC<HeaderProps> = ({
                   </span>
                 </div>
               </button>
-              
+
               <button
                 className="hidden md:flex xl:hidden relative group items-center justify-center will-change-transform rounded-xl backdrop-blur-xl bg-gradient-to-br from-rose-500/10 to-rose-500/20 border border-rose-500/30 text-gray-300 hover:text-white hover:bg-rose-500/30 hover:border-rose-500/50 shadow-[0_0_0.4rem_rgba(244,63,94,0.1)] overflow-hidden"
                 style={{
                   transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
                   height: IsScrolled ? "2.5rem" : "3rem",
-                  width: IsScrolled ? "2.5rem" : "3rem"
+                  width: IsScrolled ? "2.5rem" : "3rem",
                 }}
                 aria-label="Logout"
                 title="Logout"
@@ -477,13 +477,13 @@ const Header: FC<HeaderProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-br from-rose-500/0 to-rose-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <i className="fas fa-sign-out-alt transform group-hover:scale-110 transition-transform"></i>
               </button>
-              
+
               <button
                 className="md:hidden relative group flex items-center justify-center will-change-transform rounded-xl backdrop-blur-xl bg-gradient-to-br from-rose-500/10 to-rose-500/20 border border-rose-500/30 text-gray-300 hover:text-white hover:bg-rose-500/30 hover:border-rose-500/50 shadow-[0_0_0.4rem_rgba(244,63,94,0.1)] overflow-hidden"
                 style={{
                   transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
                   height: IsScrolled ? "2.5rem" : "3rem",
-                  width: IsScrolled ? "2.5rem" : "3rem"
+                  width: IsScrolled ? "2.5rem" : "3rem",
                 }}
                 aria-label="Logout"
                 title="Logout"

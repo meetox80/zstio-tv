@@ -31,10 +31,10 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
   const [_IsLoading, setIsLoading] = useState(false);
   const [_Error, setError] = useState("");
   const [_Success, setSuccess] = useState(false);
-  
+
   const _ModalRef = useRef<HTMLDivElement>(null);
   const _CloseButtonRef = useRef<HTMLButtonElement>(null);
-  
+
   useEffect(() => {
     if (IsOpen) {
       setTimeout(() => _CloseButtonRef.current?.focus(), 0);
@@ -46,34 +46,34 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
       setError("Hasło musi mieć co najmniej 8 znaków");
       return;
     }
-    
+
     if (_NewPassword !== _ConfirmPassword) {
       setError("Hasła nie są identyczne");
       return;
     }
-    
+
     setIsLoading(true);
     setError("");
-    
+
     try {
       const _UserId = await getUserId(Username);
-      
+
       if (!_UserId) {
         setError("Nie można znaleźć identyfikatora użytkownika");
         setIsLoading(false);
         return;
       }
-      
+
       const _Response = await fetch(`/api/users/${_UserId}/password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-          password: _NewPassword 
+        body: JSON.stringify({
+          password: _NewPassword,
         }),
       });
-      
+
       if (_Response.ok) {
         setSuccess(true);
         setTimeout(() => OnClose(), 2000);
@@ -87,10 +87,10 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
       setIsLoading(false);
     }
   };
-  
+
   const getUserId = async (username: string): Promise<string | null> => {
     try {
-      const _Response = await fetch('/api/users');
+      const _Response = await fetch("/api/users");
       if (_Response.ok) {
         const _Users = await _Response.json();
         const _AdminUser = _Users.find((user: any) => user.name === username);
@@ -139,7 +139,8 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
                   Bezpieczeństwo konta
                 </h3>
                 <p className="text-sm text-rose-200/70">
-                  Dla użytkownika: <span className="font-semibold">{Username}</span>
+                  Dla użytkownika:{" "}
+                  <span className="font-semibold">{Username}</span>
                 </p>
               </div>
             </div>
@@ -148,7 +149,10 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
               <div className="bg-rose-500/20 rounded-lg p-4 mb-6 border border-rose-500/30">
                 <p className="text-rose-100 text-sm flex items-center">
                   <i className="fas fa-triangle-exclamation mr-3 flex-shrink-0"></i>
-                  <span>Wykryto użycie domyślnego hasła administratora. Zalecana jest natychmiastowa zmiana hasła.</span>
+                  <span>
+                    Wykryto użycie domyślnego hasła administratora. Zalecana
+                    jest natychmiastowa zmiana hasła.
+                  </span>
                 </p>
               </div>
 
@@ -169,10 +173,13 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
                       </p>
                     </div>
                   )}
-                  
+
                   <div className="space-y-4 mb-6">
                     <div className="space-y-1">
-                      <label htmlFor="new-password" className="text-sm text-gray-300 block flex items-center">
+                      <label
+                        htmlFor="new-password"
+                        className="text-sm text-gray-300 block flex items-center"
+                      >
                         <i className="fas fa-key mr-2 text-rose-300/70 flex-shrink-0"></i>
                         Nowe hasło
                       </label>
@@ -191,9 +198,12 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-1">
-                      <label htmlFor="confirm-password" className="text-sm text-gray-300 block flex items-center">
+                      <label
+                        htmlFor="confirm-password"
+                        className="text-sm text-gray-300 block flex items-center"
+                      >
                         <i className="fas fa-check-double mr-2 text-rose-300/70 flex-shrink-0"></i>
                         Potwierdź nowe hasło
                       </label>
@@ -230,7 +240,7 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
                     Zamknij
                   </>
                 </motion.button>
-                
+
                 {!_Success && (
                   <motion.button
                     onClick={HandleSubmit}
@@ -244,7 +254,7 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                         Zapisywanie...
                       </>
-                ) : (
+                    ) : (
                       <>
                         <i className="fas fa-shield mr-2"></i>
                         Zmień hasło
@@ -261,4 +271,4 @@ const AdminPasswordModal: FC<AdminPasswordModalProps> = ({
   );
 };
 
-export default AdminPasswordModal; 
+export default AdminPasswordModal;

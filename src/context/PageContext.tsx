@@ -8,7 +8,11 @@ interface PageContextType {
   CurrentPageIndex: number;
   SetCurrentPageIndex: (index: number) => void;
   ActivePages: Array<{ Key: string; Component?: React.ComponentType }>;
-  SetActivePages: React.Dispatch<React.SetStateAction<Array<{ Key: string; Component?: React.ComponentType }>>>;
+  SetActivePages: React.Dispatch<
+    React.SetStateAction<
+      Array<{ Key: string; Component?: React.ComponentType }>
+    >
+  >;
 }
 
 const PageContext = createContext<PageContextType | undefined>(undefined);
@@ -16,28 +20,40 @@ const PageContext = createContext<PageContextType | undefined>(undefined);
 export function PageProvider({ children }: { children: React.ReactNode }) {
   const [EnabledPages, SetEnabledPages] = useState<string[]>(GetEnabledPages());
   const [CurrentPageIndex, SetCurrentPageIndex] = useState(0);
-  const [ActivePages, SetActivePages] = useState<Array<{ Key: string; Component?: React.ComponentType }>>([]);
+  const [ActivePages, SetActivePages] = useState<
+    Array<{ Key: string; Component?: React.ComponentType }>
+  >([]);
 
   useEffect(() => {
-    const HandlePageConfigChanged = (Event: CustomEvent<{ enabledPages: string[] }>) => {
+    const HandlePageConfigChanged = (
+      Event: CustomEvent<{ enabledPages: string[] }>,
+    ) => {
       SetEnabledPages(Event.detail.enabledPages);
     };
 
-    window.addEventListener("pageConfigChanged", HandlePageConfigChanged as EventListener);
-    
+    window.addEventListener(
+      "pageConfigChanged",
+      HandlePageConfigChanged as EventListener,
+    );
+
     return () => {
-      window.removeEventListener("pageConfigChanged", HandlePageConfigChanged as EventListener);
+      window.removeEventListener(
+        "pageConfigChanged",
+        HandlePageConfigChanged as EventListener,
+      );
     };
   }, []);
 
   return (
-    <PageContext.Provider value={{ 
-      EnabledPages,
-      CurrentPageIndex, 
-      SetCurrentPageIndex,
-      ActivePages,
-      SetActivePages
-    }}>
+    <PageContext.Provider
+      value={{
+        EnabledPages,
+        CurrentPageIndex,
+        SetCurrentPageIndex,
+        ActivePages,
+        SetActivePages,
+      }}
+    >
       {children}
     </PageContext.Provider>
   );

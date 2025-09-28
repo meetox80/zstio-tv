@@ -22,8 +22,8 @@ export default function TextWidget() {
     };
 
     FetchWidgetText();
-    
-    const IntervalId = setInterval(FetchWidgetText, 60000);    
+
+    const IntervalId = setInterval(FetchWidgetText, 60000);
     return () => clearInterval(IntervalId);
   }, []);
 

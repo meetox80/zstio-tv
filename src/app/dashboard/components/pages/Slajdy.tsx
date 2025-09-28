@@ -9,11 +9,9 @@ import {
 } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
 import { ConvertToBase64, OptimizeBase64Image } from "@/lib/imageUtils";
 import ConfirmationModal from "../modals/ConfirmationModal";
 import { useSession } from "next-auth/react";
-import { Permission } from "@/types/permissions";
 import { HasPermission } from "@/lib/permissions";
 import { useToast } from "@/app/context/ToastContext";
 
@@ -48,6 +46,7 @@ const Slajdy: FC<SlajdyProps> = () => {
   const [EditedName, SetEditedName] = useState("");
   const NameInputRef = useRef<HTMLInputElement>(null);
   const { ShowToast } = useToast();
+  const [IsMobile, SetIsMobile] = useState(false);
 
   const UserPermissions = _Session?.user?.permissions || 0;
   const CanViewSlides = HasPermission(UserPermissions, 1 << 1); // SLIDES_VIEW
@@ -457,6 +456,25 @@ const Slajdy: FC<SlajdyProps> = () => {
     };
   }, [SelectedSlide, DeletingSlideId]);
 
+  useEffect(() => {
+    const _IsMobileUa =
+      typeof window !== "undefined"
+        ? /Mobi|Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(
+            navigator.userAgent,
+          )
+        : false;
+    const _IsSmallViewport =
+      typeof window !== "undefined" ? window.innerWidth < 768 : false;
+    SetIsMobile(_IsMobileUa || _IsSmallViewport);
+    const HandleResize = () => {
+      SetIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", HandleResize);
+    return () => {
+      window.removeEventListener("resize", HandleResize);
+    };
+  }, []);
+
   const GetFileNameWithoutExtension = (FileName: string) => {
     return FileName.replace(/\.[^/.]+$/, "");
   };
@@ -550,6 +568,19 @@ const Slajdy: FC<SlajdyProps> = () => {
       SetIsEditingName(false);
     }
   };
+
+  if (IsMobile) {
+    return (
+      <div className="relative p-0 rounded-2xl overflow-hidden h-[calc(100vh-10rem)] max-w-full flex items-center justify-center">
+        <div className="text-center p-6">
+          <i className="fas fa-mobile-alt text-5xl text-rose-400 mb-4"></i>
+          <p className="text-white text-lg">
+            Slajdy nie sa dostepne do modyfikacji na telefonie
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative p-0 rounded-2xl overflow-hidden h-[calc(100vh-10rem)] max-w-full">

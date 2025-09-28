@@ -45,15 +45,16 @@ async function handlePasswordUpdate(
     }
 
     const _IsSelfUpdate = _CurrentUser?.id === _TargetUser.id;
-    const _HasAdminPermission = _CurrentUser && HasPermission(_CurrentUser.permissions, Permission.USERS_MANAGE);
-    
+    const _HasAdminPermission =
+      _CurrentUser &&
+      HasPermission(_CurrentUser.permissions, Permission.USERS_MANAGE);
+
     if (!_IsSelfUpdate && !_HasAdminPermission) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
         { status: 403 },
       );
     }
-
 
     if (_TargetUser.name === "admin" && _CurrentUser?.name !== "admin") {
       return NextResponse.json(

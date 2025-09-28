@@ -276,7 +276,6 @@ export default function LoginPage() {
           suppressHydrationWarning
         >
           <div className="relative flex flex-col max-w-md mx-auto lg:max-w-none h-full pt-8 pb-12 px-10 overflow-hidden">
-
             <div className="relative z-10 my-auto py-24">
               {ShowAnimations ? (
                 <motion.img

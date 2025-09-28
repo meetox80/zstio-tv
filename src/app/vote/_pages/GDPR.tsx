@@ -144,9 +144,7 @@ const GdprPage = () => {
         </div>
       </div>
 
-      <Footer
-        link={{ href: "/vote", text: "Powrót", subtext: "/vote" }}
-      />
+      <Footer link={{ href: "/vote", text: "Powrót", subtext: "/vote" }} />
     </main>
   );
 };

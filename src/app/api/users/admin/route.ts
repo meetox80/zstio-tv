@@ -17,31 +17,33 @@ export async function POST(req: NextRequest) {
     }
 
     const _Body = await req.json();
-    
+
     if (!_Body.checkPassword || !_Body.password) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
-    
+
     const _AdminUser = await Prisma.user.findUnique({
       where: { name: "admin" },
     });
-    
+
     if (!_AdminUser) {
-      return NextResponse.json({ error: "Admin user not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Admin user not found" },
+        { status: 404 },
+      );
     }
-    
+
     const _PasswordMatch = await bcrypt.compare(
       _Body.password,
-      _AdminUser.password || ""
+      _AdminUser.password || "",
     );
-    
+
     return NextResponse.json({ isMatch: _PasswordMatch });
-    
   } catch (_Error) {
     console.error("Error checking admin password:", _Error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} 
+}

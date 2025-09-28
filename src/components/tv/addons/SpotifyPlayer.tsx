@@ -17,7 +17,11 @@ type MatrixTextProps = {
   MaxLength: number;
 };
 
-const MatrixText: React.FC<MatrixTextProps> = ({ Text, IsTransitioning, MaxLength }) => {
+const MatrixText: React.FC<MatrixTextProps> = ({
+  Text,
+  IsTransitioning,
+  MaxLength,
+}) => {
   const [DisplayText, SetDisplayText] = useState(Text);
   const _PreviousText = useRef(Text);
   const _AnimFrame = useRef<number | null>(null);
@@ -26,36 +30,43 @@ const MatrixText: React.FC<MatrixTextProps> = ({ Text, IsTransitioning, MaxLengt
 
   useEffect(() => {
     if (Text === _PreviousText.current) return;
-    
+
     if (_AnimFrame.current) {
       cancelAnimationFrame(_AnimFrame.current);
     }
-    
+
     const _FromText = _PreviousText.current;
     const _ToText = Text;
     const _Duration = 2000;
     const _Delay = 24;
-    
+
     const _GetRandom = () => _CharSet[~~(Math.random() * _CharSet.length)];
-    
+
     const _RunFrame = (Timestamp: number) => {
       if (!_StartTime.current) _StartTime.current = Timestamp;
-      
+
       const _ElapsedTime = Timestamp - _StartTime.current;
       const _Progress = Math.min(1, _ElapsedTime / _Duration);
-      const _Smooth = _Progress < 0.5 ? 4 * _Progress * _Progress * _Progress : 1 - Math.pow(-2 * _Progress + 2, 3) / 2;
-      
-      const _CurrentLength = Math.round(_FromText.length + (_ToText.length - _FromText.length) * _Smooth);
-      
+      const _Smooth =
+        _Progress < 0.5
+          ? 4 * _Progress * _Progress * _Progress
+          : 1 - Math.pow(-2 * _Progress + 2, 3) / 2;
+
+      const _CurrentLength = Math.round(
+        _FromText.length + (_ToText.length - _FromText.length) * _Smooth,
+      );
+
       let _Result = "";
       for (let i = 0; i < _CurrentLength; i++) {
         const _CharDelay = i * _Delay;
-        const _CharProgress = (_ElapsedTime - _CharDelay) / (_Duration - Math.min(_CharDelay, _Duration * 0.6));
+        const _CharProgress =
+          (_ElapsedTime - _CharDelay) /
+          (_Duration - Math.min(_CharDelay, _Duration * 0.6));
         const _NormalizedProgress = Math.max(0, Math.min(1, _CharProgress));
-        
+
         const _FromChar = i < _FromText.length ? _FromText[i] : "";
         const _ToChar = i < _ToText.length ? _ToText[i] : "";
-        
+
         if (_FromChar === _ToChar && _ToChar !== "") {
           _Result += _ToChar;
         } else if (_NormalizedProgress > 0.7) {
@@ -66,9 +77,9 @@ const MatrixText: React.FC<MatrixTextProps> = ({ Text, IsTransitioning, MaxLengt
           _Result += _GetRandom();
         }
       }
-      
+
       SetDisplayText(_Result);
-      
+
       if (_Progress < 1) {
         _AnimFrame.current = requestAnimationFrame(_RunFrame);
       } else {
@@ -78,9 +89,9 @@ const MatrixText: React.FC<MatrixTextProps> = ({ Text, IsTransitioning, MaxLengt
         _StartTime.current = null;
       }
     };
-    
+
     _AnimFrame.current = requestAnimationFrame(_RunFrame);
-    
+
     return () => {
       if (_AnimFrame.current) {
         cancelAnimationFrame(_AnimFrame.current);
@@ -88,16 +99,13 @@ const MatrixText: React.FC<MatrixTextProps> = ({ Text, IsTransitioning, MaxLengt
       }
     };
   }, [Text, IsTransitioning, MaxLength]);
-  
-  const _FinalText = DisplayText.length > MaxLength 
-    ? DisplayText.substring(0, MaxLength) + "..." 
-    : DisplayText;
 
-  return (
-    <span>
-      {_FinalText}
-    </span>
-  );
+  const _FinalText =
+    DisplayText.length > MaxLength
+      ? DisplayText.substring(0, MaxLength) + "..."
+      : DisplayText;
+
+  return <span>{_FinalText}</span>;
 };
 
 export default function SpotifyPlayer({
@@ -106,7 +114,8 @@ export default function SpotifyPlayer({
 }: SpotifyPlayerProps) {
   const [CurrentTrack, SetCurrentTrack] = useState<TrackData | null>(null);
   const [PreviousTrack, SetPreviousTrack] = useState<TrackData | null>(null);
-  const [TransitionState, SetTransitionState] = useState<TransitionState>("idle");
+  const [TransitionState, SetTransitionState] =
+    useState<TransitionState>("idle");
   const _TimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const _PreloadImageRef = useRef<HTMLImageElement | null>(null);
   const _IsFirstRender = useRef<boolean>(true);
@@ -117,19 +126,25 @@ export default function SpotifyPlayer({
       _IsFirstRender.current = false;
 
       try {
-        const _Stored = typeof window !== "undefined" ? sessionStorage.getItem("SpotifyPrevTrack") : null;
+        const _Stored =
+          typeof window !== "undefined"
+            ? sessionStorage.getItem("SpotifyPrevTrack")
+            : null;
         const _Parsed: TrackData | null = _Stored ? JSON.parse(_Stored) : null;
 
         if (
           _Parsed &&
           _Parsed.AlbumArt &&
           TrackData.AlbumArt &&
-          (_Parsed.Title !== TrackData.Title || _Parsed.AlbumArt !== TrackData.AlbumArt)
+          (_Parsed.Title !== TrackData.Title ||
+            _Parsed.AlbumArt !== TrackData.AlbumArt)
         ) {
           SetPreviousTrack(_Parsed);
           SetTransitionState("transitioning");
 
-          const _PreloadImage = document.createElement("img") as HTMLImageElement;
+          const _PreloadImage = document.createElement(
+            "img",
+          ) as HTMLImageElement;
           _PreloadImage.decoding = "async";
           _PreloadImage.loading = "eager";
           _PreloadImage.src = TrackData.AlbumArt;
@@ -167,7 +182,7 @@ export default function SpotifyPlayer({
     }
 
     const _IsNewTrack = !CurrentTrack || TrackData.Title !== CurrentTrack.Title;
-    
+
     if (_IsNewTrack) {
       if (_TimeoutRef.current) {
         clearTimeout(_TimeoutRef.current);
@@ -215,7 +230,10 @@ export default function SpotifyPlayer({
   useEffect(() => {
     if (CurrentTrack) {
       try {
-        sessionStorage.setItem("SpotifyPrevTrack", JSON.stringify(CurrentTrack));
+        sessionStorage.setItem(
+          "SpotifyPrevTrack",
+          JSON.stringify(CurrentTrack),
+        );
       } catch {}
     }
   }, [CurrentTrack]);
@@ -290,7 +308,7 @@ export default function SpotifyPlayer({
             <div className="flex flex-col items-end mr-4">
               <div className="h-[45px] relative overflow-hidden">
                 <h2 className="text-[36px] font-bold text-white leading-tight text-right">
-                  <MatrixText 
+                  <MatrixText
                     Text={TrackData.Title || "Unknown Track"}
                     IsTransitioning={TransitionState === "transitioning"}
                     MaxLength={64}
@@ -299,7 +317,7 @@ export default function SpotifyPlayer({
               </div>
               <div className="h-[30px] relative overflow-hidden">
                 <p className="text-[24px] text-gray-300 opacity-75 text-right">
-                  <MatrixText 
+                  <MatrixText
                     Text={TrackData.Artist || "Unknown Artist"}
                     IsTransitioning={TransitionState === "transitioning"}
                     MaxLength={64}
@@ -321,14 +339,18 @@ export default function SpotifyPlayer({
           <div className="flex items-center">
             <div className="flex flex-col items-end mr-4">
               <h2 className="text-[36px] font-bold text-white/50 leading-tight">
-                {(CurrentTrack?.Title || "Brak utworu").length > 64 
-                  ? (CurrentTrack?.Title || "Brak utworu").substring(0, 64) + "..."
-                  : (CurrentTrack?.Title || "Brak utworu")}
+                {(CurrentTrack?.Title || "Brak utworu").length > 64
+                  ? (CurrentTrack?.Title || "Brak utworu").substring(0, 64) +
+                    "..."
+                  : CurrentTrack?.Title || "Brak utworu"}
               </h2>
               <p className="text-[24px] text-gray-400 mt-1 opacity-75">
-                {(CurrentTrack?.Artist || "Podepnij spotify").length > 64 
-                  ? (CurrentTrack?.Artist || "Podepnij spotify").substring(0, 64) + "..."
-                  : (CurrentTrack?.Artist || "Podepnij spotify")}
+                {(CurrentTrack?.Artist || "Podepnij spotify").length > 64
+                  ? (CurrentTrack?.Artist || "Podepnij spotify").substring(
+                      0,
+                      64,
+                    ) + "..."
+                  : CurrentTrack?.Artist || "Podepnij spotify"}
               </p>
             </div>
             <div className="h-[70px] flex items-center">
@@ -343,7 +365,6 @@ export default function SpotifyPlayer({
           </div>
         )}
       </div>
-
     </>
   );
 }

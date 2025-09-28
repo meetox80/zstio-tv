@@ -30,7 +30,7 @@ export default function AnimatedDigit({
     const CenterX = ColonRect.left - RootRect.left + ColonRect.width / 2;
     OnColonCenterChange(CenterX);
   }, [Value, Size, Color, OnColonCenterChange]);
-  
+
   const _FontSizeClass = {
     small: "text-4xl",
     medium: "text-6xl",
@@ -38,9 +38,9 @@ export default function AnimatedDigit({
     xlarge: "text-[240px]",
     xxlarge: "text-[300px]",
   } as const;
-  
+
   const _Digits = "0123456789".split("");
-  
+
   return (
     <div
       ref={_RootRef}
@@ -64,8 +64,22 @@ export default function AnimatedDigit({
                 }}
                 ref={_ColonRef}
               >
-                <span style={{ width: "0.12em", height: "0.12em", borderRadius: "9999px", background: "currentColor" }} />
-                <span style={{ width: "0.12em", height: "0.12em", borderRadius: "9999px", background: "currentColor" }} />
+                <span
+                  style={{
+                    width: "0.12em",
+                    height: "0.12em",
+                    borderRadius: "9999px",
+                    background: "currentColor",
+                  }}
+                />
+                <span
+                  style={{
+                    width: "0.12em",
+                    height: "0.12em",
+                    borderRadius: "9999px",
+                    background: "currentColor",
+                  }}
+                />
               </div>
             );
           }
@@ -96,10 +110,17 @@ export default function AnimatedDigit({
                     duration: 0.5,
                     ease: [0.22, 0.61, 0.36, 1],
                   }}
-                  style={{ y: `-${_Digits.indexOf(_PrevValueRef.current[Index] || "0") * 100}%`, willChange: "transform" }}
+                  style={{
+                    y: `-${_Digits.indexOf(_PrevValueRef.current[Index] || "0") * 100}%`,
+                    willChange: "transform",
+                  }}
                 >
                   {_Digits.map((D) => (
-                    <div key={D} className="flex-shrink-0 flex-grow-0" style={{ height: "1em" }}>
+                    <div
+                      key={D}
+                      className="flex-shrink-0 flex-grow-0"
+                      style={{ height: "1em" }}
+                    >
                       {D}
                     </div>
                   ))}

@@ -13,13 +13,13 @@ const PageConfiguration: PageConfig[] = [
 ];
 
 export function GetEnabledPages(): string[] {
-  return PageConfiguration
-    .filter(page => page.Enabled)
-    .map(page => page.Key);
+  return PageConfiguration.filter((page) => page.Enabled).map(
+    (page) => page.Key,
+  );
 }
 
 export function IsPageEnabled(pageKey: string): boolean {
-  const Page = PageConfiguration.find(page => page.Key === pageKey);
+  const Page = PageConfiguration.find((page) => page.Key === pageKey);
   return Page ? Page.Enabled : false;
 }
 

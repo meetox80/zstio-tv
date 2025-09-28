@@ -5,7 +5,7 @@ import { useToast } from "@/app/context/ToastContext";
 import { useSession } from "next-auth/react";
 import { HasPermission } from "@/lib/permissions";
 import { Permission } from "@/types/permissions";
-import { 
+import {
   SetLessonDuration,
   GetCurrentLessonDuration,
   InitializeLessonDuration,
@@ -54,8 +54,11 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
   const CanEditLessonTimes =
     CanEditClassTimes ||
     HasPermission(UserPermissions, Permission.ADMINISTRATOR);
-    
-  const CanEditWidgetText = HasPermission(UserPermissions, Permission.ADMINISTRATOR);
+
+  const CanEditWidgetText = HasPermission(
+    UserPermissions,
+    Permission.ADMINISTRATOR,
+  );
 
   useEffect(() => {
     InitializeLessonDuration(defaultLessonTime);
@@ -65,7 +68,7 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
         "settings_update_channel",
       );
     }
-    
+
     const FetchWidgetText = async () => {
       try {
         const Response = await fetch("/api/widgets/text", {
@@ -74,14 +77,13 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
           headers: { "Cache-Control": "no-cache" },
         });
         const Data = await Response.json();
-        
+
         if (Data.widget_text) {
           SetWidgetText(Data.widget_text);
         }
-      } catch (Error) {
-      }
+      } catch (Error) {}
     };
-    
+
     FetchWidgetText();
 
     return () => {
@@ -145,10 +147,10 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
       SetIsDragging(false);
     }
   };
-  
+
   const SaveWidgetText = async () => {
     if (!CanEditWidgetText || _IsWidgetTextSaving) return;
-    
+
     SetIsWidgetTextSaving(true);
     try {
       const Response = await fetch("/api/widgets/text", {
@@ -163,13 +165,16 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
           widget_text: _WidgetText,
         }),
       });
-      
+
       const Data = await Response.json();
-      
+
       if (Response.ok) {
         ShowToast("Tekst widgetu został zaktualizowany", "success");
       } else {
-        ShowToast(`Błąd: ${Data.error || "Nie udało się zapisać tekstu widgetu"}`, "error");
+        ShowToast(
+          `Błąd: ${Data.error || "Nie udało się zapisać tekstu widgetu"}`,
+          "error",
+        );
       }
     } catch (Error) {
       ShowToast("Błąd połączenia. Spróbuj ponownie.", "error");
@@ -218,14 +223,14 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
           </h3>
 
           <div className="space-y-6 relative z-10">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <label className="text-sm font-medium text-gray-300 whitespace-nowrap">
                 Wybierz Player:
               </label>
 
-              <div className="flex items-center">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center w-full sm:w-auto">
                 <div
-                  className={`relative cursor-pointer w-48 ${!CanEditSpotifySettings ? "pointer-events-none" : ""}`}
+                  className={`relative cursor-pointer w-full sm:w-48 ${!CanEditSpotifySettings ? "pointer-events-none" : ""}`}
                   onClick={ToggleDropdown}
                 >
                   <div className="flex items-center justify-between p-2.5 bg-white/5 border border-rose-500/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-rose-500 h-10 transition duration-200 hover:bg-white/10">
@@ -289,7 +294,7 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
                 </div>
 
                 <button
-                  className={`relative inline-flex items-center justify-center font-semibold overflow-hidden rounded-lg ml-3 h-10 group ${!CanEditSpotifySettings ? "pointer-events-none" : ""}`}
+                  className={`relative inline-flex items-center justify-center font-semibold overflow-hidden rounded-lg h-10 group w-full sm:w-auto mt-3 sm:mt-0 sm:ml-3 ${!CanEditSpotifySettings ? "pointer-events-none" : ""}`}
                   aria-label="Autoryzuj"
                   title="Autoryzuj"
                   onClick={AuthorizeSpotify}
@@ -345,11 +350,11 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
           </h3>
 
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-medium text-gray-300 whitespace-nowrap">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <label className="text-sm font-medium text-gray-300 whitespace-normal sm:whitespace-nowrap">
                 Tekst TV:
               </label>
-              <div className="relative flex-1">
+              <div className="relative w-full sm:flex-1">
                 <input
                   type="text"
                   value={_WidgetText}
@@ -367,7 +372,7 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
                 </div>
               </div>
               <button
-                className={`relative inline-flex items-center justify-center font-semibold overflow-hidden rounded-lg h-10 px-4 group ${_IsWidgetTextSaving ? "pointer-events-none" : ""}`}
+                className={`relative inline-flex items-center justify-center font-semibold overflow-hidden rounded-lg h-10 px-4 group w-full sm:w-auto ${_IsWidgetTextSaving ? "pointer-events-none" : ""}`}
                 onClick={SaveWidgetText}
                 disabled={_IsWidgetTextSaving}
               >
@@ -399,7 +404,7 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
           </div>
         </div>
       )}
-      
+
       {CanViewClassTimes && (
         <div className="p-4 md:p-6 rounded-xl backdrop-blur-xl bg-black/40 border border-rose-500/20 shadow-2xl">
           <h3 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6 flex items-center">
@@ -420,15 +425,15 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
           </h3>
 
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <label className="text-sm font-medium text-gray-300 whitespace-nowrap">
                 Wybierz długość:
               </label>
 
-              <div className="flex items-center">
+              <div className="flex items-center w-full sm:w-auto">
                 <div
                   ref={SwitchRef}
-                  className={`relative flex bg-white/5 border border-rose-500/20 rounded-lg overflow-hidden w-24 cursor-pointer select-none transition-opacity duration-300 ${
+                  className={`relative flex bg-white/5 border border-rose-500/20 rounded-lg overflow-hidden w-full sm:w-28 cursor-pointer select-none transition-opacity duration-300 ${
                     IsSaving
                       ? "opacity-50 pointer-events-none"
                       : !CanEditLessonTimes

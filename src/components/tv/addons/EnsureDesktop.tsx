@@ -12,9 +12,14 @@ export default function EnsureDesktop() {
   if (_IsDismissed) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center md:hidden" style={{ backgroundColor: "#000" }}>
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center md:hidden"
+      style={{ backgroundColor: "#000" }}
+    >
       <div className="w-full h-full flex flex-col items-center justify-center px-6 text-center">
-        <div className="text-white text-xl mb-8">to nie jest strona do glosowania ;p</div>
+        <div className="text-white text-xl mb-8">
+          to nie jest strona do glosowania ;p
+        </div>
         <div className="flex items-center gap-4">
           <button
             onClick={_HandleDismiss}
