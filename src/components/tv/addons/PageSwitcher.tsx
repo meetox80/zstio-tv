@@ -4,11 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import SubstitutionsPage from "../pages/SubstitutionsPage";
 import VotePage from "../pages/VotePage";
 import SlidesPage from "../pages/SlidesPage";
+import PomodoroPage from "../pages/PomodoroPage";
 import axios from "axios";
 import PageConfiguration, { GetEnabledPages } from "@/config/pageConfig";
 import { usePageContext } from "@/context/PageContext";
 
 const AllPages = [
+  { Component: PomodoroPage, Key: "pomodoro" },
   { Component: SubstitutionsPage, Key: "substitutions" },
   { Component: VotePage, Key: "vote" },
   { Component: SlidesPage, Key: "slides" },

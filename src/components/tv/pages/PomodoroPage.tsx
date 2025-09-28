@@ -2,164 +2,133 @@
 
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
+import AnimatedDigit from "../addons/AnimatedDigit";
+import {
+  GetCurrentPeriodInfo,
+  PeriodInfo,
+  SubscribeToLessonDuration,
+  InitializeLessonDuration,
+  FormatTimeDisplay,
+} from "@/lib/data/LessonTimes/LessonTimesUtil";
 
-export default function SubstitutionsPage() {
-  const [_CurrentDate, SetCurrentDate] = useState(new Date());
+export default function PomodoroPage() {
+  const [_IsLoading, SetIsLoading] = useState(true);
+  const _InitialInfo = GetCurrentPeriodInfo();
+  const [_PeriodInfo, SetPeriodInfo] = useState<PeriodInfo>(_InitialInfo);
+  const _InitialEndMsCalc = (() => {
+    if (!_InitialInfo.End) return Date.now();
+    const [H, M] = _InitialInfo.End.split(":").map(Number);
+    const Now = new Date();
+    const End = new Date(Now.getFullYear(), Now.getMonth(), Now.getDate(), H, M, 0, 0);
+    return End.getTime();
+  })();
+  const [_DisplayTime, SetDisplayTime] = useState(
+    FormatTimeDisplay(Math.max(0, Math.floor((_InitialEndMsCalc - Date.now()) / 1000)))
+  );
   const _ContainerRef = useRef<HTMLDivElement>(null);
+  const _EndTimeMsRef = useRef<number>(Date.now());
+  const _RafIdRef = useRef<number | null>(null);
+
+  const _ParseEndTimeMs = (Info: PeriodInfo): number => {
+    if (!Info.End) return Date.now();
+    const [H, M] = Info.End.split(":").map(Number);
+    const Now = new Date();
+    const End = new Date(Now.getFullYear(), Now.getMonth(), Now.getDate(), H, M, 0, 0);
+    return End.getTime();
+  };
 
   useEffect(() => {
-    const _Timer = setInterval(() => {
-      SetCurrentDate(new Date());
-    }, 1000);
-
-    return () => {
-      clearInterval(_Timer);
+    const FetchLessonDuration = async () => {
+      try {
+        const Response = await fetch("/api/settings");
+        if (Response.ok) {
+          const Settings = await Response.json();
+          if (Settings.lessonTime) {
+            InitializeLessonDuration(Settings.lessonTime);
+          }
+        }
+      } catch (Error) {
+        console.error("Failed to fetch lesson duration:", Error);
+      } finally {
+        SetIsLoading(false);
+      }
     };
+
+    FetchLessonDuration();
   }, []);
 
-  const _FormattedDate = _CurrentDate.toLocaleDateString("pl-PL", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  useEffect(() => {
+    if (_IsLoading) return;
 
-  const _FormattedTime = _CurrentDate.toLocaleTimeString("pl-PL", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
+    const InitInfo = GetCurrentPeriodInfo();
+    SetPeriodInfo(InitInfo);
+    _EndTimeMsRef.current = _ParseEndTimeMs(InitInfo);
+
+    const Tick = () => {
+      const NowMs = Date.now();
+      const RemainingSec = Math.max(0, Math.floor((_EndTimeMsRef.current - NowMs) / 1000));
+      const Display = FormatTimeDisplay(RemainingSec);
+      SetDisplayTime((Prev) => (Prev !== Display ? Display : Prev));
+      if (RemainingSec <= 0) {
+        const Info = GetCurrentPeriodInfo();
+        SetPeriodInfo(Info);
+        _EndTimeMsRef.current = _ParseEndTimeMs(Info);
+      }
+      _RafIdRef.current = requestAnimationFrame(Tick);
+    };
+
+    _RafIdRef.current = requestAnimationFrame(Tick);
+
+    const _Unsubscribe = SubscribeToLessonDuration(() => {
+      const Info = GetCurrentPeriodInfo();
+      SetPeriodInfo(Info);
+      _EndTimeMsRef.current = _ParseEndTimeMs(Info);
+    });
+
+    return () => {
+      if (_RafIdRef.current) cancelAnimationFrame(_RafIdRef.current);
+      _Unsubscribe();
+    };
+  }, [_IsLoading]);
+
+  const _PeriodLabel = _PeriodInfo.IsLesson
+    ? `Lekcja ${_PeriodInfo.PeriodNumber}`
+    : _PeriodInfo.PeriodNumber > 0
+    ? "Przerwa"
+    : "Po lekcjach";
+
+  const _SubLabel = (() => {
+    if (_PeriodInfo.IsLesson) return `Lekcja ${_PeriodInfo.PeriodNumber}`;
+    if (_PeriodInfo.PeriodNumber > 0) {
+      const [Min] = (_PeriodInfo.End && _PeriodInfo.Start)
+        ? (() => {
+            const [sh, sm] = _PeriodInfo.Start.split(":").map(Number);
+            const [eh, em] = _PeriodInfo.End.split(":").map(Number);
+            return [eh * 60 + em - (sh * 60 + sm)];
+          })()
+        : [0];
+      return `Przerwa ${Min} minutowa`;
+    }
+    return "Po lekcjach";
+  })();
 
   return (
     <div
       ref={_ContainerRef}
-      className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden mt-12"
+      className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden"
     >
       <div className="absolute inset-0"></div>
 
-      <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-5xl">
-        <motion.div
-          className="relative p-12 rounded-3xl border border-[#2F2F2F] overflow-hidden mb-12 w-full max-w-3xl"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
+      <div className="relative z-10 flex flex-col items-center justify-center w-full h-full" style={{ transform: "translateY(50px)" }}>
+        <div>
+          <AnimatedDigit Value={_DisplayTime} Size="xxlarge" />
+        </div>
+        <div
+          className="mt-6 text-white/90 text-[64px] font-semibold tracking-tight"
+          style={{ textShadow: "0 2px 16px rgba(255,255,255,0.06)" }}
         >
-          <div className="relative z-10">
-            <motion.div className="flex items-center justify-center mb-8">
-              <motion.div
-                className="w-20 h-20 rounded-full bg-gradient-to-r from-red-600 to-rose-500 flex items-center justify-center"
-                animate={{
-                  boxShadow: [
-                    "0 0 0px rgba(255,70,70,0)",
-                    "0 0 20px rgba(255,70,70,0.5)",
-                    "0 0 0px rgba(255,70,70,0)",
-                  ],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                <motion.div
-                  animate={{
-                    rotate: [0, 360],
-                    scale: [1, 1.1, 1],
-                  }}
-                  transition={{
-                    rotate: {
-                      duration: 20,
-                      repeat: Infinity,
-                      ease: "linear",
-                    },
-                    scale: {
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    },
-                  }}
-                >
-                  <svg
-                    width="36"
-                    height="36"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0035 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z"
-                      stroke="white"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </motion.div>
-              </motion.div>
-            </motion.div>
-
-            <motion.h1
-              className="text-6xl font-bold text-white text-center tracking-tight"
-              initial={{ opacity: 0, filter: "blur(10px)" }}
-              animate={{ opacity: 1, filter: "blur(0px)" }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-            >
-              <motion.span
-                animate={{
-                  textShadow: [
-                    "0 0 0px rgba(255,70,70,0)",
-                    "0 0 8px rgba(255,70,70,0.3)",
-                    "0 0 0px rgba(255,70,70,0)",
-                  ],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                Brak informacji o zastępstwach
-              </motion.span>
-            </motion.h1>
-          </div>
-        </motion.div>
-
-        <motion.div
-          className="flex items-center gap-4 py-3 px-6 rounded-full backdrop-blur-md border border-[#2F2F2F]"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-        >
-          <motion.div
-            className="w-3 h-3 rounded-full bg-red-400"
-            animate={{
-              opacity: [0.7, 0.9, 0.7],
-              boxShadow: [
-                "0 0 0px rgba(255,70,70,0)",
-                "0 0 5px rgba(255,70,70,0.4)",
-                "0 0 0px rgba(255,70,70,0)",
-              ],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          ></motion.div>
-          <motion.p
-            className="text-white/80 font-medium"
-            animate={{
-              opacity: [0.8, 1, 0.8],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          >
-            System monitoruje aktualizacje
-          </motion.p>
-        </motion.div>
+          {_SubLabel}
+        </div>
       </div>
     </div>
   );

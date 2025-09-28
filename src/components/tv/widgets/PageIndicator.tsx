@@ -37,7 +37,7 @@ export default function PageIndicator({
   }, [Pages.length]);
 
   return (
-    <div className="flex space-x-3 px-4 py-2">
+    <div className="w-full h-full bg-[#1C1919]/80 border border-[#282626] rounded-[12px] flex items-center justify-center space-x-3 px-4 py-2">
       {Pages.map((Page, Index) => (
         <button
           key={Page.Key}

@@ -6,6 +6,7 @@ export interface PageConfig {
 }
 
 const PageConfiguration: PageConfig[] = [
+  { Key: "pomodoro", Enabled: true },
   { Key: "substitutions", Enabled: false },
   { Key: "vote", Enabled: true },
   { Key: "slides", Enabled: true },

@@ -21,7 +21,14 @@ export default function TextWidget() {
       }
     };
 
+    // Fetch immediately on load
     FetchWidgetText();
+    
+    // Set up interval to fetch every minute (60000ms)
+    const IntervalId = setInterval(FetchWidgetText, 60000);
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(IntervalId);
   }, []);
 
   return (

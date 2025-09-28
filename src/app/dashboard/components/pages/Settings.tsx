@@ -1,16 +1,16 @@
 "use client";
 
 import { FC, useState, useRef, useEffect } from "react";
-import { GetSpotifyAuthUrl } from "@/lib/spotify.client";
-import {
+import { useToast } from "@/app/context/ToastContext";
+import { useSession } from "next-auth/react";
+import { HasPermission } from "@/lib/permissions";
+import { Permission } from "@/types/permissions";
+import { 
   SetLessonDuration,
   GetCurrentLessonDuration,
   InitializeLessonDuration,
 } from "@/lib/data/LessonTimes/LessonTimesUtil";
-import { HasPermission } from "@/lib/permissions";
-import { Permission } from "@/types/permissions";
-import { useSession } from "next-auth/react";
-import { useToast } from "@/app/context/ToastContext";
+import { GetSpotifyAuthUrl } from "@/lib/spotify.client";
 
 type SettingsProps = {
   username: string | null | undefined;
@@ -23,6 +23,8 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
   const [IsLoading, SetIsLoading] = useState(false);
   const [IsSaving, SetIsSaving] = useState(false);
   const [LessonTime, SetLessonTime] = useState(defaultLessonTime);
+  const [_WidgetText, SetWidgetText] = useState("");
+  const [_IsWidgetTextSaving, SetIsWidgetTextSaving] = useState(false);
   const [IsDragging, SetIsDragging] = useState(false);
   const StartXRef = useRef(0);
   const SwitchRef = useRef<HTMLDivElement>(null);
@@ -52,6 +54,8 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
   const CanEditLessonTimes =
     CanEditClassTimes ||
     HasPermission(UserPermissions, Permission.ADMINISTRATOR);
+    
+  const CanEditWidgetText = HasPermission(UserPermissions, Permission.ADMINISTRATOR);
 
   useEffect(() => {
     InitializeLessonDuration(defaultLessonTime);
@@ -61,6 +65,24 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
         "settings_update_channel",
       );
     }
+    
+    const FetchWidgetText = async () => {
+      try {
+        const Response = await fetch("/api/widgets/text", {
+          credentials: "same-origin",
+          cache: "no-store",
+          headers: { "Cache-Control": "no-cache" },
+        });
+        const Data = await Response.json();
+        
+        if (Data.widget_text) {
+          SetWidgetText(Data.widget_text);
+        }
+      } catch (Error) {
+      }
+    };
+    
+    FetchWidgetText();
 
     return () => {
       BroadcastChannelRef.current?.close();
@@ -121,6 +143,38 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
       const NewTime = e.clientX < StartXRef.current ? 45 : 30;
       ToggleLessonTime(NewTime);
       SetIsDragging(false);
+    }
+  };
+  
+  const SaveWidgetText = async () => {
+    if (!CanEditWidgetText || _IsWidgetTextSaving) return;
+    
+    SetIsWidgetTextSaving(true);
+    try {
+      const Response = await fetch("/api/widgets/text", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
+        },
+        credentials: "same-origin",
+        cache: "no-store",
+        body: JSON.stringify({
+          widget_text: _WidgetText,
+        }),
+      });
+      
+      const Data = await Response.json();
+      
+      if (Response.ok) {
+        ShowToast("Tekst widgetu został zaktualizowany", "success");
+      } else {
+        ShowToast(`Błąd: ${Data.error || "Nie udało się zapisać tekstu widgetu"}`, "error");
+      }
+    } catch (Error) {
+      ShowToast("Błąd połączenia. Spróbuj ponownie.", "error");
+    } finally {
+      SetIsWidgetTextSaving(false);
     }
   };
 
@@ -271,6 +325,81 @@ const Settings: FC<SettingsProps> = ({ username, defaultLessonTime = 45 }) => {
         </div>
       )}
 
+      {CanEditWidgetText && (
+        <div className="p-4 md:p-6 rounded-xl backdrop-blur-xl bg-black/40 border border-rose-500/20 shadow-2xl">
+          <h3 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6 flex items-center">
+            <svg
+              className="w-5 h-5 mr-2 text-rose-400"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+              />
+            </svg>
+            Tekst Widgetu
+          </h3>
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium text-gray-300 whitespace-nowrap">
+                Tekst TV:
+              </label>
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={_WidgetText}
+                  onChange={(e) => {
+                    const _Value = e.target.value.slice(0, 112);
+                    SetWidgetText(_Value);
+                  }}
+                  maxLength={112}
+                  className="w-full bg-black/30 border border-rose-500/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition duration-200"
+                  placeholder="Wprowadź tekst (max 112 znaków)"
+                  disabled={_IsWidgetTextSaving}
+                />
+                <div className="absolute -bottom-5 right-0 text-xs text-gray-400">
+                  {_WidgetText.length}/112
+                </div>
+              </div>
+              <button
+                className={`relative inline-flex items-center justify-center font-semibold overflow-hidden rounded-lg h-10 px-4 group ${_IsWidgetTextSaving ? "pointer-events-none" : ""}`}
+                onClick={SaveWidgetText}
+                disabled={_IsWidgetTextSaving}
+              >
+                <div className="absolute inset-0 bg-rose-600 rounded-lg opacity-90"></div>
+                <div className="relative z-10 flex items-center justify-center h-full text-white rounded-lg transition-all duration-300 group-hover:bg-rose-700">
+                  {!_IsWidgetTextSaving ? (
+                    <>
+                      <svg
+                        className="w-4 h-4 mr-1.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      <span>Zapisz</span>
+                    </>
+                  ) : (
+                    <span>Zapisywanie...</span>
+                  )}
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {CanViewClassTimes && (
         <div className="p-4 md:p-6 rounded-xl backdrop-blur-xl bg-black/40 border border-rose-500/20 shadow-2xl">
           <h3 className="text-lg md:text-xl font-semibold text-white mb-4 md:mb-6 flex items-center">

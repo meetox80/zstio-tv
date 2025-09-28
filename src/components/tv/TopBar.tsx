@@ -62,7 +62,7 @@ export default function TopBar() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.7, ease: "easeOut", delay: 0.3 }}
       >
-        <div className="w-full h-[60px] rounded-[7px] border border-[#2F2F2F] bg-[#151515]/80 backdrop-blur-md shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center justify-center">
+        <div className="w-full h-[60px]">
           <PageIndicator Pages={_ActivePages} OnPageChange={HandlePageChange} />
         </div>
       </motion.div>
