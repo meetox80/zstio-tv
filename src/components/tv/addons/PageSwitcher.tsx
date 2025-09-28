@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import SubstitutionsPage from "../pages/SubstitutionsPage";
 import VotePage from "../pages/VotePage";
 import SlidesPage from "../pages/SlidesPage";
 import PomodoroPage from "../pages/PomodoroPage";
 import axios from "axios";
-import PageConfiguration, { GetEnabledPages } from "@/config/pageConfig";
+import { GetEnabledPages } from "@/config/pageConfig";
 import { usePageContext } from "@/context/PageContext";
 
 const AllPages = [
@@ -24,7 +25,6 @@ export default function PageSwitcher() {
   const _TotalSeconds = 30;
   const _IsChangingPage = useRef(false);
   
-  // Use the shared page context
   const { 
     CurrentPageIndex: _CurrentPageIndex, 
     SetCurrentPageIndex, 
@@ -32,7 +32,6 @@ export default function PageSwitcher() {
     SetActivePages 
   } = usePageContext();
   
-  // Initialize the active pages in the context
   useEffect(() => {
     SetActivePages(DefaultPages);
   }, []);
@@ -131,9 +130,18 @@ export default function PageSwitcher() {
 
   return (
     <div className="relative w-full h-full">
-      <div className="w-full h-full">
-        {CurrentPageComponent && <CurrentPageComponent />}
-      </div>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={_CurrentPage?.Key || "page"}
+          className="w-full h-full"
+          initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+          transition={{ duration: 0.28, ease: [0.22, 0.61, 0.36, 1] }}
+        >
+          {CurrentPageComponent && <CurrentPageComponent />}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

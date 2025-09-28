@@ -7,17 +7,29 @@ type AnimatedDigitProps = {
   Value: string;
   Size?: "small" | "medium" | "large" | "xlarge" | "xxlarge";
   Color?: string;
+  OnColonCenterChange?: (X: number) => void;
 };
 
 export default function AnimatedDigit({
   Value,
   Size = "large",
   Color = "white",
+  OnColonCenterChange,
 }: AnimatedDigitProps) {
   const _PrevValueRef = useRef(Value);
+  const _RootRef = useRef<HTMLDivElement | null>(null);
+  const _ColonRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     _PrevValueRef.current = Value;
   }, [Value]);
+
+  useEffect(() => {
+    if (!_RootRef.current || !_ColonRef.current || !OnColonCenterChange) return;
+    const RootRect = _RootRef.current.getBoundingClientRect();
+    const ColonRect = _ColonRef.current.getBoundingClientRect();
+    const CenterX = ColonRect.left - RootRect.left + ColonRect.width / 2;
+    OnColonCenterChange(CenterX);
+  }, [Value, Size, Color, OnColonCenterChange]);
   
   const _FontSizeClass = {
     small: "text-4xl",
@@ -31,6 +43,7 @@ export default function AnimatedDigit({
   
   return (
     <div
+      ref={_RootRef}
       className={`${_FontSizeClass[Size]} font-bold leading-none tracking-tight`}
       style={{ color: Color, lineHeight: 1 }}
     >
@@ -44,12 +57,15 @@ export default function AnimatedDigit({
                   width: "0.45em",
                   height: "1em",
                   display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  transform: "translateY(-0.14em)",
+                  gap: "0.18em",
                 }}
+                ref={_ColonRef}
               >
-                :
+                <span style={{ width: "0.12em", height: "0.12em", borderRadius: "9999px", background: "currentColor" }} />
+                <span style={{ width: "0.12em", height: "0.12em", borderRadius: "9999px", background: "currentColor" }} />
               </div>
             );
           }

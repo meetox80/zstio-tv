@@ -114,8 +114,51 @@ export default function SpotifyPlayer({
   useEffect(() => {
     if (_IsFirstRender.current && TrackData) {
       SetCurrentTrack(TrackData);
-      SetPreviousTrack(TrackData);
       _IsFirstRender.current = false;
+
+      try {
+        const _Stored = typeof window !== "undefined" ? sessionStorage.getItem("SpotifyPrevTrack") : null;
+        const _Parsed: TrackData | null = _Stored ? JSON.parse(_Stored) : null;
+
+        if (
+          _Parsed &&
+          _Parsed.AlbumArt &&
+          TrackData.AlbumArt &&
+          (_Parsed.Title !== TrackData.Title || _Parsed.AlbumArt !== TrackData.AlbumArt)
+        ) {
+          SetPreviousTrack(_Parsed);
+          SetTransitionState("transitioning");
+
+          const _PreloadImage = document.createElement("img") as HTMLImageElement;
+          _PreloadImage.decoding = "async";
+          _PreloadImage.loading = "eager";
+          _PreloadImage.src = TrackData.AlbumArt;
+          _PreloadImageRef.current = _PreloadImage;
+
+          _PreloadImage.onload = () => {
+            if (_TimeoutRef.current) {
+              clearTimeout(_TimeoutRef.current);
+              _TimeoutRef.current = null;
+            }
+
+            requestAnimationFrame(() => {
+              SetTransitionState("completed");
+              _TimeoutRef.current = setTimeout(() => {
+                SetTransitionState("idle");
+              }, 800);
+            });
+          };
+
+          _PreloadImage.onerror = () => {
+            _TimeoutRef.current = setTimeout(() => {
+              SetTransitionState("idle");
+            }, 100);
+          };
+        } else {
+          SetPreviousTrack(TrackData);
+        }
+      } catch {}
+
       return;
     }
 
@@ -134,15 +177,24 @@ export default function SpotifyPlayer({
       SetTransitionState("transitioning");
 
       const _PreloadImage = document.createElement("img") as HTMLImageElement;
+      _PreloadImage.decoding = "async";
+      _PreloadImage.loading = "eager";
       _PreloadImage.src = TrackData.AlbumArt;
       _PreloadImageRef.current = _PreloadImage;
 
       _PreloadImage.onload = () => {
+        if (_TimeoutRef.current) {
+          clearTimeout(_TimeoutRef.current);
+          _TimeoutRef.current = null;
+        }
+
         SetCurrentTrack(TrackData);
-        SetTransitionState("completed");
-        _TimeoutRef.current = setTimeout(() => {
-          SetTransitionState("idle");
-        }, 800);
+        requestAnimationFrame(() => {
+          SetTransitionState("completed");
+          _TimeoutRef.current = setTimeout(() => {
+            SetTransitionState("idle");
+          }, 800);
+        });
       };
 
       _PreloadImage.onerror = () => {
@@ -160,6 +212,14 @@ export default function SpotifyPlayer({
     };
   }, [TrackData, CurrentTrack]);
 
+  useEffect(() => {
+    if (CurrentTrack) {
+      try {
+        sessionStorage.setItem("SpotifyPrevTrack", JSON.stringify(CurrentTrack));
+      } catch {}
+    }
+  }, [CurrentTrack]);
+
   return (
     <>
       <div className="absolute inset-0 overflow-hidden">
@@ -170,7 +230,7 @@ export default function SpotifyPlayer({
               alt=""
               fill
               sizes="100vw"
-              className={`object-cover blur-xl transition-opacity duration-800 ease-linear ${
+              className={`object-cover blur-xl transition-opacity duration-[800ms] ease-linear ${
                 TransitionState === "transitioning" ? "opacity-20" : "opacity-0"
               }`}
               priority={false}
@@ -184,7 +244,7 @@ export default function SpotifyPlayer({
               alt=""
               fill
               sizes="100vw"
-              className={`object-cover blur-xl transition-opacity duration-800 ease-linear ${
+              className={`object-cover blur-xl transition-opacity duration-[800ms] ease-linear ${
                 TransitionState === "transitioning" ? "opacity-0" : "opacity-20"
               }`}
               priority={false}
@@ -201,7 +261,7 @@ export default function SpotifyPlayer({
               alt=""
               fill
               sizes="50vw"
-              className={`object-cover object-[right_bottom] tv-mask-radial transition-opacity duration-600 ease-linear ${
+              className={`object-cover object-[right_bottom] tv-mask-radial transition-opacity duration-[600ms] ease-linear ${
                 TransitionState === "transitioning" ? "opacity-25" : "opacity-0"
               }`}
               priority={false}
@@ -215,7 +275,7 @@ export default function SpotifyPlayer({
               alt=""
               fill
               sizes="50vw"
-              className={`object-cover object-[right_bottom] tv-mask-radial transition-opacity duration-600 ease-linear ${
+              className={`object-cover object-[right_bottom] tv-mask-radial transition-opacity duration-[600ms] ease-linear ${
                 TransitionState === "transitioning" ? "opacity-0" : "opacity-25"
               }`}
               priority={false}

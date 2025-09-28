@@ -28,6 +28,7 @@ export default function PomodoroPage() {
   const _ContainerRef = useRef<HTMLDivElement>(null);
   const _EndTimeMsRef = useRef<number>(Date.now());
   const _RafIdRef = useRef<number | null>(null);
+  
 
   const _ParseEndTimeMs = (Info: PeriodInfo): number => {
     if (!Info.End) return Date.now();
@@ -120,11 +121,11 @@ export default function PomodoroPage() {
       <div className="absolute inset-0"></div>
 
       <div className="relative z-10 flex flex-col items-center justify-center w-full h-full" style={{ transform: "translateY(50px)" }}>
-        <div>
+        <div className="relative">
           <AnimatedDigit Value={_DisplayTime} Size="xxlarge" />
         </div>
         <div
-          className="mt-6 text-white/90 text-[64px] font-semibold tracking-tight"
+          className="mt-6 text-white/90 text-[64px] font-semibold tracking-tight text-center ml-2"
           style={{ textShadow: "0 2px 16px rgba(255,255,255,0.06)" }}
         >
           {_SubLabel}
