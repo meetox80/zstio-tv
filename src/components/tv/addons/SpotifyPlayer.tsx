@@ -22,7 +22,7 @@ const MatrixText: React.FC<MatrixTextProps> = ({ Text, IsTransitioning, MaxLengt
   const _PreviousText = useRef(Text);
   const _AnimFrame = useRef<number | null>(null);
   const _StartTime = useRef<number | null>(null);
-  const _CharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+  const _CharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
   useEffect(() => {
     if (Text === _PreviousText.current) return;
@@ -33,25 +33,24 @@ const MatrixText: React.FC<MatrixTextProps> = ({ Text, IsTransitioning, MaxLengt
     
     const _FromText = _PreviousText.current;
     const _ToText = Text;
-    const _Duration = IsTransitioning ? 800 : 600;
-    const _Delay = 20;
+    const _Duration = 2000;
+    const _Delay = 24;
     
     const _GetRandom = () => _CharSet[~~(Math.random() * _CharSet.length)];
     
     const _RunFrame = (Timestamp: number) => {
       if (!_StartTime.current) _StartTime.current = Timestamp;
       
-      // whatever this shit is
       const _ElapsedTime = Timestamp - _StartTime.current;
       const _Progress = Math.min(1, _ElapsedTime / _Duration);
-      const _Smooth = _Progress < 0.5 ? 2 * _Progress * _Progress : 1 - Math.pow(-2 * _Progress + 2, 2) / 2;
+      const _Smooth = _Progress < 0.5 ? 4 * _Progress * _Progress * _Progress : 1 - Math.pow(-2 * _Progress + 2, 3) / 2;
       
       const _CurrentLength = Math.round(_FromText.length + (_ToText.length - _FromText.length) * _Smooth);
       
       let _Result = "";
       for (let i = 0; i < _CurrentLength; i++) {
         const _CharDelay = i * _Delay;
-        const _CharProgress = (_ElapsedTime - _CharDelay) / (_Duration - Math.min(_CharDelay, _Duration * 0.7));
+        const _CharProgress = (_ElapsedTime - _CharDelay) / (_Duration - Math.min(_CharDelay, _Duration * 0.6));
         const _NormalizedProgress = Math.max(0, Math.min(1, _CharProgress));
         
         const _FromChar = i < _FromText.length ? _FromText[i] : "";
@@ -59,9 +58,9 @@ const MatrixText: React.FC<MatrixTextProps> = ({ Text, IsTransitioning, MaxLengt
         
         if (_FromChar === _ToChar && _ToChar !== "") {
           _Result += _ToChar;
-        } else if (_NormalizedProgress > 0.85) {
+        } else if (_NormalizedProgress > 0.7) {
           _Result += _ToChar;
-        } else if (_NormalizedProgress < 0.25 && _FromChar !== "") {
+        } else if (_NormalizedProgress < 0.2 && _FromChar !== "") {
           _Result += _FromChar;
         } else {
           _Result += _GetRandom();
@@ -139,17 +138,11 @@ export default function SpotifyPlayer({
       _PreloadImageRef.current = _PreloadImage;
 
       _PreloadImage.onload = () => {
+        SetCurrentTrack(TrackData);
+        SetTransitionState("completed");
         _TimeoutRef.current = setTimeout(() => {
-          SetCurrentTrack(TrackData);
-          
-          setTimeout(() => {
-            SetTransitionState("completed");
-            
-            setTimeout(() => {
-              SetTransitionState("idle");
-            }, 1000);
-          }, 700);
-        }, 100);
+          SetTransitionState("idle");
+        }, 800);
       };
 
       _PreloadImage.onerror = () => {
@@ -177,7 +170,7 @@ export default function SpotifyPlayer({
               alt=""
               fill
               sizes="100vw"
-              className={`object-cover blur-xl transition-opacity duration-1000 ease-linear ${
+              className={`object-cover blur-xl transition-opacity duration-800 ease-linear ${
                 TransitionState === "transitioning" ? "opacity-20" : "opacity-0"
               }`}
               priority={false}
@@ -191,7 +184,7 @@ export default function SpotifyPlayer({
               alt=""
               fill
               sizes="100vw"
-              className={`object-cover blur-xl transition-opacity duration-1000 ease-linear ${
+              className={`object-cover blur-xl transition-opacity duration-800 ease-linear ${
                 TransitionState === "transitioning" ? "opacity-0" : "opacity-20"
               }`}
               priority={false}
@@ -208,7 +201,7 @@ export default function SpotifyPlayer({
               alt=""
               fill
               sizes="50vw"
-              className={`object-cover object-[right_bottom] tv-mask-radial transition-opacity duration-700 ease-linear ${
+              className={`object-cover object-[right_bottom] tv-mask-radial transition-opacity duration-600 ease-linear ${
                 TransitionState === "transitioning" ? "opacity-25" : "opacity-0"
               }`}
               priority={false}
@@ -222,7 +215,7 @@ export default function SpotifyPlayer({
               alt=""
               fill
               sizes="50vw"
-              className={`object-cover object-[right_bottom] tv-mask-radial transition-opacity duration-700 ease-linear ${
+              className={`object-cover object-[right_bottom] tv-mask-radial transition-opacity duration-600 ease-linear ${
                 TransitionState === "transitioning" ? "opacity-0" : "opacity-25"
               }`}
               priority={false}

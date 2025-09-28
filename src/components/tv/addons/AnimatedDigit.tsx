@@ -27,39 +27,71 @@ export default function AnimatedDigit({
     xxlarge: "text-[300px]",
   } as const;
   
-  const _Digits = "0123456789:".split("");
+  const _Digits = "0123456789".split("");
   
   return (
     <div
       className={`${_FontSizeClass[Size]} font-bold leading-none tracking-tight`}
-      style={{ color: Color }}
+      style={{ color: Color, lineHeight: 1 }}
     >
       <div className="flex">
-        {Value.split("").map((Digit, Index) => (
-          <div key={`${Index}-${Digit}`} className="relative overflow-hidden" style={{ width: Digit === ":" ? "0.45em" : "0.62em", height: "1.15em" }}>
-            <div className="absolute inset-0 flex justify-center">
-              {_Digits.includes(Digit) && (
+        {Value.split("").map((Digit, Index) => {
+          if (Digit === ":") {
+            return (
+              <div
+                key={`${Index}-colon`}
+                style={{
+                  width: "0.45em",
+                  height: "1em",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transform: "translateY(-0.14em)",
+                }}
+              >
+                :
+              </div>
+            );
+          }
+          return (
+            <div
+              key={`${Index}-${Digit}`}
+              className="relative overflow-hidden"
+              style={{
+                width: "0.62em",
+                height: "1em",
+                WebkitMaskImage:
+                  "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 16%, rgba(0,0,0,1) 34%, rgba(0,0,0,1) 54%, rgba(0,0,0,0.65) 76%, rgba(0,0,0,0) 100%)",
+                maskImage:
+                  "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 16%, rgba(0,0,0,1) 34%, rgba(0,0,0,1) 54%, rgba(0,0,0,0.65) 76%, rgba(0,0,0,0) 100%)",
+                WebkitMaskSize: "100% 100%",
+                maskSize: "100% 100%",
+                WebkitMaskRepeat: "no-repeat",
+                maskRepeat: "no-repeat",
+              }}
+            >
+              <div className="absolute inset-0 flex justify-center">
                 <motion.div
                   className="flex flex-col items-center"
                   animate={{
                     y: `${-_Digits.indexOf(Digit) * 100}%`,
                   }}
                   transition={{
-                    duration: 0.45,
+                    duration: 0.5,
                     ease: [0.22, 0.61, 0.36, 1],
                   }}
                   style={{ y: `-${_Digits.indexOf(_PrevValueRef.current[Index] || "0") * 100}%`, willChange: "transform" }}
                 >
                   {_Digits.map((D) => (
-                    <div key={D} className="flex-shrink-0 flex-grow-0" style={{ height: "1.15em" }}>
+                    <div key={D} className="flex-shrink-0 flex-grow-0" style={{ height: "1em" }}>
                       {D}
                     </div>
                   ))}
                 </motion.div>
-              )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
