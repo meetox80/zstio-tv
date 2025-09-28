@@ -386,14 +386,22 @@
     color: var(--color-gray-400);
   }
 
-@layer utilities {
-  .tv-mask-radial {
-    -webkit-mask-image: radial-gradient(ellipse at calc(100% + 1500px) bottom, rgba(0,0,0,1) 20%, transparent 70%);
-    mask-image: radial-gradient(ellipse at calc(100% + 1500px) bottom, rgba(0,0,0,1) 20%, transparent 70%);
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
+  @layer utilities {
+    .tv-mask-radial {
+      -webkit-mask-image: radial-gradient(
+        ellipse at calc(100% + 1500px) bottom,
+        rgba(0, 0, 0, 1) 20%,
+        transparent 70%
+      );
+      mask-image: radial-gradient(
+        ellipse at calc(100% + 1500px) bottom,
+        rgba(0, 0, 0, 1) 20%,
+        transparent 70%
+      );
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+    }
   }
-}
 
   button:not(:disabled),
   [role="button"]:not(:disabled) {
