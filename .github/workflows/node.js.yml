@@ -47,5 +47,5 @@ jobs:
         run: |
           pm2 delete tv || echo "No existing PM2 process to delete"
 
-          pm2 start pnpm --name "tv" -- start
+          pm2 start "bash -c 'pnpm run start'" --name "tv"
           pm2 save
