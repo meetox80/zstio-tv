@@ -1,6 +1,6 @@
 "use client";
 
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SearchSpotifyTracks } from "@/lib/spotify.client";
 import { SpotifyTrack } from "@/types/spotify";
@@ -11,13 +11,12 @@ import Navbar from "../_components/Navbar";
 import Footer from "../_components/Footer";
 import Image from "next/image";
 
-const _Inter = Inter({ subsets: ["latin"] });
 const _JetBrainsMono = JetBrains_Mono({ subsets: ["latin"] });
 const _SpaceGrotesk = Space_Grotesk({ subsets: ["latin"] });
 
 const Vote = () => {
   const [SearchTerm, setSearchTerm] = useState("");
-  const [ActiveTab, setActiveTab] = useState("submit");
+  const [ActiveTab, setActiveTab] = useState<"submit" | "recent">("submit");
   const [SearchResults, setSearchResults] = useState<SpotifyTrack[]>([]);
   const [IsLoading, setIsLoading] = useState(false);
   const [IsAuthenticated, setIsAuthenticated] = useState(true);
@@ -33,13 +32,15 @@ const Vote = () => {
     message: string;
     type: "success" | "error";
   } | null>(null);
-  const [IsPendingExpanded, setIsPendingExpanded] = useState(false);
+  const [IsPendingView, setIsPendingView] = useState(false);
   const [PendingProposals, setPendingProposals] = useState<any[]>([]);
   const [IsLoadingPendingProposals, setIsLoadingPendingProposals] =
     useState(false);
   const [TurnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [IsTurnstileVerified, setIsTurnstileVerified] = useState(false);
   const [IsTurnstileLoading, setIsTurnstileLoading] = useState(false);
+  const IsSubmitTabActive = ActiveTab === "submit" || !ActiveTab;
+  const MobileContentOffset = ActiveTab === "submit" ? "mt-[120px]" : "mt-[72px]";
 
   const ShowNotification = (Message: string, Type: "success" | "error") => {
     setNotification({ message: Message, type: Type });
@@ -272,10 +273,10 @@ const Vote = () => {
   }, [FetchRecentProposals]);
 
   useEffect(() => {
-    if (IsPendingExpanded) {
+    if (IsPendingView) {
       FetchPendingProposals();
     }
-  }, [IsPendingExpanded, FetchPendingProposals]);
+  }, [IsPendingView, FetchPendingProposals]);
 
   const FormatDuration = (Ms: number) => {
     const Minutes = Math.floor(Ms / 60000);
@@ -302,7 +303,7 @@ const Vote = () => {
       const Data = await Response.json();
 
       if (Response.ok) {
-        if (IsPendingExpanded) {
+        if (IsPendingView) {
           FetchPendingProposals();
         } else {
           FetchRecentProposals();
@@ -339,11 +340,13 @@ const Vote = () => {
     }
   };
 
-  const TogglePendingSection = () => {
-    setIsPendingExpanded(!IsPendingExpanded);
-    if (!IsPendingExpanded) {
-      FetchPendingProposals();
-    }
+  const OpenPendingView = () => {
+    setIsPendingView(true);
+    FetchPendingProposals();
+  };
+
+  const ClosePendingView = () => {
+    setIsPendingView(false);
   };
 
   return (
@@ -404,23 +407,24 @@ const Vote = () => {
 
       <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-black via-black/90 to-transparent z-10"></div>
 
-      <Navbar />
+      <Navbar activeTab={ActiveTab} onChangeTab={setActiveTab} />
 
-      <div className="w-full mx-auto px-6 md:px-12 py-28 z-10 mt-20">
+      <div
+        className={`w-full mx-auto px-6 md:px-12 py-12 md:py-28 z-10 ${MobileContentOffset} md:mt-20`}
+      >
         <div className="max-w-6xl mx-auto">
           <h1
-            className={`text-5xl md:text-7xl font-bold mb-6 ${_SpaceGrotesk.className} tracking-tight`}
+            className={`hidden md:block text-5xl md:text-7xl font-bold mb-6 ${_SpaceGrotesk.className} tracking-tight`}
           >
             Zaproponuj piosenke
           </h1>
-          <p className="text-lg text-white/70 max-w-xl mb-16">
-            Pomóż nam tworzyć wyjątkową atmosferę w szkole. Piosenki z
-            największą ilością głosów trafiają do playlisty.
+          <p className="hidden md:block text-lg text-white/70 max-w-xl mb-16">
+            Pomóż nam tworzyć wyjątkową atmosferę w szkole. Piosenki z największą ilością głosów trafiają do playlisty.
           </p>
 
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
-            <section className="lg:w-1/2 w-full">
-              <div className="mb-8 flex space-x-4">
+            <section className="lg:w-1/2 w-full flex flex-col">
+              <div className="mb-8 hidden md:flex space-x-4">
                 <button
                   onClick={() => setActiveTab("submit")}
                   className={`py-3 px-6 relative group ${ActiveTab === "submit" ? "text-white" : "text-white/50 hover:text-white/80"}`}
@@ -447,383 +451,282 @@ const Vote = () => {
                 </button>
               </div>
 
-              {(ActiveTab === "submit" || !ActiveTab) && (
-                <div className="space-y-10 relative">
-                  <div className="relative">
-                    <div className="group">
-                      <div
-                        className={`flex flex-col w-full ${SelectedTrack ? "mb-2" : ""}`}
-                      >
-                        <div className="relative flex">
-                          <input
-                            ref={SearchInputRef}
-                            type="text"
-                            value={SearchTerm}
-                            onChange={HandleSearchChange}
-                            className="flex-grow p-4 pl-12 bg-white/5 backdrop-blur-sm border border-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300 rounded-xl"
-                            placeholder={
-                              SelectedTrack
-                                ? "Zmień utwór..."
-                                : "Wyszukaj utwór na Spotify..."
-                            }
-                            disabled={!IsAuthenticated}
-                          />
-                          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60">
-                            <i className="fas fa-search h-5 w-5"></i>
+              {IsSubmitTabActive && (
+                <div className="flex flex-col flex-1">
+                  <div className="space-y-10 relative flex-1">
+                    <div className="relative">
+                      <div className="group">
+                        <div
+                          className={`flex flex-col w-full ${SelectedTrack ? "mb-2" : ""}`}
+                        >
+                          <div className="relative flex">
+                            <input
+                              ref={SearchInputRef}
+                              type="text"
+                              value={SearchTerm}
+                              onChange={HandleSearchChange}
+                              className="flex-grow p-4 pl-12 bg-white/5 backdrop-blur-sm border border-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300 rounded-xl"
+                              placeholder={
+                                SelectedTrack
+                                  ? "Zmień utwór..."
+                                  : "Wyszukaj utwór na Spotify..."
+                              }
+                              disabled={!IsAuthenticated}
+                            />
+                            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60">
+                              <i className="fas fa-search h-5 w-5"></i>
+                            </div>
+
+                            {SearchTerm && (
+                              <button
+                                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white transition-colors duration-200"
+                                onClick={() => setSearchTerm("")}
+                                aria-label="Wyczyść wyszukiwanie"
+                                title="Wyczyść wyszukiwanie"
+                              >
+                                <i className="fas fa-times h-5 w-5"></i>
+                              </button>
+                            )}
                           </div>
 
-                          {SearchTerm && (
-                            <button
-                              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white transition-colors duration-200"
-                              onClick={() => setSearchTerm("")}
-                              aria-label="Wyczyść wyszukiwanie"
-                              title="Wyczyść wyszukiwanie"
-                            >
-                              <i className="fas fa-times h-5 w-5"></i>
-                            </button>
+                          {SelectedTrack && (
+                            <div className="flex items-center mt-4 p-3 bg-white/5 border border-white/10 rounded-xl overflow-hidden group">
+                              <div className="flex-shrink-0 w-12 h-12 rounded-md overflow-hidden mr-3 border border-white/10">
+                                {SelectedTrack.AlbumArt ? (
+                                  <Image
+                                    src={SelectedTrack.AlbumArt}
+                                    alt={SelectedTrack.Album}
+                                    width={48}
+                                    height={48}
+                                    className="object-cover w-full h-full"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full bg-white/10 flex items-center justify-center">
+                                    <i className="fas fa-music w-6 h-6 text-white/60"></i>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-grow min-w-0">
+                                <h4 className="text-sm font-medium text-white truncate">
+                                  {SelectedTrack.Title}
+                                </h4>
+                                <p className="text-xs text-white/70 truncate">
+                                  {SelectedTrack.Artist}
+                                </p>
+                              </div>
+                              <div className="flex-shrink-0 ml-2 flex items-center">
+                                <span className="text-xs text-white/60 mr-2">
+                                  {FormatDuration(SelectedTrack.Duration)}
+                                </span>
+                                <button
+                                  onClick={ClearSelection}
+                                  className="p-1.5 text-white/60 hover:text-white hover:bg-white/10 rounded-full transition-all duration-200"
+                                  aria-label="Usuń wybrany utwór"
+                                  title="Usuń wybrany utwór"
+                                >
+                                  <i className="fas fa-times h-4 w-4"></i>
+                                </button>
+                              </div>
+                            </div>
                           )}
                         </div>
 
-                        {SelectedTrack && (
-                          <div className="flex items-center mt-4 p-3 bg-white/5 border border-white/10 rounded-xl overflow-hidden group">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-md overflow-hidden mr-3 border border-white/10">
-                              {SelectedTrack.AlbumArt ? (
-                                <Image
-                                  src={SelectedTrack.AlbumArt}
-                                  alt={SelectedTrack.Album}
-                                  width={48}
-                                  height={48}
-                                  className="object-cover w-full h-full"
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-white/10 flex items-center justify-center">
-                                  <i className="fas fa-music w-6 h-6 text-white/60"></i>
+                        {SearchTerm && SearchResults.length > 0 && (
+                          <div className="absolute z-50 mt-1 w-full bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden max-h-[320px] overflow-y-auto custom-scrollbar">
+                            <div className="divide-y divide-white/10">
+                              {SearchResults.map((Track) => (
+                                <div
+                                  key={Track.Id}
+                                  onClick={() => SelectTrack(Track)}
+                                  className="flex items-center p-3 hover:bg-white/10 cursor-pointer transition-colors duration-200 group"
+                                >
+                                  <div className="flex-shrink-0 w-10 h-10 rounded-md overflow-hidden mr-3 border border-white/10 group-hover:border-white/30 transition-all duration-300">
+                                    {Track.AlbumArt ? (
+                                      <Image
+                                        src={Track.AlbumArt}
+                                        alt={Track.Album}
+                                        width={40}
+                                        height={40}
+                                        className="object-cover w-full h-full"
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full bg-white/10 flex items-center justify-center">
+                                        <i className="fas fa-music w-5 h-5 text-white/60"></i>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex-grow min-w-0">
+                                    <h4 className="text-sm font-medium text-white truncate">
+                                      {Track.Title}
+                                    </h4>
+                                    <p className="text-xs text-white/70 truncate">
+                                      {Track.Artist}
+                                    </p>
+                                  </div>
+                                  <div className="flex-shrink-0 text-xs text-white/60">
+                                    {FormatDuration(Track.Duration)}
+                                  </div>
                                 </div>
-                              )}
+                              ))}
                             </div>
-                            <div className="flex-grow min-w-0">
-                              <h4 className="text-sm font-medium text-white truncate">
-                                {SelectedTrack.Title}
-                              </h4>
-                              <p className="text-xs text-white/70 truncate">
-                                {SelectedTrack.Artist}
+                          </div>
+                        )}
+
+                        {SearchTerm && IsLoading && (
+                          <div className="absolute mt-1 w-full bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl p-6 flex justify-center">
+                            <div className="flex space-x-2 items-center">
+                              <div
+                                className="w-2 h-2 bg-white/70 rounded-full animate-pulse"
+                                style={{ animationDelay: "0ms" }}
+                              ></div>
+                              <div
+                                className="w-2 h-2 bg-white/70 rounded-full animate-pulse"
+                                style={{ animationDelay: "150ms" }}
+                              ></div>
+                              <div
+                                className="w-2 h-2 bg-white/70 rounded-full animate-pulse"
+                                style={{ animationDelay: "300ms" }}
+                              ></div>
+                            </div>
+                          </div>
+                        )}
+
+                        {SearchTerm &&
+                          !IsLoading &&
+                          SearchResults.length === 0 && (
+                            <div className="absolute mt-1 w-full bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl p-6 text-center">
+                              <p className="text-white/70">
+                                Nie znaleziono utworów
                               </p>
                             </div>
-                            <div className="flex-shrink-0 ml-2 flex items-center">
-                              <span className="text-xs text-white/60 mr-2">
-                                {FormatDuration(SelectedTrack.Duration)}
-                              </span>
-                              <button
-                                onClick={ClearSelection}
-                                className="p-1.5 text-white/60 hover:text-white hover:bg-white/10 rounded-full transition-all duration-200"
-                                aria-label="Usuń wybrany utwór"
-                                title="Usuń wybrany utwór"
-                              >
-                                <i className="fas fa-times h-4 w-4"></i>
-                              </button>
-                            </div>
-                          </div>
-                        )}
+                          )}
                       </div>
+                    </div>
 
-                      {SearchTerm && SearchResults.length > 0 && (
-                        <div className="absolute z-50 mt-1 w-full bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden max-h-[320px] overflow-y-auto custom-scrollbar">
-                          <div className="divide-y divide-white/10">
-                            {SearchResults.map((Track) => (
-                              <div
-                                key={Track.Id}
-                                onClick={() => SelectTrack(Track)}
-                                className="flex items-center p-3 hover:bg-white/10 cursor-pointer transition-colors duration-200 group"
-                              >
-                                <div className="flex-shrink-0 w-10 h-10 rounded-md overflow-hidden mr-3 border border-white/10 group-hover:border-white/30 transition-all duration-300">
-                                  {Track.AlbumArt ? (
-                                    <Image
-                                      src={Track.AlbumArt}
-                                      alt={Track.Album}
-                                      width={40}
-                                      height={40}
-                                      className="object-cover w-full h-full"
-                                    />
-                                  ) : (
-                                    <div className="w-full h-full bg-white/10 flex items-center justify-center">
-                                      <i className="fas fa-music w-5 h-5 text-white/60"></i>
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="flex-grow min-w-0">
-                                  <h4 className="text-sm font-medium text-white truncate">
-                                    {Track.Title}
-                                  </h4>
-                                  <p className="text-xs text-white/70 truncate">
-                                    {Track.Artist}
-                                  </p>
-                                </div>
-                                <div className="flex-shrink-0 text-xs text-white/60">
-                                  {FormatDuration(Track.Duration)}
-                                </div>
-                              </div>
-                            ))}
+                    {!IsTurnstileVerified ? (
+                      <div className="border border-white/10 rounded-xl py-8 px-6 flex flex-col items-center justify-center bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group relative overflow-hidden">
+                        <div className="absolute -right-24 -bottom-24 w-48 h-48 rounded-full bg-white/5 blur-[60px]"></div>
+                        <div className="absolute -left-24 -top-24 w-48 h-48 rounded-full bg-white/10 blur-[80px]"></div>
+
+                        <div className="w-full flex flex-col items-center py-3 relative z-10">
+                          <span className="text-sm text-white/80 mb-3 flex items-center font-medium">
+                            <i className="fas fa-shield-alt w-4 h-4 mr-2 text-white/60"></i>
+                            Weryfikacja CAPTCHA
+                          </span>
+                          <div className="w-full flex justify-center">
+                            <Turnstile
+                              siteKey={
+                                process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""
+                              }
+                              onSuccess={HandleTurnstileVerify}
+                              onError={() => {
+                                setIsTurnstileVerified(false);
+                                ShowNotification(
+                                  "Wystąpił błąd podczas ładowania CAPTCHA",
+                                  "error",
+                                );
+                              }}
+                              onExpire={() => {
+                                setIsTurnstileVerified(false);
+                                setTurnstileToken(null);
+                              }}
+                              options={{
+                                theme: "dark",
+                                size: "normal",
+                              }}
+                              className="mx-auto"
+                            />
                           </div>
+                          <span
+                            className={`text-xs text-white/60 mt-2 ${_JetBrainsMono.className} tracking-wider`}
+                          >
+                            {IsTurnstileVerified ? (
+                              <span className="text-green-400 flex items-center">
+                                <i className="fas fa-check w-3 h-3 mr-1"></i>
+                                Zweryfikowano
+                              </span>
+                            ) : (
+                              ""
+                            )}
+                          </span>
                         </div>
-                      )}
-
-                      {SearchTerm && IsLoading && (
-                        <div className="absolute mt-1 w-full bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl p-6 flex justify-center">
-                          <div className="flex space-x-2 items-center">
-                            <div
-                              className="w-2 h-2 bg-white/70 rounded-full animate-pulse"
-                              style={{ animationDelay: "0ms" }}
-                            ></div>
-                            <div
-                              className="w-2 h-2 bg-white/70 rounded-full animate-pulse"
-                              style={{ animationDelay: "150ms" }}
-                            ></div>
-                            <div
-                              className="w-2 h-2 bg-white/70 rounded-full animate-pulse"
-                              style={{ animationDelay: "300ms" }}
-                            ></div>
+                      </div>
+                    ) : (
+                      <div className="border border-green-400/40 rounded-xl py-6 px-6 flex items-center justify-between bg-green-500/10 backdrop-blur-sm transition-all duration-300">
+                        <div className="flex items-center text-green-200">
+                          <div className="w-10 h-10 rounded-full border border-green-400/60 bg-green-500/20 flex items-center justify-center mr-4">
+                            <i className="fas fa-check w-5 h-5"></i>
                           </div>
-                        </div>
-                      )}
-
-                      {SearchTerm &&
-                        !IsLoading &&
-                        SearchResults.length === 0 && (
-                          <div className="absolute mt-1 w-full bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl p-6 text-center">
-                            <p className="text-white/70">
-                              Nie znaleziono utworów
+                          <div>
+                            <h3 className={`text-base font-medium ${_SpaceGrotesk.className}`}>
+                              Zabezpieczenie ukończone
+                            </h3>
+                            <p className="text-xs text-green-100/80">
+                              Możesz teraz wysłać propozycję piosenki.
                             </p>
                           </div>
-                        )}
-                    </div>
-                  </div>
-
-                  <div className="border border-white/10 rounded-xl py-8 px-6 flex flex-col items-center justify-center bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group relative overflow-hidden">
-                    <div className="absolute -right-24 -bottom-24 w-48 h-48 rounded-full bg-white/5 blur-[60px]"></div>
-                    <div className="absolute -left-24 -top-24 w-48 h-48 rounded-full bg-white/10 blur-[80px]"></div>
-
-                    <div className="w-full flex flex-col items-center py-3 relative z-10">
-                      <span className="text-sm text-white/80 mb-3 flex items-center font-medium">
-                        <i className="fas fa-shield-alt w-4 h-4 mr-2 text-white/60"></i>
-                        Weryfikacja CAPTCHA
-                      </span>
-                      <div className="w-full flex justify-center">
-                        <Turnstile
-                          siteKey={
-                            process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""
-                          }
-                          onSuccess={HandleTurnstileVerify}
-                          onError={() => {
-                            setIsTurnstileVerified(false);
-                            ShowNotification(
-                              "Wystąpił błąd podczas ładowania CAPTCHA",
-                              "error",
-                            );
-                          }}
-                          onExpire={() => {
+                        </div>
+                        <button
+                          className="text-xs font-medium text-green-100/70 hover:text-white transition-colors duration-200"
+                          type="button"
+                          onClick={() => {
                             setIsTurnstileVerified(false);
                             setTurnstileToken(null);
                           }}
-                          options={{
-                            theme: "dark",
-                            size: "normal",
-                          }}
-                          className="mx-auto"
-                        />
+                        >
+                          Zmień weryfikację
+                        </button>
                       </div>
-                      <span
-                        className={`text-xs text-white/60 mt-2 ${_JetBrainsMono.className} tracking-wider`}
-                      >
-                        {IsTurnstileVerified ? (
-                          <span className="text-green-400 flex items-center">
-                            <i className="fas fa-check w-3 h-3 mr-1"></i>
-                            Zweryfikowano
-                          </span>
-                        ) : (
-                          "Cloudflare Protected"
-                        )}
-                      </span>
+                    )}
+                  </div>
+                  <div className="mt-auto pt-8">
+                    <div className="text-center">
+                      <p className="text-sm text-white/40 italic">
+                        *Nie akceptujemy propozycji z wulgaryzmami w języku polskim
+                      </p>
                     </div>
-                  </div>
 
-                  <div className="text-center -mt-4">
-                    <p className="text-sm text-white/40 italic">
-                      *Nie akceptujemy propozycji z wulgaryzmami w języku
-                      polskim
-                    </p>
+                    <button
+                      className={`w-full mt-6 py-4 bg-white text-black rounded-xl transition-all duration-500 font-medium group relative overflow-hidden ${!SelectedTrack || IsSubmitting || !IsTurnstileVerified ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02]"}`}
+                      type="button"
+                      onClick={HandleSubmit}
+                      disabled={
+                        !SelectedTrack || IsSubmitting || !IsTurnstileVerified
+                      }
+                    >
+                      <span className="relative z-10 group-hover:tracking-[0.15em] transition-all duration-500">
+                        {IsSubmitting ? "WYSYŁANIE..." : "WYŚLIJ"}
+                      </span>
+                      <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-black group-hover:w-full transition-all duration-700"></div>
+                    </button>
                   </div>
-
-                  <button
-                    className={`w-full -mt-6 py-4 bg-white text-black rounded-xl transition-all duration-500 font-medium group relative overflow-hidden ${!SelectedTrack || IsSubmitting || !IsTurnstileVerified ? "opacity-70 cursor-not-allowed" : "hover:scale-[1.02]"}`}
-                    type="button"
-                    onClick={HandleSubmit}
-                    disabled={
-                      !SelectedTrack || IsSubmitting || !IsTurnstileVerified
-                    }
-                  >
-                    <span className="relative z-10 group-hover:tracking-[0.15em] transition-all duration-500">
-                      {IsSubmitting ? "WYSYŁANIE..." : "WYŚLIJ"}
-                    </span>
-                    <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-black group-hover:w-full transition-all duration-700"></div>
-                  </button>
                 </div>
               )}
             </section>
 
             <section
-              className={`lg:w-1/2 w-full ${ActiveTab === "recent" ? "block" : "hidden md:block"}`}
+              className={`lg:w-1/2 w-full ${ActiveTab === "recent" ? "flex" : "hidden md:flex"} flex-col`}
             >
-              <div className="mb-8 hidden md:flex">
-                <h2
-                  className={`uppercase text-lg font-medium ${_SpaceGrotesk.className} tracking-wide border-b-2 border-white pb-3 text-white`}
-                >
-                  Głosowanie
-                </h2>
-              </div>
-
-              <div className="space-y-4 mb-6">
-                {IsLoadingProposals ? (
-                  <div className="flex justify-center items-center py-10">
-                    <div className="flex space-x-2 items-center">
-                      <div
-                        className="w-2 h-2 bg-white/70 rounded-full animate-pulse"
-                        style={{ animationDelay: "0ms" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-white/70 rounded-full animate-pulse"
-                        style={{ animationDelay: "150ms" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-white/70 rounded-full animate-pulse"
-                        style={{ animationDelay: "300ms" }}
-                      ></div>
-                    </div>
-                  </div>
-                ) : RecentProposals.length === 0 ? (
-                  <div className="text-center py-10 border border-white/10 rounded-xl bg-white/5 backdrop-blur-sm">
-                    <p className="text-white/70">
-                      Brak zatwierdzonych piosenek
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
-                    {RecentProposals.map((Proposal) => (
-                      <div
-                        key={Proposal.Id}
-                        className="flex border border-white/10 rounded-xl bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group relative overflow-hidden"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                        <div className="flex flex-col items-center justify-center py-2 px-2 border-r border-white/10 relative z-10">
-                          <button
-                            className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                              Proposal.UserVote === "up"
-                                ? "text-green-400 bg-green-400/10"
-                                : "text-white/50 hover:text-white/80 hover:bg-white/10"
-                            } transition-colors duration-300`}
-                            title="Głosuj za"
-                            onClick={() => HandleVote(Proposal.Id, true)}
-                            disabled={IsSubmitting}
-                          >
-                            <i className="fas fa-chevron-up w-5 h-5"></i>
-                          </button>
-                          <span className="text-sm font-medium my-1 text-white/70">
-                            {(Proposal.Upvotes || 0) -
-                              (Proposal.Downvotes || 0)}
-                          </span>
-                          <button
-                            className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                              Proposal.UserVote === "down"
-                                ? "text-red-400 bg-red-400/10"
-                                : "text-white/50 hover:text-white/80 hover:bg-white/10"
-                            } transition-colors duration-300`}
-                            title="Głosuj przeciw"
-                            onClick={() => HandleVote(Proposal.Id, false)}
-                            disabled={IsSubmitting}
-                          >
-                            <i className="fas fa-chevron-down w-5 h-5"></i>
-                          </button>
-                        </div>
-
-                        <div className="flex-grow p-4 pl-4 relative z-10 flex items-center">
-                          <div className="h-16 w-16 rounded-lg overflow-hidden mr-4 shrink-0 group-hover:scale-105 transition-all duration-500 border border-white/10">
-                            {Proposal.AlbumArt ? (
-                              <Image
-                                src={Proposal.AlbumArt}
-                                alt={Proposal.Album}
-                                width={64}
-                                height={64}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-white/10 flex items-center justify-center">
-                                <i className="fas fa-music w-8 h-8 text-white/60"></i>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="min-w-0 flex-1 flex flex-col justify-center">
-                            <h3
-                              className={`font-medium text-white line-clamp-1 ${_SpaceGrotesk.className}`}
-                            >
-                              {Proposal.Title}
-                            </h3>
-                            <p className="text-sm text-white/70">
-                              {Proposal.Artist}
-                            </p>
-                            <div className="flex items-center justify-between mt-1">
-                              <span
-                                className={`text-xs text-white/60 ${_JetBrainsMono.className} tracking-wider`}
-                              >
-                                {new Date(
-                                  Proposal.CreatedAt,
-                                ).toLocaleDateString("pl-PL", {
-                                  day: "numeric",
-                                  month: "short",
-                                })}
-                              </span>
-                              <span
-                                className={`text-xs text-white/60 ${_JetBrainsMono.className} tracking-wider`}
-                              >
-                                {Proposal.Fingerprint &&
-                                  Proposal.Fingerprint.substring(0, 8)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Pending Songs Accordion */}
-              <div className="border border-white/10 rounded-xl overflow-hidden mb-16">
-                <button
-                  onClick={TogglePendingSection}
-                  className="w-full px-6 py-4 bg-white/5 backdrop-blur-sm flex justify-between items-center hover:bg-white/10 transition-all duration-300"
-                >
-                  <div className="flex items-center">
-                    <span
-                      className={`text-lg font-medium ${_SpaceGrotesk.className} tracking-wide text-white mr-2`}
+              {IsPendingView ? (
+                <div className="flex flex-col flex-1 min-h-0">
+                  <div className="flex items-center justify-between mb-6">
+                    <button
+                      onClick={ClosePendingView}
+                      className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors text-sm font-medium"
                     >
-                      Piosenki oczekujące
-                    </span>
+                      <i className="fas fa-arrow-left w-4 h-4"></i>
+                      Wróć do głosowania
+                    </button>
                     {PendingProposals.length > 0 && (
-                      <span className="bg-white/10 text-white/80 text-xs px-2 py-1 rounded-full">
-                        {PendingProposals.length}
+                      <span className="bg-white/10 text-white/80 text-xs px-3 py-1 rounded-full">
+                        {PendingProposals.length} w kolejce
                       </span>
                     )}
                   </div>
-                  <i
-                    className={`fas fa-chevron-down w-5 h-5 text-white/70 transition-transform duration-300 ${IsPendingExpanded ? "rotate-180" : ""}`}
-                  ></i>
-                </button>
 
-                {IsPendingExpanded && (
-                  <div className="p-4 border-t border-white/10">
+                  <div className="flex-1 min-h-0">
                     {IsLoadingPendingProposals ? (
-                      <div className="flex justify-center items-center py-6">
+                      <div className="flex justify-center items-center py-10">
                         <div className="flex space-x-2 items-center">
                           <div
                             className="w-2 h-2 bg-white/70 rounded-full animate-pulse"
@@ -840,13 +743,13 @@ const Vote = () => {
                         </div>
                       </div>
                     ) : PendingProposals.length === 0 ? (
-                      <div className="text-center py-6">
-                        <p className="text-white/60">
+                      <div className="text-center py-10 border border-white/10 rounded-xl bg-white/5 backdrop-blur-sm">
+                        <p className="text-white/70">
                           Brak oczekujących propozycji
                         </p>
                       </div>
                     ) : (
-                      <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                      <div className="space-y-4 overflow-y-auto custom-scrollbar pr-2">
                         {PendingProposals.map((Proposal) => (
                           <div
                             key={Proposal.Id}
@@ -889,14 +792,165 @@ const Vote = () => {
                       </div>
                     )}
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-8 hidden md:flex">
+                    <h2
+                      className={`uppercase text-lg font-medium ${_SpaceGrotesk.className} tracking-wide border-b-2 border-white pb-3 text-white`}
+                    >
+                      Głosowanie
+                    </h2>
+                  </div>
+
+                  <div className="flex flex-col flex-1 min-h-0">
+                    <div className="flex-1 min-h-0">
+                      {IsLoadingProposals ? (
+                        <div className="flex justify-center items-center py-10">
+                          <div className="flex space-x-2 items-center">
+                            <div
+                              className="w-2 h-2 bg-white/70 rounded-full animate-pulse"
+                              style={{ animationDelay: "0ms" }}
+                            ></div>
+                            <div
+                              className="w-2 h-2 bg-white/70 rounded-full animate-pulse"
+                              style={{ animationDelay: "150ms" }}
+                            ></div>
+                            <div
+                              className="w-2 h-2 bg-white/70 rounded-full animate-pulse"
+                              style={{ animationDelay: "300ms" }}
+                            ></div>
+                          </div>
+                        </div>
+                      ) : RecentProposals.length === 0 ? (
+                        <div className="text-center py-10 border border-white/10 rounded-xl bg-white/5 backdrop-blur-sm">
+                          <p className="text-white/70">
+                            Brak zatwierdzonych piosenek
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4 overflow-y-auto custom-scrollbar pr-2">
+                          {RecentProposals.map((Proposal) => (
+                            <div
+                              key={Proposal.Id}
+                              className="flex border border-white/10 rounded-xl bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group relative overflow-hidden"
+                            >
+                              <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                              <div className="flex flex-col items-center justify-center py-2 px-2 border-r border-white/10 relative z-10">
+                                <button
+                                  className={`w-8 h-8 flex items-center justify-center rounded-full ${
+                                    Proposal.UserVote === "up"
+                                      ? "text-green-400 bg-green-400/10"
+                                      : "text-white/50 hover:text-white/80 hover:bg-white/10"
+                                  } transition-colors duration-300`}
+                                  title="Głosuj za"
+                                  onClick={() => HandleVote(Proposal.Id, true)}
+                                  disabled={IsSubmitting}
+                                >
+                                  <i className="fas fa-chevron-up w-5 h-5"></i>
+                                </button>
+                                <span className="text-sm font-medium my-1 text-white/70">
+                                  {(Proposal.Upvotes || 0) -
+                                    (Proposal.Downvotes || 0)}
+                                </span>
+                                <button
+                                  className={`w-8 h-8 flex items-center justify-center rounded-full ${
+                                    Proposal.UserVote === "down"
+                                      ? "text-red-400 bg-red-400/10"
+                                      : "text-white/50 hover:text-white/80 hover:bg-white/10"
+                                  } transition-colors duration-300`}
+                                  title="Głosuj przeciw"
+                                  onClick={() => HandleVote(Proposal.Id, false)}
+                                  disabled={IsSubmitting}
+                                >
+                                  <i className="fas fa-chevron-down w-5 h-5"></i>
+                                </button>
+                              </div>
+
+                              <div className="flex-grow p-4 pl-4 relative z-10 flex items-center">
+                                <div className="h-16 w-16 rounded-lg overflow-hidden mr-4 shrink-0 group-hover:scale-105 transition-all duration-500 border border-white/10">
+                                  {Proposal.AlbumArt ? (
+                                    <Image
+                                      src={Proposal.AlbumArt}
+                                      alt={Proposal.Album}
+                                      width={64}
+                                      height={64}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full bg-white/10 flex items-center justify-center">
+                                      <i className="fas fa-music w-8 h-8 text-white/60"></i>
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="min-w-0 flex-1 flex flex-col justify-center">
+                                  <h3
+                                    className={`font-medium text-white line-clamp-1 ${_SpaceGrotesk.className}`}
+                                  >
+                                    {Proposal.Title}
+                                  </h3>
+                                  <p className="text-sm text-white/70">
+                                    {Proposal.Artist}
+                                  </p>
+                                  <div className="flex items-center justify-between mt-1">
+                                    <span
+                                      className={`text-xs text-white/60 ${_JetBrainsMono.className} tracking-wider`}
+                                    >
+                                      {new Date(
+                                        Proposal.CreatedAt,
+                                      ).toLocaleDateString("pl-PL", {
+                                        day: "numeric",
+                                        month: "short",
+                                      })}
+                                    </span>
+                                    <span
+                                      className={`text-xs text-white/60 ${_JetBrainsMono.className} tracking-wider`}
+                                    >
+                                      {Proposal.Fingerprint &&
+                                        Proposal.Fingerprint.substring(0, 8)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-auto pt-6">
+                      <button
+                        onClick={OpenPendingView}
+                        className="w-full px-6 py-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl flex items-center justify-between text-white hover:bg-white/10 transition-all duration-300"
+                      >
+                        <span
+                          className={`text-base font-medium ${_SpaceGrotesk.className}`}
+                        >
+                          Piosenki oczekujące
+                        </span>
+                        <span className="inline-flex items-center gap-2 text-sm">
+                          {PendingProposals.length > 0 && (
+                            <span className="bg-white/10 text-white/80 text-xs px-2 py-1 rounded-full">
+                              {PendingProposals.length}
+                            </span>
+                          )}
+                          <i className="fas fa-chevron-right w-4 h-4 text-white/70"></i>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </section>
           </div>
         </div>
       </div>
 
-      <Footer link={{ href: "/vote/gdpr", text: "GDPR", subtext: "/gdpr" }} />
+      <Footer
+        link={{ href: "/vote/gdpr", text: "GDPR", subtext: "/gdpr" }}
+      />
     </main>
   );
 };
