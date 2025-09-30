@@ -6,7 +6,10 @@ const Footer = ({
   link: { href: string; text: string; subtext: string };
 }) => {
   return (
-    <footer className="fixed bottom-0 left-0 w-full bg-gradient-to-t from-black via-black/90 to-transparent pt-20 pb-6 px-6 md:px-12 z-20">
+    <footer
+      id="site-footer"
+      className="fixed bottom-0 left-0 w-full bg-gradient-to-t from-black via-black/90 to-transparent pt-20 pb-6 px-6 md:px-12 z-20"
+    >
       <div className="max-w-6xl mx-auto flex justify-between items-center">
         <div className="flex gap-8">
           <Link

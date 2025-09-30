@@ -39,8 +39,14 @@ const Vote = () => {
   const [TurnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [IsTurnstileVerified, setIsTurnstileVerified] = useState(false);
   const [IsTurnstileLoading, setIsTurnstileLoading] = useState(false);
+  const [FooterMetrics, setFooterMetrics] = useState({
+    height: 0,
+    paddingTop: 0,
+  });
+  const [IsMobile, setIsMobile] = useState(false);
   const IsSubmitTabActive = ActiveTab === "submit" || !ActiveTab;
-  const MobileContentOffset = ActiveTab === "submit" ? "mt-[120px]" : "mt-[72px]";
+  const MobileContentOffset =
+    ActiveTab === "submit" ? "mt-[145px]" : "mt-[90px]";
 
   const ShowNotification = (Message: string, Type: "success" | "error") => {
     setNotification({ message: Message, type: Type });
@@ -269,6 +275,29 @@ const Vote = () => {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const measure = () => {
+      const el = document.getElementById("site-footer");
+      if (!el) return;
+      const height = el.offsetHeight || 0;
+      const computed = window.getComputedStyle(el);
+      const paddingTop = parseFloat(computed.paddingTop || "0");
+      setFooterMetrics({ height, paddingTop });
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const updateIsMobile = () => setIsMobile(window.innerWidth < 768);
+    updateIsMobile();
+    window.addEventListener("resize", updateIsMobile);
+    return () => window.removeEventListener("resize", updateIsMobile);
+  }, []);
+
+  useEffect(() => {
     FetchRecentProposals();
   }, [FetchRecentProposals]);
 
@@ -277,6 +306,16 @@ const Vote = () => {
       FetchPendingProposals();
     }
   }, [IsPendingView, FetchPendingProposals]);
+
+  const BaseStickyOffset = Math.max(
+    16,
+    FooterMetrics.height - FooterMetrics.paddingTop - 8,
+  );
+  const StickyBottomOffset = IsMobile
+    ? Math.max(BaseStickyOffset, FooterMetrics.height + 16)
+    : BaseStickyOffset;
+  const ScrollPaddingOffset =
+    StickyBottomOffset + (IsMobile ? 96 : 48);
 
   const FormatDuration = (Ms: number) => {
     const Minutes = Math.floor(Ms / 60000);
@@ -350,7 +389,7 @@ const Vote = () => {
   };
 
   return (
-    <main className="flex min-h-screen relative overflow-hidden bg-black text-white">
+    <main className="flex flex-col min-h-screen relative overflow-hidden bg-black text-white">
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 8px;
@@ -410,9 +449,10 @@ const Vote = () => {
       <Navbar activeTab={ActiveTab} onChangeTab={setActiveTab} />
 
       <div
-        className={`w-full mx-auto px-6 md:px-12 py-12 md:py-28 z-10 ${MobileContentOffset} md:mt-20`}
+        className={`w-full mx-auto px-6 md:px-12 pt-2 pb-12 md:py-28 z-10 ${MobileContentOffset} md:mt-20 flex-1`}
+        style={{ paddingBottom: FooterMetrics.height ? FooterMetrics.height + 8 : undefined }}
       >
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto min-h-full flex flex-col">
           <h1
             className={`hidden md:block text-5xl md:text-7xl font-bold mb-6 ${_SpaceGrotesk.className} tracking-tight`}
           >
@@ -422,7 +462,7 @@ const Vote = () => {
             Pomóż nam tworzyć wyjątkową atmosferę w szkole. Piosenki z największą ilością głosów trafiają do playlisty.
           </p>
 
-          <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 flex-1 min-h-0">
             <section className="lg:w-1/2 w-full flex flex-col">
               <div className="mb-8 hidden md:flex space-x-4">
                 <button
@@ -603,7 +643,7 @@ const Vote = () => {
                       </div>
                     </div>
 
-                    {!IsTurnstileVerified ? (
+                    {!IsTurnstileVerified && (
                       <div className="border border-white/10 rounded-xl py-8 px-6 flex flex-col items-center justify-center bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group relative overflow-hidden">
                         <div className="absolute -right-24 -bottom-24 w-48 h-48 rounded-full bg-white/5 blur-[60px]"></div>
                         <div className="absolute -left-24 -top-24 w-48 h-48 rounded-full bg-white/10 blur-[80px]"></div>
@@ -650,32 +690,6 @@ const Vote = () => {
                             )}
                           </span>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="border border-green-400/40 rounded-xl py-6 px-6 flex items-center justify-between bg-green-500/10 backdrop-blur-sm transition-all duration-300">
-                        <div className="flex items-center text-green-200">
-                          <div className="w-10 h-10 rounded-full border border-green-400/60 bg-green-500/20 flex items-center justify-center mr-4">
-                            <i className="fas fa-check w-5 h-5"></i>
-                          </div>
-                          <div>
-                            <h3 className={`text-base font-medium ${_SpaceGrotesk.className}`}>
-                              Zabezpieczenie ukończone
-                            </h3>
-                            <p className="text-xs text-green-100/80">
-                              Możesz teraz wysłać propozycję piosenki.
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          className="text-xs font-medium text-green-100/70 hover:text-white transition-colors duration-200"
-                          type="button"
-                          onClick={() => {
-                            setIsTurnstileVerified(false);
-                            setTurnstileToken(null);
-                          }}
-                        >
-                          Zmień weryfikację
-                        </button>
                       </div>
                     )}
                   </div>
@@ -749,7 +763,10 @@ const Vote = () => {
                         </p>
                       </div>
                     ) : (
-                      <div className="space-y-4 overflow-y-auto custom-scrollbar pr-2">
+                      <div
+                        className="space-y-4 overflow-y-auto custom-scrollbar pr-2 h-full"
+                        style={{ paddingBottom: ScrollPaddingOffset }}
+                      >
                         {PendingProposals.map((Proposal) => (
                           <div
                             key={Proposal.Id}
@@ -829,7 +846,10 @@ const Vote = () => {
                           </p>
                         </div>
                       ) : (
-                        <div className="space-y-4 overflow-y-auto custom-scrollbar pr-2">
+                        <div
+                          className="space-y-4 overflow-y-auto custom-scrollbar pr-2 h-full"
+                          style={{ paddingBottom: ScrollPaddingOffset }}
+                        >
                           {RecentProposals.map((Proposal) => (
                             <div
                               key={Proposal.Id}
@@ -920,7 +940,10 @@ const Vote = () => {
                       )}
                     </div>
 
-                    <div className="mt-auto pt-6">
+                    <div
+                      className={`${IsMobile ? "fixed left-0 right-0 z-20 px-6" : "sticky z-10"}`}
+                      style={{ bottom: StickyBottomOffset, ...(IsMobile ? { position: "fixed" } : {}) }}
+                    >
                       <button
                         onClick={OpenPendingView}
                         className="w-full px-6 py-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl flex items-center justify-between text-white hover:bg-white/10 transition-all duration-300"
