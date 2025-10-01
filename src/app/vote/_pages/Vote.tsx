@@ -764,7 +764,7 @@ const Vote = () => {
                       </div>
                     ) : (
                       <div
-                        className="space-y-4 overflow-y-auto custom-scrollbar pr-2 h-full"
+                        className="space-y-4 overflow-y-auto custom-scrollbar pr-2 h-full md:h-screen"
                         style={{ paddingBottom: ScrollPaddingOffset }}
                       >
                         {PendingProposals.map((Proposal) => (
@@ -847,7 +847,7 @@ const Vote = () => {
                         </div>
                       ) : (
                         <div
-                          className="space-y-4 overflow-y-auto custom-scrollbar pr-2 h-full"
+                          className="space-y-4 overflow-y-auto custom-scrollbar pr-2 h-full md:h-screen"
                           style={{ paddingBottom: ScrollPaddingOffset }}
                         >
                           {RecentProposals.map((Proposal) => (
