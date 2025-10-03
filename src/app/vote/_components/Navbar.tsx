@@ -59,7 +59,10 @@ const Navbar = ({ logoHref, activeTab, onChangeTab }: NavbarProps) => {
           <p className="text-center text-sm text-white/85 leading-tight">
             hej! pomoz nam tworzyc wyjatkowa atmosfere w szkole -
             <span className="ml-2 inline-flex items-center gap-1">
-              <a href="" className="underline underline-offset-2 decoration-white/70 hover:text-white -ml-1">
+              <a
+                href=""
+                className="underline underline-offset-2 decoration-white/70 hover:text-white -ml-1"
+              >
                 udostepnij projekt
               </a>
               <span className="text-white/80">&lt;3</span>
@@ -70,7 +73,10 @@ const Navbar = ({ logoHref, activeTab, onChangeTab }: NavbarProps) => {
           <div className="max-w-6xl mx-auto flex justify-between items-center">
             <div className="flex items-center gap-4">
               {logoHref ? (
-                <Link href={logoHref} className="relative w-10 h-10 md:w-12 md:h-12">
+                <Link
+                  href={logoHref}
+                  className="relative w-10 h-10 md:w-12 md:h-12"
+                >
                   <Logo />
                 </Link>
               ) : (
@@ -88,7 +94,10 @@ const Navbar = ({ logoHref, activeTab, onChangeTab }: NavbarProps) => {
             <div className="flex items-center gap-2 md:gap-4 flex-wrap md:flex-nowrap justify-end">
               {onChangeTab && (
                 <div className="flex md:hidden items-center mr-2">
-                  <nav aria-label="Przełączanie zakładek" className="flex items-center gap-3">
+                  <nav
+                    aria-label="Przełączanie zakładek"
+                    className="flex items-center gap-3"
+                  >
                     <button
                       onClick={() => onChangeTab("submit")}
                       type="button"

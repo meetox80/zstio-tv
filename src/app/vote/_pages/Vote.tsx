@@ -217,44 +217,10 @@ const Vote = () => {
   }, [ClientFingerprint]);
 
   const HandleTurnstileVerify = async (Token: string) => {
+    // Store token and mark as verified locally; server will verify on action
     setTurnstileToken(Token);
-    setIsTurnstileLoading(true);
-
-    const IsDevelopment = process.env.NODE_ENV === "development";
-    if (IsDevelopment) {
-      setIsTurnstileVerified(true);
-      setIsTurnstileLoading(false);
-      return;
-    }
-
-    try {
-      const Response = await fetch("/api/verify-turnstile", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ Token }),
-      });
-
-      const Result = await Response.json();
-
-      if (Result.Success) {
-        setIsTurnstileVerified(true);
-        ShowNotification("Weryfikacja CAPTCHA zakończona pomyślnie", "success");
-      } else {
-        setIsTurnstileVerified(false);
-        ShowNotification(
-          "Weryfikacja CAPTCHA nie powiodła się. Spróbuj ponownie.",
-          "error",
-        );
-      }
-    } catch (Error) {
-      console.error("Error verifying Turnstile token:", Error);
-      setIsTurnstileVerified(false);
-      ShowNotification("Wystąpił błąd podczas weryfikacji CAPTCHA", "error");
-    } finally {
-      setIsTurnstileLoading(false);
-    }
+    setIsTurnstileVerified(true);
+    setIsTurnstileLoading(false);
   };
 
   useEffect(() => {
@@ -314,8 +280,7 @@ const Vote = () => {
   const StickyBottomOffset = IsMobile
     ? Math.max(BaseStickyOffset, FooterMetrics.height + 16)
     : BaseStickyOffset;
-  const ScrollPaddingOffset =
-    StickyBottomOffset + (IsMobile ? 96 : 48);
+  const ScrollPaddingOffset = StickyBottomOffset + (IsMobile ? 96 : 48);
 
   const FormatDuration = (Ms: number) => {
     const Minutes = Math.floor(Ms / 60000);
@@ -327,6 +292,14 @@ const Vote = () => {
     try {
       setIsSubmitting(true);
 
+      if (!TurnstileToken || !IsTurnstileVerified) {
+        ShowNotification(
+          "Proszę zweryfikować CAPTCHA przed głosowaniem",
+          "error",
+        );
+        return;
+      }
+
       const Response = await fetch("/api/songs/vote", {
         method: "POST",
         headers: {
@@ -336,6 +309,7 @@ const Vote = () => {
           ProposalId: proposalId,
           Vote: vote,
           ClientId: ClientFingerprint,
+          Token: TurnstileToken,
         }),
       });
 
@@ -353,8 +327,17 @@ const Vote = () => {
         } else {
           ShowNotification("Głos został zapisany!", "success");
         }
+
+        // Invalidate used CAPTCHA token to prevent reuse; user will reverify if needed
+        setTurnstileToken(null);
+        setIsTurnstileVerified(false);
       } else {
-        if (Response.status === 429) {
+        if (Data && Data.captchaFailed) {
+          ShowNotification(
+            "Weryfikacja CAPTCHA jest wymagana do głosowania",
+            "error",
+          );
+        } else if (Response.status === 429) {
           ShowNotification(
             `Limit czasu: ${Data.error || "Spróbuj zagłosować za chwilę"}`,
             "error",
@@ -450,7 +433,11 @@ const Vote = () => {
 
       <div
         className={`w-full mx-auto px-6 md:px-12 pt-2 pb-12 md:py-28 z-10 ${MobileContentOffset} md:mt-20 flex-1`}
-        style={{ paddingBottom: FooterMetrics.height ? FooterMetrics.height + 8 : undefined }}
+        style={{
+          paddingBottom: FooterMetrics.height
+            ? FooterMetrics.height + 8
+            : undefined,
+        }}
       >
         <div className="max-w-6xl mx-auto min-h-full flex flex-col">
           <h1
@@ -459,7 +446,8 @@ const Vote = () => {
             Zaproponuj piosenke
           </h1>
           <p className="hidden md:block text-lg text-white/70 max-w-xl mb-16">
-            Pomóż nam tworzyć wyjątkową atmosferę w szkole. Piosenki z największą ilością głosów trafiają do playlisty.
+            Pomóż nam tworzyć wyjątkową atmosferę w szkole. Piosenki z
+            największą ilością głosów trafiają do playlisty.
           </p>
 
           <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 flex-1 min-h-0">
@@ -644,7 +632,10 @@ const Vote = () => {
                     </div>
 
                     {!IsTurnstileVerified && (
-                      <div className="border border-white/10 rounded-xl py-8 px-6 flex flex-col items-center justify-center bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group relative overflow-hidden">
+                      <div
+                        id="turnstile-verify"
+                        className="border border-white/10 rounded-xl py-8 px-6 flex flex-col items-center justify-center bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 group relative overflow-hidden"
+                      >
                         <div className="absolute -right-24 -bottom-24 w-48 h-48 rounded-full bg-white/5 blur-[60px]"></div>
                         <div className="absolute -left-24 -top-24 w-48 h-48 rounded-full bg-white/10 blur-[80px]"></div>
 
@@ -693,10 +684,11 @@ const Vote = () => {
                       </div>
                     )}
                   </div>
-                  <div className="mt-auto pt-8">
+                  <div className="pt-6">
                     <div className="text-center">
                       <p className="text-sm text-white/40 italic">
-                        *Nie akceptujemy propozycji z wulgaryzmami w języku polskim
+                        *Nie akceptujemy propozycji z wulgaryzmami w języku
+                        polskim
                       </p>
                     </div>
 
@@ -763,10 +755,7 @@ const Vote = () => {
                         </p>
                       </div>
                     ) : (
-                      <div
-                        className="space-y-4 overflow-y-auto custom-scrollbar pr-2 h-full md:h-screen"
-                        style={{ paddingBottom: ScrollPaddingOffset }}
-                      >
+                      <div className="space-y-4 overflow-y-auto custom-scrollbar pr-2 max-h-[70vh]">
                         {PendingProposals.map((Proposal) => (
                           <div
                             key={Proposal.Id}
@@ -820,7 +809,55 @@ const Vote = () => {
                     </h2>
                   </div>
 
+                  <div className="mb-4">
+                    <button
+                      onClick={OpenPendingView}
+                      className="w-full px-3 md:px-6 py-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl flex items-center justify-between text-white hover:bg-white/10 transition-all duration-300"
+                    >
+                      <span
+                        className={`text-base font-medium ${_SpaceGrotesk.className}`}
+                      >
+                        Piosenki oczekujące
+                      </span>
+                      <span className="inline-flex items-center gap-2 text-sm">
+                        {PendingProposals.length > 0 && (
+                          <span className="bg-white/10 text-white/80 text-xs px-2 py-1 rounded-full">
+                            {PendingProposals.length}
+                          </span>
+                        )}
+                        <i className="fas fa-chevron-right w-4 h-4 text-white/70"></i>
+                      </span>
+                    </button>
+                  </div>
+
                   <div className="flex flex-col flex-1 min-h-0">
+                    {/* Require CAPTCHA for voting too */}
+                    {!IsTurnstileVerified && (
+                      <div className="mb-3 flex items-center gap-2 text-xs text-white/70">
+                        <i className="fas fa-shield-alt w-3 h-3 text-white/60"></i>
+                        <span>
+                          Aby zaglosowac, zweryfikuj swoje urzadzenie w sekcji
+                          "wyslij piosenke"
+                        </span>
+                        <button
+                          className="ml-auto px-4 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white/90 hover:text-white transition-colors"
+                          type="button"
+                          onClick={() => {
+                            setActiveTab("submit");
+                            setTimeout(() => {
+                              const el =
+                                document.getElementById("turnstile-verify");
+                              el?.scrollIntoView({
+                                behavior: "smooth",
+                                block: "center",
+                              });
+                            }, 0);
+                          }}
+                        >
+                          przejdź
+                        </button>
+                      </div>
+                    )}
                     <div className="flex-1 min-h-0">
                       {IsLoadingProposals ? (
                         <div className="flex justify-center items-center py-10">
@@ -846,10 +883,7 @@ const Vote = () => {
                           </p>
                         </div>
                       ) : (
-                        <div
-                          className="space-y-4 overflow-y-auto custom-scrollbar pr-2 h-full md:h-screen"
-                          style={{ paddingBottom: ScrollPaddingOffset }}
-                        >
+                        <div className="space-y-4 overflow-y-auto custom-scrollbar pr-2 max-h-[70vh]">
                           {RecentProposals.map((Proposal) => (
                             <div
                               key={Proposal.Id}
@@ -866,7 +900,9 @@ const Vote = () => {
                                   } transition-colors duration-300`}
                                   title="Głosuj za"
                                   onClick={() => HandleVote(Proposal.Id, true)}
-                                  disabled={IsSubmitting}
+                                  disabled={
+                                    IsSubmitting || !IsTurnstileVerified
+                                  }
                                 >
                                   <i className="fas fa-chevron-up w-5 h-5"></i>
                                 </button>
@@ -882,7 +918,9 @@ const Vote = () => {
                                   } transition-colors duration-300`}
                                   title="Głosuj przeciw"
                                   onClick={() => HandleVote(Proposal.Id, false)}
-                                  disabled={IsSubmitting}
+                                  disabled={
+                                    IsSubmitting || !IsTurnstileVerified
+                                  }
                                 >
                                   <i className="fas fa-chevron-down w-5 h-5"></i>
                                 </button>
@@ -939,30 +977,6 @@ const Vote = () => {
                         </div>
                       )}
                     </div>
-
-                    <div
-                      className={`${IsMobile ? "fixed left-0 right-0 z-20 px-6" : "sticky z-10"}`}
-                      style={{ bottom: StickyBottomOffset, ...(IsMobile ? { position: "fixed" } : {}) }}
-                    >
-                      <button
-                        onClick={OpenPendingView}
-                        className="w-full px-6 py-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl flex items-center justify-between text-white hover:bg-white/10 transition-all duration-300"
-                      >
-                        <span
-                          className={`text-base font-medium ${_SpaceGrotesk.className}`}
-                        >
-                          Piosenki oczekujące
-                        </span>
-                        <span className="inline-flex items-center gap-2 text-sm">
-                          {PendingProposals.length > 0 && (
-                            <span className="bg-white/10 text-white/80 text-xs px-2 py-1 rounded-full">
-                              {PendingProposals.length}
-                            </span>
-                          )}
-                          <i className="fas fa-chevron-right w-4 h-4 text-white/70"></i>
-                        </span>
-                      </button>
-                    </div>
                   </div>
                 </>
               )}
@@ -971,9 +985,7 @@ const Vote = () => {
         </div>
       </div>
 
-      <Footer
-        link={{ href: "/vote/gdpr", text: "GDPR", subtext: "/gdpr" }}
-      />
+      <Footer link={{ href: "/vote/gdpr", text: "GDPR", subtext: "/gdpr" }} />
     </main>
   );
 };

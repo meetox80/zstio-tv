@@ -2,13 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@/lib/prisma";
 import { GenerateFingerprint } from "@/lib/client-fingerprint";
 
+const _TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY;
+const _TURNSTILE_VERIFY_URL =
+  "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+
 const _VoteRateLimitMap = new Map<string, number>();
 const _VOTE_RATE_LIMIT_WINDOW = 5 * 1000;
 
 export async function POST(Request: NextRequest) {
   try {
     const Body = await Request.json();
-    const { ProposalId, Vote, ClientId } = Body;
+    const { ProposalId, Vote, ClientId, Token } = Body;
 
     if (!ProposalId) {
       return NextResponse.json(
@@ -20,6 +24,61 @@ export async function POST(Request: NextRequest) {
     const ForwardedFor = Request.headers.get("x-forwarded-for") || "unknown";
     const IpAddress = ForwardedFor.split(",")[0].trim();
     const UserAgent = Request.headers.get("user-agent") || "unknown";
+
+    // Require and verify Turnstile token for voting
+    if (!Token) {
+      return NextResponse.json(
+        {
+          error: "CAPTCHA verification required",
+          captchaFailed: true,
+        },
+        { status: 400 },
+      );
+    }
+
+    if (!_TURNSTILE_SECRET_KEY) {
+      console.error("TURNSTILE_SECRET_KEY is not configured");
+      return NextResponse.json(
+        {
+          error: "Server configuration error",
+        },
+        { status: 500 },
+      );
+    }
+
+    try {
+      const FormData = new URLSearchParams();
+      FormData.append("secret", _TURNSTILE_SECRET_KEY);
+      FormData.append("response", Token);
+      if (IpAddress && IpAddress !== "unknown") {
+        FormData.append("remoteip", IpAddress);
+      }
+
+      const VerifyResponse = await fetch(_TURNSTILE_VERIFY_URL, {
+        method: "POST",
+        body: FormData,
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+      const VerifyResult = await VerifyResponse.json();
+      if (!VerifyResult.success) {
+        return NextResponse.json(
+          {
+            error: "Weryfikacja CAPTCHA nie powiodła się",
+            captchaFailed: true,
+          },
+          { status: 400 },
+        );
+      }
+    } catch (CaptchaError) {
+      console.error("Turnstile verification error:", CaptchaError);
+      return NextResponse.json(
+        {
+          error: "Błąd weryfikacji CAPTCHA",
+          captchaFailed: true,
+        },
+        { status: 400 },
+      );
+    }
 
     const Fingerprint = ClientId || GenerateFingerprint(IpAddress, UserAgent);
 
