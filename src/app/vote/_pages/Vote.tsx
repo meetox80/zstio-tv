@@ -217,7 +217,6 @@ const Vote = () => {
   }, [ClientFingerprint]);
 
   const HandleTurnstileVerify = async (Token: string) => {
-    // Store token and mark as verified locally; server will verify on action
     setTurnstileToken(Token);
     setIsTurnstileVerified(true);
     setIsTurnstileLoading(false);
@@ -328,9 +327,12 @@ const Vote = () => {
           ShowNotification("Głos został zapisany!", "success");
         }
 
-        // Invalidate used CAPTCHA token to prevent reuse; user will reverify if needed
         setTurnstileToken(null);
         setIsTurnstileVerified(false);
+
+        if (typeof window !== "undefined") {
+          window.location.reload();
+        }
       } else {
         if (Data && Data.captchaFailed) {
           ShowNotification(
@@ -831,7 +833,6 @@ const Vote = () => {
                   </div>
 
                   <div className="flex flex-col flex-1 min-h-0">
-                    {/* Require CAPTCHA for voting too */}
                     {!IsTurnstileVerified && (
                       <div className="mb-3 flex items-center gap-2 text-xs text-white/70">
                         <i className="fas fa-shield-alt w-3 h-3 text-white/60"></i>
