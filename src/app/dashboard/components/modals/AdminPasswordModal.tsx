@@ -17,7 +17,7 @@ const modalContentVariants = {
   visible: {
     scale: 1,
     opacity: 1,
-    transition: { duration: 0.25, ease: "easeOut" },
+    transition: { duration: 0.25, ease: "easeOut" as const },
   },
 };
 
