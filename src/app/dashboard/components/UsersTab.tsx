@@ -19,16 +19,16 @@ const accordionVariants = {
     opacity: 1,
     height: "auto",
     transition: {
-      height: { duration: 0.3, ease: "easeOut" },
-      opacity: { duration: 0.25, ease: "easeInOut" },
+      height: { duration: 0.3, ease: "easeOut" as const },
+      opacity: { duration: 0.25, ease: "easeInOut" as const },
     },
   },
   collapsed: {
     opacity: 0,
     height: 0,
     transition: {
-      height: { duration: 0.3, ease: "easeIn" },
-      opacity: { duration: 0.2, ease: "easeIn" },
+      height: { duration: 0.3, ease: "easeIn" as const },
+      opacity: { duration: 0.2, ease: "easeIn" as const },
     },
   },
 };
@@ -38,16 +38,16 @@ const permissionsSectionVariants = {
     opacity: 1,
     height: "auto",
     transition: {
-      height: { duration: 0.3, ease: "easeOut", delay: 0.05 },
-      opacity: { duration: 0.25, ease: "easeInOut", delay: 0.1 },
+      height: { duration: 0.3, ease: "easeOut" as const, delay: 0.05 },
+      opacity: { duration: 0.25, ease: "easeInOut" as const, delay: 0.1 },
     },
   },
   collapsed: {
     opacity: 0,
     height: 0,
     transition: {
-      height: { duration: 0.3, ease: "easeIn" },
-      opacity: { duration: 0.2, ease: "easeIn" },
+      height: { duration: 0.3, ease: "easeIn" as const },
+      opacity: { duration: 0.2, ease: "easeIn" as const },
     },
   },
 };
@@ -62,7 +62,7 @@ const modalContentVariants = {
   visible: {
     scale: 1,
     opacity: 1,
-    transition: { duration: 0.25, ease: "easeOut" },
+    transition: { duration: 0.25, ease: "easeOut" as const },
   },
 };
 
