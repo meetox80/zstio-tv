@@ -22,7 +22,7 @@ export default function BottomBar({
   );
   const _RetryCount = useRef(0);
   const _MaxRetries = 3;
-  const _RetryDelay = 5000;
+  const _RetryDelay = 15000;
   const _IsMounted = useRef(true);
 
   useEffect(() => {
